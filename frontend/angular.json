@@ -1,0 +1,158 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm"
+  },
+  "newProjectRoot": "modules",
+  "projects": {
+    "common": {
+      "projectType": "library",
+      "root": "modules/common",
+      "sourceRoot": "modules/common/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "modules/common/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "modules/common/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "modules/common/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "sender-registry": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "modules/sender-registry",
+      "sourceRoot": "modules/sender-registry/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "modules/sender-registry/src/main.ts",
+            "tsConfig": "modules/sender-registry/tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "modules/sender-registry/public"
+              }
+            ],
+            "styles": ["modules/sender-registry/src/styles.css"]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "sender-registry:build:production"
+            },
+            "development": {
+              "buildTarget": "sender-registry:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        }
+      }
+    },
+    "role-login": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "modules/role-login",
+      "sourceRoot": "modules/role-login/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "modules/role-login/src/main.ts",
+            "tsConfig": "modules/role-login/tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "modules/role-login/public"
+              }
+            ],
+            "styles": ["modules/role-login/src/styles.css"]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "role-login:build:production"
+            },
+            "development": {
+              "buildTarget": "role-login:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        }
+      }
+    }
+  }
+}
