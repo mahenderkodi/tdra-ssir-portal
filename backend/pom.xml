@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>ae.gov.tdra.ssir</groupId>
+        <artifactId>tdra-ssir-portal</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>tdra-ssir-backend</artifactId>
+    <packaging>pom</packaging>
+    <name>TDRA SSIR Portal - Backend Parent</name>
+
+    <!-- Child modules -->
+    <modules>
+        <module>ssir-core</module>
+        <module>ssir-api</module>
+    </modules>
+
+    <properties>
+        <spring-boot.version>3.2.4</spring-boot.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Boot Dependency Management Bill of Materials -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Internal Inter-module dependency -->
+            <dependency>
+                <groupId>ae.gov.tdra.ssir</groupId>
+                <artifactId>ssir-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
