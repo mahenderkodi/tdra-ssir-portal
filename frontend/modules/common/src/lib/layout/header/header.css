@@ -1,0 +1,89 @@
+.header {
+  width: 100%;
+  height: 60px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.nav {
+    height: 100%;
+    padding: 0 15px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn {
+  min-width: 80px;
+  min-height: 20px;
+  padding: 10px 15px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+
+  text-decoration: none;
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* Contact Us button */
+
+.btn-secondary {
+  background-color: #ffffff;
+  color: #075985;
+  border-color: #075985;
+}
+
+.btn-secondary:hover {
+  background-color: #f0f9ff;
+  border-color: #0369a1;
+  color: #0369a1;
+  transform: translateY(-1px);
+}
+
+/* Sign In button */
+
+.btn-primary {
+  background-color: #075985;
+  color: #ffffff;
+  border-color: #075985;
+  box-shadow: 0 4px 10px rgba(7, 89, 133, 0.2);
+}
+
+.btn-primary:hover {
+  background-color: #0c4a6e;
+  border-color: #0c4a6e;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(7, 89, 133, 0.25);
+}
+
+/* Button press effect */
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Keyboard accessibility */
+
+.btn:focus-visible {
+  outline: 3px solid rgba(14, 165, 233, 0.35);
+  outline-offset: 3px;
+}
