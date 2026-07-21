@@ -8,10 +8,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication(scanBasePackages = "ae.gov.tdra.ssir")
 @EnableJpaAuditing
-// Explicitly scans core package for databases repositories
 @EnableJpaRepositories(basePackages = "ae.gov.tdra.ssir.core.repository")
-// Explicitly scans core package for entities
 @EntityScan(basePackages = "ae.gov.tdra.ssir.core.entity")
+
+
 public class SSIRApplication {
     public static void main(String[] args) {
         SpringApplication.run(SSIRApplication.class, args);

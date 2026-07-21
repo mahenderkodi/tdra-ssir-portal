@@ -22,7 +22,7 @@ public class Company {
     private Long id;
 
     @Column(name = "company_id_string", unique = true, length = 30)
-    private String companyIdString; // COMP000001
+    private String companyIdString;
 
     @Column(name = "company_name", nullable = false)
     private String companyName;
@@ -49,7 +49,7 @@ public class Company {
     private String email;
 
     @Column(name = "status", nullable = false, length = 30)
-    private String status; // e.g., ACTIVE, SUSPENDED, DEACTIVATED
+    private String status; 
 
     @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private CompanyAddress address;

@@ -10,10 +10,12 @@
     <packaging>pom</packaging>
 
     <name>TDRA SSIR Portal - Parent</name>
-    <description>Enterprise Parent POM for TDRA SMS Sender ID Registry Onboarding Portal</description>
+    <description>Parent POM for TDRA SMS Sender ID Registry Onboarding Portal</description>
 
+    <!-- BOTH frontend and backend must be registered here -->
     <modules>
         <module>frontend</module>
+        <module>backend</module>
     </modules>
 
     <properties>
