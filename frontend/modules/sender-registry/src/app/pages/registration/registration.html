@@ -1,0 +1,103 @@
+<section class="registration-page">
+  <div class="registration-container">
+    <header class="page-heading">
+      <p class="eyebrow">TDRA Sender Registry</p>
+      <h1>Company Registration</h1>
+      <p>
+        Complete all four sections before submitting your registration request.
+      </p>
+    </header>
+
+    <div class="stepper" aria-label="Registration progress">
+      @for (step of steps; track step.number) {
+        <div
+          class="step"
+          [class.active]="currentStep() === step.number"
+          [class.completed]="currentStep() > step.number"
+        >
+          <div class="step-number">
+            @if (currentStep() > step.number) {
+              ✓
+            } @else {
+              {{ step.number }}
+            }
+          </div>
+
+          <span class="step-title">
+            {{ step.title }}
+          </span>
+        </div>
+      }
+    </div> 
+
+
+      <form
+      [formGroup]="registrationForm"
+      (ngSubmit)="submitRegistration()"
+    >
+     <div class="registration-screen">
+      @if (currentStep() === 1) {
+        <app-company-registration  [group]="registrationForm.controls.company"></app-company-registration>
+      }
+
+      @if (currentStep() === 2) {
+        <app-legal-documents></app-legal-documents>
+      }
+
+      @if (currentStep() === 3) {
+        <app-authorized-representative></app-authorized-representative>
+      }
+
+      @if (currentStep() === 4) {
+        <app-account-setup></app-account-setup>
+      }
+    </div>
+
+    <div class="form-actions">
+      @if (currentStep() > 1) {
+        <button
+          type="button"
+          class="previous-button button-primary"
+          (click)="previousStep()"
+        >
+          Previous
+        </button>
+      }
+<!--Temporary button for testing backend submission-->
+      @if (currentStep() === 1) {
+  <button
+    type="button submit-button"
+    class="test-api-button"
+    [disabled]="isSubmitting()"
+    (click)="submitRegistration()"
+  >
+    @if (isSubmitting()) {
+      Submitting...
+    } @else {
+      Test Backend Submission
+    }
+  </button>
+}
+
+      @if (currentStep() < 4) {
+        <button
+          type="button "
+          class="next-button button-primary"
+          (click)="nextStep()"
+        >
+          Next
+        </button>
+      }
+
+      @if (currentStep() === 4) {
+        <button
+          type="submit"
+          class="submit-button"
+        >
+          Submit Registration
+        </button>
+      }
+    </div>
+   </form>
+  </div>
+</section>

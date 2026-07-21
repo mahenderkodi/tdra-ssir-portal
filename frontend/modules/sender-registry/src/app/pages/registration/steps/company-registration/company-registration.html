@@ -1,0 +1,387 @@
+<section [formGroup]="group">
+  <div class="section-heading">
+    <h2>Company Registration</h2>
+
+    <p>
+      Enter the organization’s legal and registration information.
+    </p>
+  </div>
+
+  <div class="form-grid">
+    <!-- Fields will go here -->
+     <div class="form-field">
+  <label for="companyName">
+    Company Name
+    <span class="required">*</span>
+  </label>
+
+  <input
+    id="companyName"
+    type="text"
+    formControlName="companyName"
+    placeholder="Enter company name"
+  />
+
+  @if (
+    group.get('companyName')?.touched &&
+    group.get('companyName')?.hasError('required')
+  ) {
+    <small class="error-message">
+      Company name is required.
+    </small>
+  }
+</div>
+<div class="form-field">
+  <label for="legalEntityName">
+    Legal Entity Name
+    <span class="required">*</span>
+  </label>
+
+  <input
+    id="legalEntityName"
+    type="text"
+    formControlName="legalEntityName"
+    placeholder="Enter legal entity name"
+  />
+
+  @if (
+    group.get('legalEntityName')?.touched &&
+    group.get('legalEntityName')?.hasError('required')
+  ) {
+    <small class="error-message">
+      Legal entity name is required.
+    </small>
+  }
+</div>
+<div class="form-field">
+  <label for="tradeLicenseNumber">
+    Trade License Number
+    <span class="required">*</span>
+  </label>
+
+  <input
+    id="tradeLicenseNumber"
+    type="text"
+    formControlName="tradeLicenseNumber"
+    placeholder="Enter trade license number"
+  />
+
+  @if (
+    group.get('tradeLicenseNumber')?.touched &&
+    group.get('tradeLicenseNumber')?.hasError('required')
+  ) {
+    <small class="error-message">
+      Trade license number is required.
+    </small>
+  }
+</div>
+<div class="form-field">
+  <label for="registrationNumber">
+    Registration Number
+    <span class="required">*</span>
+  </label>
+
+  <input
+    id="registrationNumber"
+    type="text"
+    formControlName="registrationNumber"
+    placeholder="Enter registration number"
+  />
+
+  @if (
+    group.get('registrationNumber')?.touched &&
+    group.get('registrationNumber')?.hasError('required')
+  ) {
+    <small class="error-message">
+      Registration number is required.
+    </small>
+  }
+</div>
+<div class="form-field">
+  <label for="taxId">
+    Tax ID / VAT Number
+    <span class="required">*</span>
+  </label>
+
+  <input
+    id="taxId"
+    type="text"
+    formControlName="taxId"
+    placeholder="Enter Tax ID or VAT number"
+  />
+
+  @if (
+    group.get('taxId')?.touched &&
+    group.get('taxId')?.hasError('required')
+  ) {
+    <small class="error-message">
+      Tax ID or VAT number is required.
+    </small>
+  }
+</div>
+<div class="form-field">
+  <label for="companyType">
+    Company Type
+    <span class="required">*</span>
+  </label>
+
+  <select
+    id="companyType"
+    formControlName="companyType"
+  >
+    <option value="" disabled>
+      Select company type
+    </option>
+
+    @for (type of companyTypes; track type) {
+      <option [value]="type">
+        {{ type }}
+      </option>
+    }
+  </select>
+
+  @if (
+    group.get('companyType')?.touched &&
+    group.get('companyType')?.hasError('required')
+  ) {
+    <small class="error-message">
+      Company type is required.
+    </small>
+  }
+</div>
+<div class="form-field">
+  <label for="industry">
+    Industry
+    <span class="required">*</span>
+  </label>
+
+  <select
+    id="industry"
+    formControlName="industry"
+  >
+    <option value="" disabled>
+      Select industry
+    </option>
+
+    @for (industry of industries; track industry) {
+      <option [value]="industry">
+        {{ industry }}
+      </option>
+    }
+  </select>
+
+  @if (
+    group.get('industry')?.touched &&
+    group.get('industry')?.hasError('required')
+  ) {
+    <small class="error-message">
+      Industry is required.
+    </small>
+  }
+</div>
+<div class="form-field">
+  <label for="dateOfIncorporation">
+    Date of Incorporation
+    <span class="required">*</span>
+  </label>
+
+  <input
+    id="dateOfIncorporation"
+    type="date"
+    formControlName="dateOfIncorporation"
+  />
+
+  @if (
+    group.get('dateOfIncorporation')?.touched &&
+    group.get('dateOfIncorporation')?.hasError('required')
+  ) {
+    <small class="error-message">
+      Date of incorporation is required.
+    </small>
+  }
+</div>
+<div class="form-field full-width">
+  <label for="registeredAddress">
+    Registered Address
+    <span class="required">*</span>
+  </label>
+
+  <textarea
+    id="registeredAddress"
+    formControlName="registeredAddress"
+    placeholder="Enter complete registered address"
+    rows="3"
+  ></textarea>
+
+  @if (
+    group.get('registeredAddress')?.touched &&
+    group.get('registeredAddress')?.hasError('required')
+  ) {
+    <small class="error-message">
+      Registered address is required.
+    </small>
+  }
+</div>
+<div class="form-field">
+  <label for="country">
+    Country
+    <span class="required">*</span>
+  </label>
+
+  <input
+    id="country"
+    type="text"
+    formControlName="country"
+    readonly
+  />
+</div>
+<div class="form-field">
+  <label for="emirateState">
+    Emirate / State
+    <span class="required">*</span>
+  </label>
+
+  <select
+    id="emirateState"
+    formControlName="emirateState"
+  >
+    <option value="" disabled>
+      Select emirate
+    </option>
+
+    @for (emirate of emirates; track emirate) {
+      <option [value]="emirate">
+        {{ emirate }}
+      </option>
+    }
+  </select>
+
+  @if (
+    group.get('emirateState')?.touched &&
+    group.get('emirateState')?.hasError('required')
+  ) {
+    <small class="error-message">
+      Emirate is required.
+    </small>
+  }
+</div>
+<div class="form-field">
+  <label for="city">
+    City
+    <span class="required">*</span>
+  </label>
+
+  <input
+    id="city"
+    type="text"
+    formControlName="city"
+    placeholder="Enter city"
+  />
+
+  @if (
+    group.get('city')?.touched &&
+    group.get('city')?.hasError('required')
+  ) {
+    <small class="error-message">
+      City is required.
+    </small>
+  }
+</div>
+<div class="form-field">
+  <label for="postalCode">
+    Postal Code
+    <span class="required">*</span>
+  </label>
+
+  <input
+    id="postalCode"
+    type="text"
+    formControlName="postalCode"
+    placeholder="Enter postal code"
+  />
+
+  @if (
+    group.get('postalCode')?.touched &&
+    group.get('postalCode')?.hasError('required')
+  ) {
+    <small class="error-message">
+      Postal code is required.
+    </small>
+  }
+</div>
+<div class="form-field">
+  <label for="website">
+    Website
+  </label>
+
+  <input
+    id="website"
+    type="url"
+    formControlName="website"
+    placeholder="https://www.company.com"
+  />
+</div>
+<div class="form-field">
+  <label for="companyEmail">
+    Company Email
+    <span class="required">*</span>
+  </label>
+
+  <input
+    id="companyEmail"
+    type="email"
+    formControlName="companyEmail"
+    placeholder="name@company.com"
+  />
+
+  @if (
+    group.get('companyEmail')?.touched &&
+    group.get('companyEmail')?.hasError('required')
+  ) {
+    <small class="error-message">
+      Company email is required.
+    </small>
+  }
+
+  @if (
+    group.get('companyEmail')?.touched &&
+    group.get('companyEmail')?.hasError('email')
+  ) {
+    <small class="error-message">
+      Enter a valid email address.
+    </small>
+  }
+</div>
+<div class="form-field">
+  <label for="companyPhone">
+    Company Phone
+    <span class="required">*</span>
+  </label>
+
+  <input
+    id="companyPhone"
+    type="tel"
+    formControlName="companyPhone"
+    placeholder="+971 50 123 4567"
+  />
+
+  @if (
+    group.get('companyPhone')?.touched &&
+    group.get('companyPhone')?.hasError('required')
+  ) {
+    <small class="error-message">
+      Company phone is required.
+    </small>
+  }
+
+  @if (
+    group.get('companyPhone')?.touched &&
+    group.get('companyPhone')?.hasError('pattern')
+  ) {
+    <small class="error-message">
+      Enter a valid phone number.
+    </small>
+  }
+</div>
+  </div>
+</section>
