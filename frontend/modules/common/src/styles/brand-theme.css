@@ -1,0 +1,81 @@
+/* ==================================================
+   TDRA theme colours
+   ================================================== */
+
+:root {
+  /* Custom application variables */
+  --tdra-primary: #075985;
+  --tdra-primary-rgb: 7, 89, 133;
+
+  --tdra-primary-hover: #0c4a6e;
+  --tdra-primary-active: #083e5c;
+
+  --tdra-success: #15803d;
+  --tdra-success-rgb: 21, 128, 61;
+
+  /* Override Bootstrap global theme variables */
+  --bs-primary: var(--tdra-primary);
+  --bs-primary-rgb: var(--tdra-primary-rgb);
+
+  --bs-success: var(--tdra-success);
+  --bs-success-rgb: var(--tdra-success-rgb);
+
+  --bs-link-color: var(--tdra-primary);
+  --bs-link-color-rgb: var(--tdra-primary-rgb);
+  --bs-link-hover-color: var(--tdra-primary-hover);
+
+  --bs-focus-ring-color: rgba(var(--tdra-primary-rgb), 0.25);
+}
+
+/* ==================================================
+   Bootstrap primary button
+   ================================================== */
+
+.btn-primary {
+  --bs-btn-color: #ffffff;
+  --bs-btn-bg: var(--tdra-primary);
+  --bs-btn-border-color: var(--tdra-primary);
+
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: var(--tdra-primary-hover);
+  --bs-btn-hover-border-color: var(--tdra-primary-hover);
+
+  --bs-btn-focus-shadow-rgb: var(--tdra-primary-rgb);
+
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: var(--tdra-primary-active);
+  --bs-btn-active-border-color: var(--tdra-primary-active);
+
+  --bs-btn-disabled-color: #ffffff;
+  --bs-btn-disabled-bg: var(--tdra-primary);
+  --bs-btn-disabled-border-color: var(--tdra-primary);
+}
+
+/* ==================================================
+   Bootstrap outline primary button
+   ================================================== */
+
+.btn-outline-primary {
+  --bs-btn-color: var(--tdra-primary);
+  --bs-btn-border-color: var(--tdra-primary);
+
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: var(--tdra-primary);
+  --bs-btn-hover-border-color: var(--tdra-primary);
+
+  --bs-btn-focus-shadow-rgb: var(--tdra-primary-rgb);
+
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: var(--tdra-primary-hover);
+  --bs-btn-active-border-color: var(--tdra-primary-hover);
+
+  --bs-btn-disabled-color: var(--tdra-primary);
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: var(--tdra-primary);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--tdra-primary);
+  box-shadow: 0 0 0 0.25rem rgba(var(--tdra-primary-rgb), 0.2);
+}

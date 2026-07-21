@@ -1,11 +1,44 @@
-<footer class="footer">
-  <div class="footer-content">
-    <p>© 2026 TDRA Sender Registry</p>
+<footer class="bg-light border-top py-2">
+  <div class="container-fluid px-4">
+    <div class="row align-items-center">
 
-    <nav class="footer-links">
-      <a routerLink="/privacy-policy">Privacy Policy</a>
-      <a routerLink="/terms-of-use">Terms of Use</a>
-     
-    </nav>
+      <!-- Left -->
+      <div class="col-12 col-md-4 text-center text-md-start">
+        <a
+          routerLink="/product-info"
+          class="small text-secondary text-decoration-none"
+        >
+          Product Info
+        </a>
+      </div>
+
+      <!-- Center -->
+      <div class="col-12 col-md-4 text-center">
+        <p class="small text-secondary mb-0">
+          © 2026 TDRA Sender Registry
+        </p>
+      </div>
+
+      <!-- Right -->
+      <nav
+        class="col-12 col-md-4 d-flex justify-content-center justify-content-md-end gap-3"
+        aria-label="Footer navigation"
+      >
+        <a
+          routerLink="/privacy-policy"
+          class="small text-secondary text-decoration-none"
+        >
+          Privacy Policy
+        </a>
+
+        <a
+          routerLink="/terms-of-use"
+          class="small text-secondary text-decoration-none"
+        >
+          Terms of Use
+        </a>
+      </nav>
+
+    </div>
   </div>
 </footer>

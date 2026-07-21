@@ -1,12 +1,19 @@
-<header class="header">
-  
-  <nav class="nav">
-   
-    <a class="btn btn-secondary" routerLink="/contact-us">
+<header class="navbar bg-white border-bottom shadow-sm py-2">
+  <nav
+    class="container-fluid d-flex flex-wrap justify-content-end align-items-center gap-2 px-3"
+    aria-label="Public navigation"
+  >
+    <a
+      class="btn btn-outline-primary btn-sm btn-md-normal px-3"
+      routerLink="/contact-us"
+    >
       Contact Us
     </a>
 
-    <a class="btn btn-primary" [href]="signInUrl">
+    <a
+      class="btn btn-primary btn-sm btn-md-normal px-3"
+      [href]="signInUrl"
+    >
       Sign In
     </a>
   </nav>

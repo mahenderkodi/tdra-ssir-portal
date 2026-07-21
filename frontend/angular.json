@@ -50,7 +50,9 @@
                 "input": "modules/sender-registry/public"
               }
             ],
-            "styles": ["modules/sender-registry/src/styles.css"]
+            "styles": ["node_modules/bootstrap/dist/css/bootstrap.min.css",
+             "modules/common/src/styles/brand-theme.css",
+            "modules/sender-registry/src/styles.css"]
           },
           "configurations": {
             "production": {
