@@ -3,11 +3,13 @@ package ae.gov.tdra.ssir.core.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "registration_requests", indexes = {
     @Index(name = "idx_reg_tracking", columnList = "tracking_id")
 })
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

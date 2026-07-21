@@ -2,6 +2,8 @@ package ae.gov.tdra.ssir.core.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "company_contacts")
@@ -18,6 +20,7 @@ public class CompanyContact {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false, foreignKey = @ForeignKey(name = "fk_contact_company"))
+    @JsonIgnore
     private Company company;
 
     @Column(name = "first_name", nullable = false, length = 50)

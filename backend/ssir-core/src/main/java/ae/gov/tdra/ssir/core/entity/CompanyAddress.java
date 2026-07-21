@@ -1,5 +1,7 @@
 package ae.gov.tdra.ssir.core.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +20,7 @@ public class CompanyAddress {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false, foreignKey = @ForeignKey(name = "fk_address_company"))
+    @JsonIgnore
     private Company company;
 
     @Column(name = "address_line_1", nullable = false)

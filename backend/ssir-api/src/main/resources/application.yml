@@ -7,6 +7,10 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+  # Global Jackson configuration fallback
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
 
 server:
   port: 8080
