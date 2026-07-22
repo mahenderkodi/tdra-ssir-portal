@@ -24,7 +24,7 @@ public class Company {
     private Long id;
 
     @Column(name = "company_id", unique = true, length = 30)
-    private String companyIdString; 
+    private String companyId; 
 
     @Column(name = "company_name", nullable = false)
     private String companyName;
@@ -61,12 +61,13 @@ public class Company {
 
     @Column(name = "status", nullable = false, length = 30)
     private String status;
-
+    @JsonIgnoreProperties("company")
     @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private CompanyAddress address;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonIgnoreProperties("company")
     private List<CompanyContact> contacts = new ArrayList<>();
 
     @Column(name = "created_at", updatable = false)

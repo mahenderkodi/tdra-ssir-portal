@@ -25,8 +25,8 @@ public class CompanyAddress {
     @Column(name = "address_line_1", nullable = false)
     private String addressLine1;
 
-    @Column(name = "address_line_2")
-    private String addressLine2;
+   // @Column(name = "address_line_2")
+   // private String addressLine2;
 
     @Column(name = "country", nullable = false, length = 100)
     private String country; 

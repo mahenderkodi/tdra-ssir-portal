@@ -105,7 +105,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         if ("APPROVED".equalsIgnoreCase(status)) {
             request.getCompany().setStatus("ACTIVE");
             String companyIdStr = "COMP" + String.format("%06d", request.getCompany().getId());
-            request.getCompany().setCompanyIdString(companyIdStr);
+            request.getCompany().setCompanyId(companyIdStr);
         } else if ("REJECTED".equalsIgnoreCase(status)) {
             request.getCompany().setStatus("DEACTIVATED");
             request.setRejectionReason(comments);

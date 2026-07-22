@@ -10,5 +10,5 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     
     // Custom database queries to verify duplicates during registration validation
     Optional<Company> findByTradeLicenseNumber(String tradeLicenseNumber);
-    Optional<Company> findByCompanyIdString(String companyIdString);
+    Optional<Company> findByCompanyId(String companyId);
 }
