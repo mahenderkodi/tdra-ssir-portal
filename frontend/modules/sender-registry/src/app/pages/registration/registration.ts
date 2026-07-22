@@ -490,32 +490,109 @@ private legalDocumentsComponent?: LegalDocuments;
     }),
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Step 3: Authorized Representative
-    |--------------------------------------------------------------------------
-    |
-    | This group is currently empty.
-    |
-    | Representative controls will be added when Step 3 is developed.
-    |
-    */
+   
     representative:
-      this.formBuilder.group({}),
+  this.formBuilder.nonNullable.group({
 
+    firstName: [
+      'Ahmed',
+      /* Validators.required */
+    ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Step 4: Account Setup
-    |--------------------------------------------------------------------------
-    |
-    | This group is currently empty.
-    |
-    | Account controls will be added when Step 4 is developed.
-    |
-    */
+    lastName: [
+      'Al Mansoori',
+      /* Validators.required */
+    ],
+
+    designation: [
+      'Operations Manager',
+      /* Validators.required */
+    ],
+
+    department: [
+      'Operations',
+      /* Validators.required */
+    ],
+
+    officialEmail: [
+      'ahmed.almansoori@apexinnovations.ae',
+      [
+        /* Validators.required, */
+        Validators.email
+      ]
+    ],
+
+    mobileNumber: [
+      '+971 58 123 4765',
+      [
+        /* Validators.required, */
+        Validators.pattern(
+          /^[0-9+\-\s()]{7,20}$/
+        )
+      ]
+    ],
+
+    officeNumber: [
+      '+971 4 123 4567',
+      [
+        /* Validators.required, */
+        Validators.pattern(
+          /^[0-9+\-\s()]{7,20}$/
+        )
+      ]
+    ],
+
+    address: [
+      'Office 808, One Business Centre, Dubai',
+      /* Validators.required */
+    ],
+
+    uaePassId: [
+      'UAE-PASS-58214',
+      /* Validators.required */
+    ],
+
+    passportOrEmiratesId: [
+      '784-1990-1234567-1',
+      /* Validators.required */
+    ]
+  }),
+
     account:
-      this.formBuilder.group({}),
+  this.formBuilder.nonNullable.group({
+
+    Username: [
+      'ahmed.almansoori',
+      [
+        /* Validators.required, */
+        Validators.minLength(4),
+        Validators.maxLength(30),
+        Validators.pattern(
+          /^[a-zA-Z0-9._-]+$/
+        )
+      ]
+    ],
+
+    PreferredLanguage: [
+      'English',
+      /* Validators.required */
+    ],
+
+    TimeZone: [
+      'Asia/Dubai',
+      /* Validators.required */
+    ],
+
+    MfaPreference: [
+      'Authenticator App',
+      /* Validators.required */
+    ],
+
+    NotificationPreference: [
+      'Email and SMS',
+      /* Validators.required */
+    ]
+  }),
   });
 
 
@@ -539,6 +616,12 @@ private legalDocumentsComponent?: LegalDocuments;
     */
     const company =
       this.registrationForm.controls.company.getRawValue();
+
+    const representative =
+      this.registrationForm.controls.representative.getRawValue();
+
+    const account =
+      this.registrationForm.controls.account.getRawValue();
 
     /*
     | Return an object that follows RegistrationRequest.
@@ -613,8 +696,26 @@ private legalDocumentsComponent?: LegalDocuments;
       /*
       | These remain empty until Steps 3 and 4 are developed.
       */
-      representative: {},
-      account: {}
+      representative: {
+        firstName: representative.firstName ?? '',
+        lastName: representative.lastName ?? '',
+        designation: representative.designation ?? '',
+        department: representative.department ?? '',
+        officialEmail: representative.officialEmail ?? '',
+        mobileNumber: representative.mobileNumber ?? '', 
+        officeNumber: representative.officeNumber ?? '',
+        address: representative.address ?? '',
+        uaePassId: representative.uaePassId ?? '',
+        passportOrEmiratesId: representative.passportOrEmiratesId ?? ''
+      },
+      account: {
+        Username: account.Username ?? '',
+        PreferredLanguage: account.PreferredLanguage ?? '',
+        TimeZone: account.TimeZone ?? '',
+        MfaPreference: account.MfaPreference ?? '',
+        NotificationPreference: account.NotificationPreference ?? ''
+
+      }
     };
   }
 
@@ -804,6 +905,40 @@ private legalDocumentsComponent?: LegalDocuments;
     | have been selected before allowing navigation to Step 3.
     */
 
+     if (this.currentStep() === 3){
+      const representativeGroup =
+        this.registrationForm.controls.representative;
+
+      /*
+      | Marking controls as touched allows validation messages
+      | to appear in the child component.
+      */
+      representativeGroup.markAllAsTouched();
+
+      /*
+      | Stop here when any representative control is invalid.
+      */
+      if (representativeGroup.invalid) {
+        return;
+      }
+     }
+
+     if (this.currentStep() === 4){
+      const representativeGroup =
+        this.registrationForm.controls.account;
+
+    
+      representativeGroup.markAllAsTouched();
+
+      
+      if (representativeGroup.invalid) {
+        return;
+      }
+     }
+
+      
+    
+
     /*
     | Increase the step only when it is below Step 4.
     */
@@ -829,63 +964,87 @@ private legalDocumentsComponent?: LegalDocuments;
   |
   |
   */
-  submitRegistration(): void {
-    const companyGroup =
-      this.registrationForm.controls.company;
+ submitRegistration(): void {
 
-    companyGroup.markAllAsTouched();
+  const companyGroup =
+    this.registrationForm.controls.company;
 
-    if (companyGroup.invalid) {
-      this.currentStep.set(1);
-      return;
-    }
+  companyGroup.markAllAsTouched();
 
-    const formData =
-      this.buildRegistrationFormData();
-
-    this.isSubmitting.set(true);
-    this.successMessage.set('');
-    this.errorMessage.set('');
-
-    /*
-     * Temporary testing log.
-     *
-     * It should show:
-     * registrationData → JSON string
-     * file             → File object
-     */
-    formData.forEach((value, key) => {
-      console.log(key, value);
-    });
-
-    this.registrationService
-      .createRegistration(formData)
-      .subscribe({
-        next: (response) => {
-          console.log(
-            'Backend response:',
-            response
-          );
-
-          this.isSubmitting.set(false);
-          this.resetDocuments();
-          this.successMessage.set(
-            'Registration and documents submitted successfully.'
-          );
-        },
-
-        error: (error) => {
-          console.error(
-            'Registration API error:',
-            error
-          );
-
-          this.isSubmitting.set(false);
-            this.resetDocuments();
-          this.errorMessage.set(
-            'Registration could not be submitted. Please try again.'
-          );
-        }
-      });
+  if (companyGroup.invalid) {
+    this.currentStep.set(1);
+    return;
   }
+
+  const representativeGroup =
+    this.registrationForm.controls.representative;
+
+  representativeGroup.markAllAsTouched();
+
+  if (representativeGroup.invalid) {
+    this.currentStep.set(3);
+    return;
+  }
+
+  const accountGroup =
+    this.registrationForm.controls.account;
+
+  accountGroup.markAllAsTouched();
+
+  if (accountGroup.invalid) {
+    this.currentStep.set(4);
+    return;
+  }
+
+  const formData =
+    this.buildRegistrationFormData();
+
+  this.isSubmitting.set(true);
+  this.successMessage.set('');
+  this.errorMessage.set('');
+
+  formData.forEach((value, key) => {
+    console.log(key, value);
+  });
+
+  this.registrationService
+    .createRegistration(formData)
+    .subscribe({
+
+      next: (response) => {
+        console.log(
+          'Backend response:',
+          response
+        );
+
+        this.isSubmitting.set(false);
+
+        /*
+         * Clear documents only after successful submission.
+         */
+        this.resetDocuments();
+
+        this.successMessage.set(
+          'Registration and documents submitted successfully.'
+        );
+      },
+
+      error: (error) => {
+        console.error(
+          'Registration API error:',
+          error
+        );
+
+        this.isSubmitting.set(false);
+
+        /*
+         * Do not reset documents here.
+         * The user may retry the submission.
+         */
+        this.errorMessage.set(
+          'Registration could not be submitted. Please try again.'
+        );
+      }
+    });
+}
 }

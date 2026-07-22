@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
 import { Input } from '@angular/core';
+import {
+  RouterLink
+} from '@angular/router';
 
 @Component({
   selector: 'tt-header',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './header.html',
   styleUrl: './header.css',
   standalone: true,

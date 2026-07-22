@@ -1,0 +1,18 @@
+.ssir-logo {
+  color: var(--bs-primary);
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.ssir-logo:hover {
+  color: var(--bs-primary);
+}
+
+@media (max-width: 576px) {
+  .ssir-logo {
+    font-size: 1.4rem;
+  }
+}

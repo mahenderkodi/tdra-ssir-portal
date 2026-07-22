@@ -1,9 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import {
+  FormGroup,
+  ReactiveFormsModule
+} from '@angular/forms';
 
 @Component({
   selector: 'app-authorized-representative',
-  imports: [],
+  standalone: true,
+  imports: [ReactiveFormsModule],
   templateUrl: './authorized-representative.html',
   styleUrl: './authorized-representative.css',
 })
-export class AuthorizedRepresentative {}
+export class AuthorizedRepresentative {
+  @Input() group!: FormGroup;
+
+}

@@ -1,20 +1,34 @@
 <header class="navbar bg-white border-bottom shadow-sm py-2">
   <nav
-    class="container-fluid d-flex flex-wrap justify-content-end align-items-center gap-2 px-3"
+    class="container-fluid d-flex justify-content-between align-items-center gap-3 px-3"
     aria-label="Public navigation"
   >
+
+    <!-- SSIR Logo -->
     <a
-      class="btn btn-outline-primary btn-sm btn-md-normal px-3"
-      routerLink="/contact-us"
+      class="ssir-logo text-decoration-none"
+      routerLink="/"
+      aria-label="SSIR Home"
     >
-      Contact Us
+      SSIR
     </a>
 
-    <a
-      class="btn btn-primary btn-sm btn-md-normal px-3"
-      [href]="signInUrl"
-    >
-      Sign In
-    </a>
+    <!-- Right-side navigation -->
+    <div class="d-flex align-items-center gap-2">
+      <a
+        class="btn btn-outline-primary btn-sm btn-md-normal px-3"
+        routerLink="/contact-us"
+      >
+        Contact Us
+      </a>
+
+      <a
+        class="btn btn-primary btn-sm btn-md-normal px-3"
+        [href]="signInUrl"
+      >
+        Sign In
+      </a>
+    </div>
+
   </nav>
 </header>

@@ -205,16 +205,18 @@
 
         <!-- Step 3: Authorized Representative -->
         @if (currentStep() === 3) {
-          <app-authorized-representative>
-          </app-authorized-representative>
-        }
+  <app-authorized-representative
+    [group]="registrationForm.controls.representative"
+  />
+}
 
 
         <!-- Step 4: Account Setup -->
         @if (currentStep() === 4) {
-          <app-account-setup>
-          </app-account-setup>
-        }
+  <app-account-setup
+    [group]="registrationForm.controls.account"
+  />
+}
       </div>
 
 
@@ -231,87 +233,89 @@
       |
       -->
       <div
-        class="
-          card-footer
-          bg-body-tertiary
-          d-flex
-          flex-wrap
-          align-items-center
-          gap-2
-          p-3
-          p-md-4
-        "
+  class="
+    card-footer
+    bg-body-tertiary
+    d-flex
+    align-items-center
+    gap-2
+    p-3
+    p-md-4
+  "
+>
+  <!-- Left: Previous button -->
+  <div class="footer-action">
+    @if (currentStep() > 1) {
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        (click)="previousStep()"
       >
-        @if (currentStep() > 1) {
-          <button
-            type="button"
-            class="btn btn-outline-secondary"
-            (click)="previousStep()"
-          >
-            Previous
-          </button>
+        Previous
+      </button>
+    }
+  </div>
+
+  <!-- Centre: Current page number -->
+  <div class="flex-grow-1 text-center">
+    <span class="small fw-semibold text-secondary">
+      Step {{ currentStep() }} of {{ steps.length }}
+    </span>
+  </div>
+
+  <!-- Right: Next or Submit button -->
+  <div class="footer-action d-flex justify-content-end gap-2">
+
+    @if (currentStep() === 2) {
+      <button
+        type="submit"
+        class="btn btn-outline-primary"
+        [disabled]="isSubmitting()"
+      >
+        @if (isSubmitting()) {
+          <span
+            class="spinner-border spinner-border-sm me-2"
+            aria-hidden="true"
+          ></span>
+
+          Submitting...
+        } @else {
+          Test Backend Submission
         }
+      </button>
+    }
 
+    @if (currentStep() < 4) {
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="nextStep()"
+      >
+        Next
+      </button>
+    }
 
-       
-        <div class="ms-auto d-flex flex-wrap gap-2">
+    @if (currentStep() === 4) {
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="isSubmitting()"
+      >
+        @if (isSubmitting()) {
+          <span
+            class="spinner-border spinner-border-sm me-2"
+            aria-hidden="true"
+          ></span>
 
-          
-          @if (currentStep() === 2) {
-            <button
-              type="submit"
-              class="btn btn-outline-primary"
-              [disabled]="isSubmitting()"
-            >
+          Submitting...
+        } @else {
+          Submit Registration
+        }
+      </button>
+    }
 
-              <!-- Display a spinner while the API call is running -->
-              @if (isSubmitting()) {
-                <span
-                  class="spinner-border spinner-border-sm me-2"
-                  aria-hidden="true"
-                ></span>
-
-                Submitting...
-              } @else {
-                Test Backend Submission
-              }
-            </button>
-          }
-
-
-          @if (currentStep() < 4) {
-            <button
-              type="button"
-              class="btn btn-primary"
-              (click)="nextStep()"
-            >
-              Next
-            </button>
-          }
-
-
-          
-          @if (currentStep() === 4) {
-            <button
-              type="submit"
-              class="btn btn-success"
-              [disabled]="isSubmitting()"
-            >
-
-              @if (isSubmitting()) {
-                <span
-                  class="spinner-border spinner-border-sm me-2"
-                  aria-hidden="true"
-                ></span>
-
-                Submitting...
-              } @else {
-                Submit Registration
-              }
-            </button>
-          }
-        </div>
-      </div>
+  </div>
+</div>
     </form>
   </div>
 </section>
