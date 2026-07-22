@@ -1,6 +1,5 @@
 package ae.gov.tdra.ssir.api.service;
 
-
 import ae.gov.tdra.ssir.api.dto.CompanyDto;
 import ae.gov.tdra.ssir.api.dto.RegistrationRequestDto;
 import ae.gov.tdra.ssir.core.entity.*;
@@ -8,6 +7,7 @@ import ae.gov.tdra.ssir.core.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -24,45 +24,48 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Autowired
     private RegistrationStatusHistoryRepository historyRepository;
 
+    @Autowired
+    private DocumentStorageService storageService;
+
     @Override
     @Transactional
-    public RegistrationRequest submitRegistration(RegistrationRequestDto dto) {
+    public RegistrationRequest submitRegistrationWithFile(RegistrationRequestDto dto, MultipartFile file) {
         CompanyDto companyDto = dto.getCompany();
 
-        // 1. Validate if trade license number is already registered
+        // 1. Validate duplicates
         if (companyRepository.findByTradeLicenseNumber(companyDto.getTradeLicenseNumber()).isPresent()) {
             throw new IllegalArgumentException("A company with this Trade License Number is already registered");
         }
 
-        // 2. Build the Company Entity
+        // 2. Build Company
         Company company = Company.builder()
                 .companyName(companyDto.getCompanyName())
                 .legalEntityName(companyDto.getLegalEntityName())
                 .tradeLicenseNumber(companyDto.getTradeLicenseNumber())
                 .registrationNumber(companyDto.getRegistrationNumber())
-                .taxVatNumber(companyDto.getTaxId()) // Maps taxId -> taxVatNumber
+                .taxVatNumber(companyDto.getTaxId())
                 .companyType(companyDto.getCompanyType())
-                .industryType(companyDto.getIndustry()) // Maps industry -> industryType
+                .industryType(companyDto.getIndustry())
                 .dateOfIncorporation(companyDto.getDateOfIncorporation())
-                .email(companyDto.getCompanyEmail()) // Maps companyEmail -> email
+                .email(companyDto.getCompanyEmail())
                 .companyPhone(companyDto.getCompanyPhone())
                 .website(companyDto.getWebsite())
                 .status("DRAFT")
                 .build();
 
-        // 3. Build the One-to-One Address Mapping
+        // 3. Build Address
         CompanyAddress address = CompanyAddress.builder()
                 .company(company)
-                .addressLine1(companyDto.getRegisteredAddress()) // Maps registeredAddress -> addressLine1
+                .addressLine1(companyDto.getRegisteredAddress())
                 .country(companyDto.getCountry())
-                .emirate(companyDto.getEmirateState()) // Maps emirateState -> emirate
+                .emirate(companyDto.getEmirateState())
                 .city(companyDto.getCity())
                 .postalCode(companyDto.getPostalCode())
                 .build();
         
-        company.setAddress(address); // Link bi-directionally
+        company.setAddress(address);
 
-        // 4. Build the Registration Request
+        // 4. Build Registration Request
         String trackingId = "REG-" + LocalDateTime.now().getYear() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         
         RegistrationRequest request = RegistrationRequest.builder()
@@ -71,10 +74,15 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .currentStatus("SUBMITTED")
                 .build();
 
-        // Save cascade will automatically write to 'companies' and 'company_addresses'
+        // Persist registration and company first to obtain primary key
         RegistrationRequest savedRequest = registrationRepository.save(request);
 
-        // 5. Write Initial Entry in Status History
+        // 5. Upload file directly to S3 and link it to this registration
+        if (file != null && !file.isEmpty()) {
+            storageService.uploadAndLinkDocument(file, "TRADE_LICENSE", savedRequest);
+        }
+
+        // 6. Save History Log
         RegistrationStatusHistory history = RegistrationStatusHistory.builder()
                 .registrationRequest(savedRequest)
                 .fromStatus("DRAFT")

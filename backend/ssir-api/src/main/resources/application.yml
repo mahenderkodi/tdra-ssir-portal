@@ -1,12 +1,15 @@
 spring:
   application:
     name: tdra-ssir-backend
+
   profiles:
     active: local
+
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+
   # Global Jackson configuration fallback
   jackson:
     serialization:
@@ -16,3 +19,9 @@ server:
   port: 8080
   error:
     include-message: always
+
+minio:
+  endpoint: http://localhost:9100
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket-name: ssir-documents

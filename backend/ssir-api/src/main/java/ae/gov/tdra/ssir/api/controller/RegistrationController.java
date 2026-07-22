@@ -4,10 +4,15 @@ import ae.gov.tdra.ssir.api.dto.RegistrationRequestDto;
 import ae.gov.tdra.ssir.api.service.RegistrationService;
 import ae.gov.tdra.ssir.core.entity.RegistrationRequest;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
 
 @RestController
@@ -18,9 +23,16 @@ public class RegistrationController {
     private RegistrationService registrationService;
 
     // 1. Submit Registration API
-    @PostMapping
-    public ResponseEntity<RegistrationRequest> submitRegistration(@Valid @RequestBody RegistrationRequestDto dto) {
-        RegistrationRequest savedRequest = registrationService.submitRegistration(dto);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<RegistrationRequest> submitRegistration(
+            @RequestPart("registrationData") String registrationDataJson,
+            @RequestPart("file") MultipartFile file) throws Exception {
+
+        // Manually deserialize the JSON string into your validated DTO
+        ObjectMapper objectMapper = new ObjectMapper();
+        RegistrationRequestDto dto = objectMapper.readValue(registrationDataJson, RegistrationRequestDto.class);
+
+        RegistrationRequest savedRequest = registrationService.submitRegistrationWithFile(dto, file);
         return new ResponseEntity<>(savedRequest, HttpStatus.CREATED);
     }
 
