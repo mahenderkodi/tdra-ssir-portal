@@ -16,8 +16,9 @@
 */
 import {
   Component,
+  inject,
   signal,
-  inject
+  ViewChild
 } from '@angular/core';
 
 /*
@@ -148,6 +149,8 @@ import {
 })
 export class Registration {
 
+  @ViewChild(LegalDocuments)
+private legalDocumentsComponent?: LegalDocuments;
   /*
   |--------------------------------------------------------------------------
   | Dependency injection
@@ -715,6 +718,31 @@ export class Registration {
     return formData;
   }
 
+  private resetDocuments(): void {
+  /*
+   * Clear all File objects stored in the reactive form.
+   */
+  this.registrationForm.controls.documents.reset({
+    tradeLicense: null,
+    certificateOfIncorporation: null,
+    taxRegistrationCertificate: null,
+    authorizedSignatoryLetter: null,
+    signatoryIdentityDocument: null,
+    businessRegistrationCertificate: null,
+    companyLogo: null,
+    additionalSupportingDocuments: []
+  });
+
+  /*
+   * Clear the visible native file-input values.
+   *
+   * The component may not exist when another registration step is open,
+   * so optional chaining is used.
+   */
+  this.legalDocumentsComponent
+    ?.clearFileInputs();
+}
+
   /*
   |--------------------------------------------------------------------------
   | Move to the previous step
@@ -840,7 +868,7 @@ export class Registration {
           );
 
           this.isSubmitting.set(false);
-
+          this.resetDocuments();
           this.successMessage.set(
             'Registration and documents submitted successfully.'
           );
@@ -853,7 +881,7 @@ export class Registration {
           );
 
           this.isSubmitting.set(false);
-
+            this.resetDocuments();
           this.errorMessage.set(
             'Registration could not be submitted. Please try again.'
           );

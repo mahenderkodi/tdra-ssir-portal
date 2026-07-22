@@ -13,7 +13,10 @@
 */
 import {
   Component,
-  Input
+  ElementRef,
+  Input,
+  QueryList,
+  ViewChildren
 } from '@angular/core';
 
 /*
@@ -111,6 +114,26 @@ export class LegalDocuments {
   */
   @Input({ required: true })
   group!: FormGroup;
+
+  @ViewChildren('fileInput')
+  private readonly fileInputs!: QueryList<
+  ElementRef<HTMLInputElement>
+>;
+
+/*
+|--------------------------------------------------------------------------
+| Clear native file-input elements
+|--------------------------------------------------------------------------
+|
+| Resetting the Angular FormControls removes the stored File objects,
+| but browsers do not automatically clear the visible native file inputs.
+|
+*/
+clearFileInputs(): void {
+  this.fileInputs.forEach(inputReference => {
+    inputReference.nativeElement.value = '';
+  });
+}
 
 
   /*

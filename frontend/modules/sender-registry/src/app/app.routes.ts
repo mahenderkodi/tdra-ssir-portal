@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-
 import { PrivacyPolicy } from './pages/privacy-policy/privacy-policy';
 import { TermsOfUse } from './pages/terms-of-use/terms-of-use';
 import {Registration} from './pages/registration/registration';
