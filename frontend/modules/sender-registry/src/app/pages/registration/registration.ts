@@ -483,9 +483,7 @@ export class Registration {
       | Initially, the array is empty.
       */
       additionalSupportingDocuments:
-        this.formBuilder.control<File[]>(
-          []
-        ),
+        this.formBuilder.nonNullable.control<File[]>([]),
     }),
 
 
@@ -617,6 +615,105 @@ export class Registration {
     };
   }
 
+  private buildRegistrationFormData(): FormData {
+    const formData = new FormData();
+
+    /*
+     * First multipart request part:
+     *
+     * Backend:
+     * @RequestPart("registrationData")
+     */
+    const payload = this.buildRegistrationPayload();
+
+    formData.append(
+      'registrationData',
+      JSON.stringify(payload)
+    );
+
+    /*
+     * Read all selected documents from Step 2.
+     */
+    const documents =
+      this.registrationForm.controls.documents.getRawValue();
+
+    /*
+     * Second multipart request-part name:
+     *
+     * Backend:
+     * @RequestPart("file")
+     *
+     * The same key is added once for every selected file.
+     */
+    if (documents.tradeLicense) {
+      formData.append(
+        'file',
+        documents.tradeLicense,
+        documents.tradeLicense.name
+      );
+    }
+
+    if (documents.certificateOfIncorporation) {
+      formData.append(
+        'file',
+        documents.certificateOfIncorporation,
+        documents.certificateOfIncorporation.name
+      );
+    }
+
+    if (documents.taxRegistrationCertificate) {
+      formData.append(
+        'file',
+        documents.taxRegistrationCertificate,
+        documents.taxRegistrationCertificate.name
+      );
+    }
+
+    if (documents.authorizedSignatoryLetter) {
+      formData.append(
+        'file',
+        documents.authorizedSignatoryLetter,
+        documents.authorizedSignatoryLetter.name
+      );
+    }
+
+    if (documents.signatoryIdentityDocument) {
+      formData.append(
+        'file',
+        documents.signatoryIdentityDocument,
+        documents.signatoryIdentityDocument.name
+      );
+    }
+
+    if (documents.businessRegistrationCertificate) {
+      formData.append(
+        'file',
+        documents.businessRegistrationCertificate,
+        documents.businessRegistrationCertificate.name
+      );
+    }
+
+    if (documents.companyLogo) {
+      formData.append(
+        'file',
+        documents.companyLogo,
+        documents.companyLogo.name
+      );
+    }
+
+    /*
+     * This control is non-nullable, so its value is always File[].
+     */
+    documents.additionalSupportingDocuments.forEach(file => {
+      formData.append(
+        'file',
+        file,
+        file.name
+      );
+    });
+
+    return formData;
+  }
 
   /*
   |--------------------------------------------------------------------------
@@ -702,121 +799,61 @@ export class Registration {
   | - Builds the company JSON payload
   | - Sends the payload to the registration API
   |
-  | Current limitation:
-  | - Documents are not uploaded yet
-  | - Representative data is not sent yet
-  | - Account data is not sent yet
   |
   */
   submitRegistration(): void {
-
-    /*
-    | Obtain the company FormGroup.
-    */
     const companyGroup =
       this.registrationForm.controls.company;
 
-    /*
-    | Display validation messages where applicable.
-    */
     companyGroup.markAllAsTouched();
 
-    /*
-    | When company data is invalid:
-    |
-    | 1. Return the user to Step 1.
-    | 2. Stop the submission method.
-    */
     if (companyGroup.invalid) {
       this.currentStep.set(1);
       return;
     }
 
-    /*
-    | Convert form values into the request structure expected
-    | by the backend.
-    */
-    const payload =
-      this.buildRegistrationPayload();
+    const formData =
+      this.buildRegistrationFormData();
 
-    /*
-    | Set the loading state.
-    |
-    | The HTML uses isSubmitting() to:
-    | - Disable the submit button
-    | - Display "Submitting..."
-    | - Display the loading spinner
-    */
     this.isSubmitting.set(true);
-
-    /*
-    | Remove messages left from any previous request.
-    */
     this.successMessage.set('');
     this.errorMessage.set('');
 
     /*
-    | Development logging.
-    |
-    | Remove or reduce console logs before production deployment.
-    */
-    console.log(
-      'Payload sent to backend:',
-      payload
-    );
+     * Temporary testing log.
+     *
+     * It should show:
+     * registrationData → JSON string
+     * file             → File object
+     */
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
 
-    /*
-    | Call the service method.
-    |
-    | createRegistration() returns an Observable.
-    |
-    | The HTTP request is handled when we subscribe to it.
-    */
     this.registrationService
-      .createRegistration(payload)
+      .createRegistration(formData)
       .subscribe({
-
-        /*
-        | Runs when the backend request succeeds.
-        */
         next: (response) => {
-
           console.log(
             'Backend response:',
             response
           );
 
-          /*
-          | Stop the loading state.
-          */
           this.isSubmitting.set(false);
 
-          /*
-          | Store the success message.
-          */
           this.successMessage.set(
-            'Company registration was submitted successfully.'
+            'Registration and documents submitted successfully.'
           );
         },
 
-        /*
-        | Runs when the backend request fails.
-        */
         error: (error) => {
-
           console.error(
             'Registration API error:',
             error
           );
 
-          /*
-          | Stop the loading state.
-          */
           this.isSubmitting.set(false);
 
-          /*
-          | Store the error message.
-          */
           this.errorMessage.set(
             'Registration could not be submitted. Please try again.'
           );

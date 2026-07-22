@@ -53,21 +53,6 @@ import {
 } from 'rxjs';
 
 
-/*
-|--------------------------------------------------------------------------
-| Registration request model
-|--------------------------------------------------------------------------
-|
-| RegistrationRequest defines the TypeScript structure of the data
-| that must be passed to createRegistration().
-|
-| It helps TypeScript verify that the payload contains the expected
-| registration properties.
-|
-*/
-import {
-  RegistrationRequest
-} from '../models/registration-request';
 
 
 @Injectable({
@@ -158,7 +143,7 @@ export class RegistrationService {
   |
   */
   createRegistration(
-    payload: RegistrationRequest
+    formData: FormData
   ): Observable<unknown> {
 
     /*
@@ -175,7 +160,7 @@ export class RegistrationService {
     */
     return this.http.post<unknown>(
       this.apiUrl,
-      payload
+      formData
     );
   }
 
