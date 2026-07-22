@@ -4,43 +4,60 @@
 
 .registration-step {
   position: relative;
+  min-width: 0;
   color: #94a3b8;
 }
 
+/* Connector line */
+
+.stepper-track {
+  position: relative;
+}
+
+/* One continuous line behind all step circles */
+.stepper-track::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+
+  top: 17px;
+  left: 12.5%;
+  right: 12.5%;
+
+  height: 2px;
+  background-color: #cbd5e1;
+}
+
+/* Step circle */
+
 .step-number {
   position: relative;
-  z-index: 2;
-
-  width: 36px;
-  height: 36px;
-  border: 2px solid #cbd5e1;
-  border-radius: 50%;
+  z-index: 1;
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
 
   background-color: #ffffff;
   font-size: 13px;
   font-weight: 700;
 }
 
-/* Connector line */
+/* Step title */
 
-.registration-step:not(:last-child)::after {
-  position: absolute;
+.registration-step span {
+  position: relative;
   z-index: 1;
-  top: 17px;
-  left: calc(50% + 24px);
-
-  width: calc(100% - 48px);
-  height: 2px;
-
-  background-color: #cbd5e1;
-  content: "";
+  color: inherit;
 }
 
-/* Current step */
+/* Active step */
 
 .registration-step.active {
   color: var(--bs-primary);
@@ -52,7 +69,7 @@
   color: #ffffff;
 }
 
-/* Completed steps */
+/* Completed step */
 
 .registration-step.completed {
   color: var(--bs-success);
@@ -64,19 +81,22 @@
   color: #ffffff;
 }
 
+/* Completed connector */
+
 .registration-step.completed:not(:last-child)::after {
   background-color: var(--bs-success);
 }
+
+/* Mobile */
 
 @media (max-width: 575.98px) {
   .step-number {
     width: 32px;
     height: 32px;
+    font-size: 12px;
   }
 
   .registration-step:not(:last-child)::after {
     top: 15px;
-    left: calc(50% + 20px);
-    width: calc(100% - 40px);
   }
 }
