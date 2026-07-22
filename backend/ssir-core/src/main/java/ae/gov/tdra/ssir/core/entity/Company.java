@@ -2,10 +2,10 @@ package ae.gov.tdra.ssir.core.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "companies", indexes = {
@@ -23,8 +23,8 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "company_id_string", unique = true, length = 30)
-    private String companyIdString;
+    @Column(name = "company_id", unique = true, length = 30)
+    private String companyIdString; 
 
     @Column(name = "company_name", nullable = false)
     private String companyName;
@@ -41,17 +41,26 @@ public class Company {
     @Column(name = "tax_vat_number", length = 50)
     private String taxVatNumber;
 
+    @Column(name = "company_type", nullable = false, length = 50)
+    private String companyType; // Added to map the UI dropdown
+
     @Column(name = "industry_type", length = 100)
     private String industryType;
 
-    @Column(name = "website")
-    private String website;
+    @Column(name = "date_of_incorporation", nullable = false, length = 50)
+    private String dateOfIncorporation; // Added to map the UI date
 
     @Column(name = "email", nullable = false, length = 100)
     private String email;
 
+    @Column(name = "company_phone", nullable = false, length = 50)
+    private String companyPhone; // Added to map the UI phone
+
+    @Column(name = "website")
+    private String website;
+
     @Column(name = "status", nullable = false, length = 30)
-    private String status; 
+    private String status;
 
     @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private CompanyAddress address;

@@ -30,74 +30,79 @@
       }
     </div> 
 
-
-      <form
+    <!-- The form manages the submit lifecycle cleanly via ngSubmit -->
+    <form
       [formGroup]="registrationForm"
       (ngSubmit)="submitRegistration()"
     >
-     <div class="registration-screen">
-      @if (currentStep() === 1) {
-        <app-company-registration  [group]="registrationForm.controls.company"></app-company-registration>
-      }
+      <div class="registration-screen">
+        @if (currentStep() === 1) {
+          <app-company-registration [group]="registrationForm.controls.company"></app-company-registration>
+        }
 
-      @if (currentStep() === 2) {
-        <app-legal-documents></app-legal-documents>
-      }
+        @if (currentStep() === 2) {
+          <app-legal-documents></app-legal-documents>
+        }
 
-      @if (currentStep() === 3) {
-        <app-authorized-representative></app-authorized-representative>
-      }
+        @if (currentStep() === 3) {
+          <app-authorized-representative></app-authorized-representative>
+        }
 
-      @if (currentStep() === 4) {
-        <app-account-setup></app-account-setup>
-      }
-    </div>
+        @if (currentStep() === 4) {
+          <app-account-setup></app-account-setup>
+        }
+      </div>
 
-    <div class="form-actions">
-      @if (currentStep() > 1) {
-        <button
-          type="button"
-          class="previous-button button-primary"
-          (click)="previousStep()"
-        >
-          Previous
-        </button>
-      }
-<!--Temporary button for testing backend submission-->
-      @if (currentStep() === 1) {
-  <button
-    type="button submit-button"
-    class="test-api-button"
-    [disabled]="isSubmitting()"
-    (click)="submitRegistration()"
-  >
-    @if (isSubmitting()) {
-      Submitting...
-    } @else {
-      Test Backend Submission
-    }
-  </button>
-}
+      <div class="form-actions">
+        @if (currentStep() > 1) {
+          <button
+            type="button"
+            class="previous-button button-primary"
+            (click)="previousStep()"
+          >
+            Previous
+          </button>
+        }
 
-      @if (currentStep() < 4) {
-        <button
-          type="button "
-          class="next-button button-primary"
-          (click)="nextStep()"
-        >
-          Next
-        </button>
-      }
+        <!-- Temporary button for testing backend submission (Safe submit configuration) -->
+        @if (currentStep() === 1) {
+          <button
+            type="submit"
+            class="test-api-button"
+            [disabled]="isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              Submitting...
+            } @else {
+              Test Backend Submission
+            }
+          </button>
+        }
 
-      @if (currentStep() === 4) {
-        <button
-          type="submit"
-          class="submit-button"
-        >
-          Submit Registration
-        </button>
-      }
-    </div>
-   </form>
+        @if (currentStep() < 4) {
+          <button
+            type="button"
+            class="next-button button-primary"
+            (click)="nextStep()"
+          >
+            Next
+          </button>
+        }
+
+        @if (currentStep() === 4) {
+          <button
+            type="submit"
+            class="submit-button"
+            [disabled]="isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              Submitting...
+            } @else {
+              Submit Registration
+            }
+          </button>
+        }
+      </div>
+    </form>
   </div>
 </section>

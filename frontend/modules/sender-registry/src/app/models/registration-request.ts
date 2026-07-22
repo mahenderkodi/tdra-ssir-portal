@@ -1,20 +1,25 @@
-export interface RegistrationRequest {
+export interface CompanyDto {
   companyName: string;
   legalEntityName: string;
   tradeLicenseNumber: string;
   registrationNumber: string;
-  email: string;
-  taxVatNumber: string;
-  industryType: string;
-  website: string;
-  addressLine1: string;
-  addressLine2: string;
-  emirate: string;
+  taxId: string;
+  companyType: string;
+  industry: string;
+  dateOfIncorporation: string;
+  registeredAddress: string;
+  country: string;
+  emirateState: string;
   city: string;
   postalCode: string;
-  firstName: string;
-  lastName: string;
-  designation: string;
-  officialEmail: string;
-  mobileNumber: string;
+  website?: string;
+  companyEmail: string;
+  companyPhone: string;
+}
+
+export interface RegistrationRequest {
+  company: CompanyDto;
+  documents?: any;
+  representative?: any;
+  account?: any;
 }

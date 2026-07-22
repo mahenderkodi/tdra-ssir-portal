@@ -1,5 +1,7 @@
 package ae.gov.tdra.ssir.api.service;
 
+
+import ae.gov.tdra.ssir.api.dto.CompanyDto;
 import ae.gov.tdra.ssir.api.dto.RegistrationRequestDto;
 import ae.gov.tdra.ssir.core.entity.*;
 import ae.gov.tdra.ssir.core.repository.*;
@@ -25,50 +27,42 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     @Transactional
     public RegistrationRequest submitRegistration(RegistrationRequestDto dto) {
-        
+        CompanyDto companyDto = dto.getCompany();
+
         // 1. Validate if trade license number is already registered
-        if (companyRepository.findByTradeLicenseNumber(dto.getTradeLicenseNumber()).isPresent()) {
+        if (companyRepository.findByTradeLicenseNumber(companyDto.getTradeLicenseNumber()).isPresent()) {
             throw new IllegalArgumentException("A company with this Trade License Number is already registered");
         }
 
         // 2. Build the Company Entity
         Company company = Company.builder()
-                .companyName(dto.getCompanyName())
-                .legalEntityName(dto.getLegalEntityName())
-                .tradeLicenseNumber(dto.getTradeLicenseNumber())
-                .registrationNumber(dto.getRegistrationNumber())
-                .taxVatNumber(dto.getTaxVatNumber())
-                .industryType(dto.getIndustryType())
-                .website(dto.getWebsite())
-                .email(dto.getEmail())
-                .status("DRAFT") // Initial corporate status
+                .companyName(companyDto.getCompanyName())
+                .legalEntityName(companyDto.getLegalEntityName())
+                .tradeLicenseNumber(companyDto.getTradeLicenseNumber())
+                .registrationNumber(companyDto.getRegistrationNumber())
+                .taxVatNumber(companyDto.getTaxId()) // Maps taxId -> taxVatNumber
+                .companyType(companyDto.getCompanyType())
+                .industryType(companyDto.getIndustry()) // Maps industry -> industryType
+                .dateOfIncorporation(companyDto.getDateOfIncorporation())
+                .email(companyDto.getCompanyEmail()) // Maps companyEmail -> email
+                .companyPhone(companyDto.getCompanyPhone())
+                .website(companyDto.getWebsite())
+                .status("DRAFT")
                 .build();
 
         // 3. Build the One-to-One Address Mapping
         CompanyAddress address = CompanyAddress.builder()
                 .company(company)
-                .addressLine1(dto.getAddressLine1())
-                .addressLine2(dto.getAddressLine2())
-                .emirate(dto.getEmirate())
-                .city(dto.getCity())
-                .postalCode(dto.getPostalCode())
+                .addressLine1(companyDto.getRegisteredAddress()) // Maps registeredAddress -> addressLine1
+                .country(companyDto.getCountry())
+                .emirate(companyDto.getEmirateState()) // Maps emirateState -> emirate
+                .city(companyDto.getCity())
+                .postalCode(companyDto.getPostalCode())
                 .build();
         
         company.setAddress(address); // Link bi-directionally
 
-        // 4. Build the One-to-Many Authorized Contact Mapping
-        CompanyContact contact = CompanyContact.builder()
-                .company(company)
-                .firstName(dto.getFirstName())
-                .lastName(dto.getLastName())
-                .designation(dto.getDesignation())
-                .officialEmail(dto.getOfficialEmail())
-                .mobileNumber(dto.getMobileNumber())
-                .build();
-        
-        company.getContacts().add(contact); // Link bi-directionally
-
-        // 5. Build the Registration Request
+        // 4. Build the Registration Request
         String trackingId = "REG-" + LocalDateTime.now().getYear() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         
         RegistrationRequest request = RegistrationRequest.builder()
@@ -77,10 +71,10 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .currentStatus("SUBMITTED")
                 .build();
 
-        // Save cascade will automatically write to 'companies', 'company_addresses', & 'company_contacts'
+        // Save cascade will automatically write to 'companies' and 'company_addresses'
         RegistrationRequest savedRequest = registrationRepository.save(request);
 
-        // 6. Write Initial Entry in Status History
+        // 5. Write Initial Entry in Status History
         RegistrationStatusHistory history = RegistrationStatusHistory.builder()
                 .registrationRequest(savedRequest)
                 .fromStatus("DRAFT")
@@ -102,18 +96,14 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     @Transactional
     public RegistrationRequest updateRegistrationStatus(Long id, String status, String comments) {
-        
-        // Find existing request
         RegistrationRequest request = registrationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Registration Request not found with ID: " + id));
 
         String oldStatus = request.getCurrentStatus();
         request.setCurrentStatus(status);
 
-        // Update corresponding company status on approval
         if ("APPROVED".equalsIgnoreCase(status)) {
             request.getCompany().setStatus("ACTIVE");
-            // Generate standard Company ID reference
             String companyIdStr = "COMP" + String.format("%06d", request.getCompany().getId());
             request.getCompany().setCompanyIdString(companyIdStr);
         } else if ("REJECTED".equalsIgnoreCase(status)) {
@@ -123,7 +113,6 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         RegistrationRequest updatedRequest = registrationRepository.save(request);
 
-        // Save transaction history log
         RegistrationStatusHistory history = RegistrationStatusHistory.builder()
                 .registrationRequest(updatedRequest)
                 .fromStatus(oldStatus)

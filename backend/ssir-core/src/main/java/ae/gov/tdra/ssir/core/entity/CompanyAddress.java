@@ -1,9 +1,8 @@
 package ae.gov.tdra.ssir.core.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore; // Import Jackson Annotation
 
 @Entity
 @Table(name = "company_addresses")
@@ -20,7 +19,7 @@ public class CompanyAddress {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false, foreignKey = @ForeignKey(name = "fk_address_company"))
-    @JsonIgnore
+    @JsonIgnore // Add this annotation back to prevent infinite loop
     private Company company;
 
     @Column(name = "address_line_1", nullable = false)
@@ -29,8 +28,11 @@ public class CompanyAddress {
     @Column(name = "address_line_2")
     private String addressLine2;
 
+    @Column(name = "country", nullable = false, length = 100)
+    private String country; 
+
     @Column(name = "emirate", nullable = false, length = 50)
-    private String emirate; // Dubai, Abu Dhabi, etc.
+    private String emirate; 
 
     @Column(name = "city", nullable = false, length = 50)
     private String city;
