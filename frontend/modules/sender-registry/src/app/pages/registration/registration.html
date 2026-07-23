@@ -266,24 +266,7 @@
   <!-- Right: Next or Submit button -->
   <div class="footer-action d-flex justify-content-end gap-2">
 
-    @if (currentStep() === 2) {
-      <button
-        type="submit"
-        class="btn btn-outline-primary"
-        [disabled]="isSubmitting()"
-      >
-        @if (isSubmitting()) {
-          <span
-            class="spinner-border spinner-border-sm me-2"
-            aria-hidden="true"
-          ></span>
-
-          Submitting...
-        } @else {
-          Test Backend Submission
-        }
-      </button>
-    }
+  
 
     @if (currentStep() < 4) {
       <button

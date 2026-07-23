@@ -709,11 +709,11 @@ private legalDocumentsComponent?: LegalDocuments;
         passportOrEmiratesId: representative.passportOrEmiratesId ?? ''
       },
       account: {
-        Username: account.Username ?? '',
-        PreferredLanguage: account.PreferredLanguage ?? '',
-        TimeZone: account.TimeZone ?? '',
-        MfaPreference: account.MfaPreference ?? '',
-        NotificationPreference: account.NotificationPreference ?? ''
+        username: account.Username ?? '',
+        preferredLanguage: account.PreferredLanguage ?? '',
+        timeZone: account.TimeZone ?? '',
+        mfaPreference: account.MfaPreference ?? '',
+        notificationPreference: account.NotificationPreference ?? ''
 
       }
     };
