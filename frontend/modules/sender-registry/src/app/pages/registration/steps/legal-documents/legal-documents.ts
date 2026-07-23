@@ -160,77 +160,30 @@ clearFileInputs(): void {
   | (change)="onFileSelected($event, 'tradeLicense')"
   |
   */
-  onFileSelected(
-    event: Event,
-    controlName: string
-  ): void {
+ onFileSelected(
+  event: Event,
+  controlName: string
+): void {
 
-    /*
-    | event.target represents the input element that triggered
-    | the change event.
-    |
-    | TypeScript initially sees event.target as EventTarget.
-    | We convert it to HTMLInputElement so we can access:
-    |
-    | input.files
-    */
-    const input =
-      event.target as HTMLInputElement;
+  const input =
+    event.target as HTMLInputElement;
 
-    /*
-    | input.files contains the files chosen by the user.
-    |
-    | [0]:
-    | Gets the first selected file.
-    |
-    | ?? null:
-    | If no file was selected, store null.
-    */
-    const file =
-      input.files?.[0] ?? null;
+  const file =
+    input.files?.[0] ?? null;
 
-    /*
-    | Find the correct FormControl using the control name.
-    |
-    | Example:
-    |
-    | controlName = 'tradeLicense'
-    |
-    | This becomes:
-    |
-    | group.get('tradeLicense')
-    |
-    | setValue(file):
-    | Stores the selected File object in that FormControl.
-    */
-    this.group
-      .get(controlName)
-      ?.setValue(file);
+  const control =
+    this.group.get(controlName);
 
-    /*
-    | Mark the control as touched.
-    |
-    | This is useful when validation messages are added because Angular
-    | can then show errors after the user interacts with the field.
-    */
-    this.group
-      .get(controlName)
-      ?.markAsTouched();
+  control?.setValue(file);
+  control?.markAsTouched();
+  control?.markAsDirty();
+  control?.updateValueAndValidity();
 
-    /*
-    | Temporary development log.
-    |
-    | Example console output:
-    |
-    | tradeLicense: File
-    |
-    | This can be removed before production.
-    */
-    console.log(
-      `${controlName}:`,
-      file
-    );
-  }
+  console.log(
+    `${controlName}:`,
+    file
+  );
+}
 
 
   /*
@@ -247,49 +200,23 @@ clearFileInputs(): void {
   |
   */
   onMultipleFilesSelected(
-    event: Event
-  ): void {
+  event: Event
+): void {
 
-    /*
-    | Convert the event target into a file input element.
-    */
-    const input =
-      event.target as HTMLInputElement;
+  const input =
+    event.target as HTMLInputElement;
 
-    /*
-    | input.files is a FileList object.
-    |
-    | Array.from converts it into a normal File[] array.
-    |
-    | If no files were selected, an empty array is created.
-    */
-    const files =
-      Array.from(input.files ?? []);
+  const files =
+    Array.from(input.files ?? []);
 
-    /*
-    | Store the complete File[] array inside:
-    |
-    | additionalSupportingDocuments
-    */
-    this.group
-      .get('additionalSupportingDocuments')
-      ?.setValue(files);
-
-    /*
-    | Mark the control as touched after user interaction.
-    */
-    this.group
-      .get('additionalSupportingDocuments')
-      ?.markAsTouched();
-
-    /*
-    | Temporary development log.
-    |
-    | This displays all selected supporting files.
-    */
-    console.log(
-      'Additional documents:',
-      files
+  const control =
+    this.group.get(
+      'additionalSupportingDocuments'
     );
-  }
+
+  control?.setValue(files);
+  control?.markAsTouched();
+  control?.markAsDirty();
+  control?.updateValueAndValidity();
+}
 }

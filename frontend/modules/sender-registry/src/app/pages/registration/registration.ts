@@ -306,7 +306,7 @@ private legalDocumentsComponent?: LegalDocuments;
          Validators.required
       ],
       industry: [
-        'Artificial Intelligence',
+        '',
         Validators.required
       ],
 
@@ -843,12 +843,20 @@ private legalDocumentsComponent?: LegalDocuments;
       }
     }
 
-    /*
-    | Step 2 validation is not added yet.
-    |
-    | Later, this section can check whether all mandatory documents
-    | have been selected before allowing navigation to Step 3.
-    */
+    
+
+
+    if (this.currentStep() === 2) {
+
+  const documentsGroup =
+    this.registrationForm.controls.documents;
+
+  documentsGroup.markAllAsTouched();
+
+  if (documentsGroup.invalid) {
+    return;
+  }
+}
 
      if (this.currentStep() === 3){
       const representativeGroup =
@@ -921,6 +929,16 @@ private legalDocumentsComponent?: LegalDocuments;
     return;
   }
 
+   const documentsGroup =
+  this.registrationForm.controls.documents;
+
+documentsGroup.markAllAsTouched();
+
+if (documentsGroup.invalid) {
+  this.currentStep.set(2);
+  return;
+}
+
   const representativeGroup =
     this.registrationForm.controls.representative;
 
@@ -930,6 +948,8 @@ private legalDocumentsComponent?: LegalDocuments;
     this.currentStep.set(3);
     return;
   }
+
+ 
 
   const accountGroup =
     this.registrationForm.controls.account;

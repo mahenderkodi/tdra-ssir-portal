@@ -16,7 +16,10 @@
   </div>
 
   <!-- Information -->
-  <div class="alert alert-info small" role="alert">
+  <div
+    class="alert alert-info small"
+    role="alert"
+  >
     Documents marked with
     <span class="text-danger fw-bold">*</span>
     are mandatory.
@@ -36,7 +39,7 @@
       </label>
 
       <input
-       #fileInput
+        #fileInput
         id="tradeLicense"
         type="file"
         class="form-control"
@@ -47,14 +50,31 @@
             'tradeLicense'
           )
         "
+        [class.is-invalid]="
+          group.get('tradeLicense')?.touched &&
+          group.get('tradeLicense')?.invalid
+        "
       />
 
-      @if (group.get('tradeLicense')?.value; as file) {
+      @if (
+        group.get('tradeLicense')?.touched &&
+        group.get('tradeLicense')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Trade License is required.
+        </div>
+      }
+
+      @if (
+        group.get('tradeLicense')?.value;
+        as file
+      ) {
         <div class="form-text text-success text-break">
           Selected: {{ file.name }}
         </div>
       }
     </div>
+
 
     <!-- Certificate of Incorporation -->
     <div class="col-12 col-md-6 col-lg-4">
@@ -67,7 +87,7 @@
       </label>
 
       <input
-         #fileInput
+        #fileInput
         id="certificateOfIncorporation"
         type="file"
         class="form-control"
@@ -78,7 +98,20 @@
             'certificateOfIncorporation'
           )
         "
+        [class.is-invalid]="
+          group.get('certificateOfIncorporation')?.touched &&
+          group.get('certificateOfIncorporation')?.invalid
+        "
       />
+
+      @if (
+        group.get('certificateOfIncorporation')?.touched &&
+        group.get('certificateOfIncorporation')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Certificate of Incorporation is required.
+        </div>
+      }
 
       @if (
         group.get('certificateOfIncorporation')?.value;
@@ -89,6 +122,7 @@
         </div>
       }
     </div>
+
 
     <!-- Tax Registration Certificate -->
     <div class="col-12 col-md-6 col-lg-4">
@@ -112,7 +146,20 @@
             'taxRegistrationCertificate'
           )
         "
+        [class.is-invalid]="
+          group.get('taxRegistrationCertificate')?.touched &&
+          group.get('taxRegistrationCertificate')?.invalid
+        "
       />
+
+      @if (
+        group.get('taxRegistrationCertificate')?.touched &&
+        group.get('taxRegistrationCertificate')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Tax Registration Certificate is required.
+        </div>
+      }
 
       @if (
         group.get('taxRegistrationCertificate')?.value;
@@ -123,6 +170,7 @@
         </div>
       }
     </div>
+
 
     <!-- Authorized Signatory Letter -->
     <div class="col-12 col-md-6 col-lg-4">
@@ -135,7 +183,7 @@
       </label>
 
       <input
-         #fileInput
+        #fileInput
         id="authorizedSignatoryLetter"
         type="file"
         class="form-control"
@@ -146,7 +194,20 @@
             'authorizedSignatoryLetter'
           )
         "
+        [class.is-invalid]="
+          group.get('authorizedSignatoryLetter')?.touched &&
+          group.get('authorizedSignatoryLetter')?.invalid
+        "
       />
+
+      @if (
+        group.get('authorizedSignatoryLetter')?.touched &&
+        group.get('authorizedSignatoryLetter')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Authorized Signatory Letter is required.
+        </div>
+      }
 
       @if (
         group.get('authorizedSignatoryLetter')?.value;
@@ -157,6 +218,7 @@
         </div>
       }
     </div>
+
 
     <!-- Signatory Identity Document -->
     <div class="col-12 col-md-6 col-lg-4">
@@ -169,7 +231,7 @@
       </label>
 
       <input
-       #fileInput
+        #fileInput
         id="signatoryIdentityDocument"
         type="file"
         class="form-control"
@@ -180,7 +242,20 @@
             'signatoryIdentityDocument'
           )
         "
+        [class.is-invalid]="
+          group.get('signatoryIdentityDocument')?.touched &&
+          group.get('signatoryIdentityDocument')?.invalid
+        "
       />
+
+      @if (
+        group.get('signatoryIdentityDocument')?.touched &&
+        group.get('signatoryIdentityDocument')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Emirates ID or Passport of Signatory is required.
+        </div>
+      }
 
       @if (
         group.get('signatoryIdentityDocument')?.value;
@@ -191,6 +266,7 @@
         </div>
       }
     </div>
+
 
     <!-- Business Registration Certificate -->
     <div class="col-12 col-md-6 col-lg-4">
@@ -214,7 +290,20 @@
             'businessRegistrationCertificate'
           )
         "
+        [class.is-invalid]="
+          group.get('businessRegistrationCertificate')?.touched &&
+          group.get('businessRegistrationCertificate')?.invalid
+        "
       />
+
+      @if (
+        group.get('businessRegistrationCertificate')?.touched &&
+        group.get('businessRegistrationCertificate')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Business Registration Certificate is required.
+        </div>
+      }
 
       @if (
         group.get('businessRegistrationCertificate')?.value;
@@ -226,6 +315,7 @@
       }
     </div>
 
+
     <!-- Company Logo -->
     <div class="col-12 col-md-6 col-lg-4">
       <label
@@ -233,13 +323,14 @@
         class="form-label fw-semibold"
       >
         Company Logo
+
         <span class="text-secondary fw-normal">
           (Optional)
         </span>
       </label>
 
       <input
-       #fileInput
+        #fileInput
         id="companyLogo"
         type="file"
         class="form-control"
@@ -252,12 +343,16 @@
         "
       />
 
-      @if (group.get('companyLogo')?.value; as file) {
+      @if (
+        group.get('companyLogo')?.value;
+        as file
+      ) {
         <div class="form-text text-success text-break">
           Selected: {{ file.name }}
         </div>
       }
     </div>
+
 
     <!-- Additional Supporting Documents -->
     <div class="col-12 col-md-6 col-lg-4">
@@ -266,19 +361,22 @@
         class="form-label fw-semibold"
       >
         Additional Supporting Documents
+
         <span class="text-secondary fw-normal">
           (Optional)
         </span>
       </label>
 
       <input
-       #fileInput
+        #fileInput
         id="additionalSupportingDocuments"
         type="file"
         class="form-control"
         accept=".pdf,.png,.jpg,.jpeg"
         multiple
-        (change)="onMultipleFilesSelected($event)"
+        (change)="
+          onMultipleFilesSelected($event)
+        "
       />
 
       @if (

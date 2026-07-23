@@ -17,9 +17,51 @@ export interface CompanyDto {
   companyPhone: string;
 }
 
+
+export interface RepresentativeDto {
+  firstName: string;
+  lastName: string;
+  designation: string;
+  department: string;
+  officialEmail: string;
+  mobileNumber: string;
+  officeNumber: string;
+  address: string;
+  uaePassId: string;
+  passportOrEmiratesId: string;
+}
+
+
+export interface AccountDto {
+  username: string;
+  preferredLanguage: string;
+  timeZone: string;
+  mfaPreference: string;
+  notificationPreference: string;
+}
+
+
+/*
+ * Documents are uploaded separately as multipart File objects.
+ *
+ * Therefore, the JSON registrationData currently sends
+ * an empty documents object.
+ */
+export interface DocumentsDto {
+}
+
+
 export interface RegistrationRequest {
   company: CompanyDto;
-  documents?: any;
-  representative?: any;
-  account?: any;
+  documents: DocumentsDto;
+  representative: RepresentativeDto;
+  account: AccountDto;
+}
+
+
+export interface RegistrationSubmissionResponseModel {
+  trackingId: string;
+  status: string;
+  message: string;
+  submittedAt: string;
 }
