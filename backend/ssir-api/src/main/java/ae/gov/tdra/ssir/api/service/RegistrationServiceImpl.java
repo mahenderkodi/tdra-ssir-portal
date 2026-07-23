@@ -7,6 +7,7 @@ import ae.gov.tdra.ssir.core.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,7 +30,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     @Transactional
-    public RegistrationRequest submitRegistrationWithFile(RegistrationRequestDto dto, MultipartFile file) {
+    public RegistrationRequest submitRegistrationWithFiles(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap) {
         CompanyDto companyDto = dto.getCompany();
 
         // 1. Validate duplicates
@@ -74,12 +75,22 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .currentStatus("SUBMITTED")
                 .build();
 
-        // Persist registration and company first to obtain primary key
         RegistrationRequest savedRequest = registrationRepository.save(request);
 
-        // 5. Upload file directly to S3 and link it to this registration
-        if (file != null && !file.isEmpty()) {
-            storageService.uploadAndLinkDocument(file, "TRADE_LICENSE", savedRequest);
+        // 5. LOOP OVER ALL UPLOADED FILES DYNAMICALLY AND PERSIST THEM
+        if (fileMap != null && !fileMap.isEmpty()) {
+            for (String formKey : fileMap.keySet()) {
+                List<MultipartFile> files = fileMap.get(formKey);
+                if (files != null) {
+                    for (MultipartFile file : files) {
+                        if (file != null && !file.isEmpty()) {
+                            // Converts form key 'tradeLicense' to database 'TRADE_LICENSE'
+                            String documentType = convertCamelCaseToUnderscore(formKey).toUpperCase();
+                            storageService.uploadAndLinkDocument(file, documentType, savedRequest);
+                        }
+                    }
+                }
+            }
         }
 
         // 6. Save History Log
@@ -93,6 +104,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         historyRepository.save(history);
 
         return savedRequest;
+    }
+
+    // Helper method to convert 'tradeLicense' -> 'TRADE_LICENSE'
+    private String convertCamelCaseToUnderscore(String camelCase) {
+        return camelCase.replaceAll("(?<!_)(?=[A-Z])", "_");
     }
 
     @Override

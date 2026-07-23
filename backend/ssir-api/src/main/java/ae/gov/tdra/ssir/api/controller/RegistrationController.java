@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -26,13 +27,13 @@ public class RegistrationController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<RegistrationRequest> submitRegistration(
             @RequestPart("registrationData") String registrationDataJson,
-            @RequestPart("file") MultipartFile file) throws Exception {
+            MultipartHttpServletRequest request) throws Exception { // Accepts dynamic multi-file map
 
-        // Manually deserialize the JSON string into your validated DTO
         ObjectMapper objectMapper = new ObjectMapper();
         RegistrationRequestDto dto = objectMapper.readValue(registrationDataJson, RegistrationRequestDto.class);
 
-        RegistrationRequest savedRequest = registrationService.submitRegistrationWithFile(dto, file);
+        // Pass the dynamic multi-file map to the service layer
+        RegistrationRequest savedRequest = registrationService.submitRegistrationWithFiles(dto, request.getMultiFileMap());
         return new ResponseEntity<>(savedRequest, HttpStatus.CREATED);
     }
 
