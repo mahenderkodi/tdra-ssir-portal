@@ -53,7 +53,7 @@ import {
 } from 'rxjs';
 
 
-
+import { RegistrationSubmissionResponseModel } from '../models/registration-response';
 
 @Injectable({
   /*
@@ -103,16 +103,6 @@ export class RegistrationService {
   | Current local-development URL:
   |
   | http://localhost:8080/api/v1/registrations
-  |
-  | localhost:
-  | The backend is running on the same computer.
-  |
-  | 8080:
-  | The Spring Boot backend port.
-  |
-  | /api/v1/registrations:
-  | The registration API endpoint.
-  |
   */
   private readonly apiUrl =
     'http://localhost:8080/api/v1/registrations';
@@ -144,7 +134,7 @@ export class RegistrationService {
   */
   createRegistration(
     formData: FormData
-  ): Observable<unknown> {
+  ): Observable<RegistrationSubmissionResponseModel> {
 
     /*
     | http.post sends the payload to the backend API.
@@ -158,7 +148,7 @@ export class RegistrationService {
     | <unknown>:
     | The exact response structure has not yet been defined.
     */
-    return this.http.post<unknown>(
+    return this.http.post<RegistrationSubmissionResponseModel>(
       this.apiUrl,
       formData
     );

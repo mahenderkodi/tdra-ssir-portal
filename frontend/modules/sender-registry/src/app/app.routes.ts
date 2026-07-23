@@ -3,6 +3,7 @@ import { PrivacyPolicy } from './pages/privacy-policy/privacy-policy';
 import { TermsOfUse } from './pages/terms-of-use/terms-of-use';
 import {Registration} from './pages/registration/registration';
 import { ProductInfo } from './pages/product-info/product-info';
+import { RegistrationSuccessComponent } from 'common/lib/components/registration-success/registration-success';
 export const routes: Routes = [
   {
   path: 'registration',
@@ -28,5 +29,10 @@ export const routes: Routes = [
   path: '',
   component: Registration,
   title: 'Company Registration'
-}
+},
+ {
+    path: 'registration-success',
+    component: RegistrationSuccessComponent,
+    title: 'Registration Success'
+  },
 ];

@@ -1,0 +1,53 @@
+:host {
+  display: block;
+}
+
+.success-page {
+  min-height: 70vh;
+  background-color: var(--bs-tertiary-bg);
+}
+
+.success-card {
+  max-width: 680px;
+}
+
+.success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 76px;
+  height: 76px;
+
+  border-radius: 50%;
+
+  background-color:
+    var(--bs-success-bg-subtle);
+
+  color:
+    var(--bs-success);
+
+  font-size: 2.25rem;
+  font-weight: 700;
+}
+
+.tracking-box {
+  background-color:
+    var(--bs-tertiary-bg);
+}
+
+.detail-label {
+  display: block;
+  margin-bottom: 0.25rem;
+
+  color:
+    var(--bs-secondary-color);
+
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.detail-value {
+  margin-bottom: 0;
+  font-weight: 500;
+}

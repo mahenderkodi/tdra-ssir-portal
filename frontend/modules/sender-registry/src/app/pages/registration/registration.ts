@@ -21,6 +21,10 @@ import {
   ViewChild
 } from '@angular/core';
 
+
+import {
+  HotToastService
+} from '@ngxpert/hot-toast';
 /*
 |--------------------------------------------------------------------------
 | Step components
@@ -97,19 +101,10 @@ import {
 import {
   RegistrationRequest
 } from '../../models/registration-request';
+import { Router } from '@angular/router';
 
 
 @Component({
-  /*
-  |--------------------------------------------------------------------------
-  | Component selector
-  |--------------------------------------------------------------------------
-  |
-  | This component can be used in HTML as:
-  |
-  | <app-registration></app-registration>
-  |
-  */
   selector: 'app-registration',
 
   /*
@@ -139,11 +134,6 @@ import {
     ReactiveFormsModule
   ],
 
-  /*
-  |--------------------------------------------------------------------------
-  | Component files
-  |--------------------------------------------------------------------------
-  */
   templateUrl: './registration.html',
   styleUrl: './registration.css',
 })
@@ -170,6 +160,11 @@ private legalDocumentsComponent?: LegalDocuments;
   |
   */
   private readonly formBuilder = inject(FormBuilder);
+
+  private readonly toast =
+  inject(HotToastService);
+  private readonly router =
+  inject(Router);
 
   private readonly registrationService =
     inject(RegistrationService);
@@ -280,134 +275,90 @@ private legalDocumentsComponent?: LegalDocuments;
     |
     */
     company: this.formBuilder.nonNullable.group({
-
-      /*
-      | TEMPORARY TEST DATA
-      |
-      | Production version:
-      | companyName: ['', Validators.required]
-      */
       companyName: [
-        'Apex Innovations LLC',
-        /* Validators.required */
+        '',
+         Validators.required
       ],
 
       legalEntityName: [
-        'Apex Innovations UAE LLC',
-        /* Validators.required */
+        '',
+        Validators.required
       ],
 
       tradeLicenseNumber: [
-        'TL-483917',
-        /* Validators.required */
+        '',
+        Validators.required
       ],
 
       registrationNumber: [
-        'REG-58214',
-        /* Validators.required */
+        '',
+       Validators.required 
+
       ],
 
       taxId: [
-        'VAT-493821',
-        /* Validators.required */
+        '',
+        Validators.required
       ],
 
-      /*
-      | The value must exactly match one value from the companyTypes array
-      | inside CompanyRegistration.
-      */
       companyType: [
-        'Limited Liability Company',
-        /* Validators.required */
+        '',
+         Validators.required
       ],
-
-      /*
-      | The value must exactly match one value from the industries array
-      | inside CompanyRegistration.
-      */
       industry: [
         'Artificial Intelligence',
-        /* Validators.required */
+        Validators.required
       ],
 
-      /*
-      | HTML date inputs require YYYY-MM-DD format.
-      */
+     
       dateOfIncorporation: [
-        '2020-05-15',
-        /* Validators.required */
+        '',
+         Validators.required 
       ],
 
       registeredAddress: [
-        'Office 808, One Business Centre, Al Barsha',
-        /* Validators.required */
+        '',
+         Validators.required
       ],
 
       country: [
         'United Arab Emirates',
-        /* Validators.required */
+         Validators.required
       ],
 
-      /*
-      | This value must match one value from the emirates array.
-      */
       emirateState: [
-        'Dubai',
-        /* Validators.required */
+        '',
+        Validators.required
       ],
 
       city: [
-        'Dubai',
-        /* Validators.required */
+        '',
+      Validators.required 
       ],
 
       postalCode: [
-        '00000',
-        /* Validators.required */
+        '',
+        Validators.required
       ],
 
-      /*
-      | Website is optional, so there is no required validator.
-      */
       website: [
-        'https://www.apexinnovations.ae'
+        ''
       ],
 
-      /*
-      | Validators.required is temporarily disabled.
-      |
-      | Validators.email remains enabled.
-      |
-      | Therefore:
-      | - An empty email is currently allowed.
-      | - An entered email must have a valid email format.
-      */
+
       companyEmail: [
-        'contact@apexinnovations.ae',
+        '',
         [
-          /* Validators.required, */
+           Validators.required, 
           Validators.email
         ]
       ],
 
-      /*
-      | Validators.required is temporarily disabled.
-      |
-      | The pattern validator remains enabled.
-      |
-      | It accepts:
-      | - Digits
-      | - Spaces
-      | - Plus sign
-      | - Hyphen
-      | - Parentheses
-      |
-      | The allowed length is between 7 and 20 characters.
-      */
+      
       companyPhone: [
-        '+971 58 123 4765',
+        '',
         [
-          /* Validators.required, */
+          Validators.required,
           Validators.pattern(
             /^[0-9+\-\s()]{7,20}$/
           )
@@ -434,25 +385,25 @@ private legalDocumentsComponent?: LegalDocuments;
       tradeLicense:
         this.formBuilder.control<File | null>(
           null,
-          /* Validators.required */
+          Validators.required 
         ),
 
       certificateOfIncorporation:
         this.formBuilder.control<File | null>(
           null,
-          /* Validators.required */
+          Validators.required
         ),
 
       taxRegistrationCertificate:
         this.formBuilder.control<File | null>(
           null,
-          /* Validators.required */
+          Validators.required
         ),
 
       authorizedSignatoryLetter:
         this.formBuilder.control<File | null>(
           null,
-          /* Validators.required */
+          Validators.required 
         ),
 
       /*
@@ -461,13 +412,13 @@ private legalDocumentsComponent?: LegalDocuments;
       signatoryIdentityDocument:
         this.formBuilder.control<File | null>(
           null,
-          /* Validators.required */
+          Validators.required
         ),
 
       businessRegistrationCertificate:
         this.formBuilder.control<File | null>(
           null,
-          /* Validators.required */
+          Validators.required 
         ),
 
       /*
@@ -478,13 +429,6 @@ private legalDocumentsComponent?: LegalDocuments;
           null
         ),
 
-      /*
-      | Additional supporting documents can contain multiple files.
-      |
-      | It therefore stores File[] rather than File | null.
-      |
-      | Initially, the array is empty.
-      */
       additionalSupportingDocuments:
         this.formBuilder.nonNullable.control<File[]>([]),
     }),
@@ -495,37 +439,37 @@ private legalDocumentsComponent?: LegalDocuments;
   this.formBuilder.nonNullable.group({
 
     firstName: [
-      'Ahmed',
-      /* Validators.required */
+      '',
+       Validators.required 
     ],
 
     lastName: [
-      'Al Mansoori',
-      /* Validators.required */
+      '',
+       Validators.required 
     ],
 
     designation: [
-      'Operations Manager',
-      /* Validators.required */
+      '',
+      Validators.required 
     ],
 
     department: [
-      'Operations',
-      /* Validators.required */
+      '',
+      Validators.required 
     ],
 
     officialEmail: [
-      'ahmed.almansoori@apexinnovations.ae',
+      '',
       [
-        /* Validators.required, */
+        Validators.required, 
         Validators.email
       ]
     ],
 
     mobileNumber: [
-      '+971 58 123 4765',
+      '',
       [
-        /* Validators.required, */
+        Validators.required, 
         Validators.pattern(
           /^[0-9+\-\s()]{7,20}$/
         )
@@ -533,9 +477,9 @@ private legalDocumentsComponent?: LegalDocuments;
     ],
 
     officeNumber: [
-      '+971 4 123 4567',
+      '',
       [
-        /* Validators.required, */
+        Validators.required,
         Validators.pattern(
           /^[0-9+\-\s()]{7,20}$/
         )
@@ -543,18 +487,18 @@ private legalDocumentsComponent?: LegalDocuments;
     ],
 
     address: [
-      'Office 808, One Business Centre, Dubai',
-      /* Validators.required */
+      '',
+      Validators.required
     ],
 
     uaePassId: [
-      'UAE-PASS-58214',
-      /* Validators.required */
+      '',
+      Validators.required
     ],
 
     passportOrEmiratesId: [
-      '784-1990-1234567-1',
-      /* Validators.required */
+      '',
+      Validators.required
     ]
   }),
 
@@ -562,9 +506,10 @@ private legalDocumentsComponent?: LegalDocuments;
   this.formBuilder.nonNullable.group({
 
     Username: [
-      'ahmed.almansoori',
+      '',
       [
-        /* Validators.required, */
+        
+        Validators.required, 
         Validators.minLength(4),
         Validators.maxLength(30),
         Validators.pattern(
@@ -574,23 +519,23 @@ private legalDocumentsComponent?: LegalDocuments;
     ],
 
     PreferredLanguage: [
-      'English',
-      /* Validators.required */
+      '',
+      Validators.required
     ],
 
     TimeZone: [
-      'Asia/Dubai',
-      /* Validators.required */
+      '',
+      Validators.required
     ],
 
     MfaPreference: [
-      'Authenticator App',
-      /* Validators.required */
+      '',
+       Validators.required 
     ],
 
     NotificationPreference: [
-      'Email and SMS',
-      /* Validators.required */
+      '',
+    Validators.required
     ]
   }),
   });
@@ -1027,6 +972,30 @@ private legalDocumentsComponent?: LegalDocuments;
         this.successMessage.set(
           'Registration and documents submitted successfully.'
         );
+
+         this.toast.success(
+          'Registration submitted successfully.'
+        );
+
+         void this.router.navigate(
+        ['/registration-success'],
+        {
+          state: {
+            trackingId:
+              response.trackingId,
+
+            status:
+              response.status,
+
+            message:
+              response.message,
+
+            submittedAt:
+              response.submittedAt
+          }
+        }
+      );
+    
       },
 
       error: (error) => {
@@ -1037,6 +1006,8 @@ private legalDocumentsComponent?: LegalDocuments;
 
         this.isSubmitting.set(false);
 
+      
+
         /*
          * Do not reset documents here.
          * The user may retry the submission.
@@ -1044,6 +1015,10 @@ private legalDocumentsComponent?: LegalDocuments;
         this.errorMessage.set(
           'Registration could not be submitted. Please try again.'
         );
+
+           this.toast.error(
+        'Registration could not be submitted. Please try again.'
+      );
       }
     });
 }

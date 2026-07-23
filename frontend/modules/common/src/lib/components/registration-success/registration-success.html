@@ -1,0 +1,149 @@
+<section
+  class="
+    success-page
+    d-flex
+    align-items-center
+    py-5
+  "
+>
+  <div class="container">
+
+    <div
+      class="
+        card
+        success-card
+        border-0
+        shadow-sm
+        mx-auto
+      "
+    >
+      <div
+        class="
+          card-body
+          text-center
+          p-4
+          p-md-5
+        "
+      >
+
+        <!-- Success icon -->
+        <div
+          class="success-icon mx-auto mb-4"
+          aria-hidden="true"
+        >
+          ✓
+        </div>
+
+
+        <!-- Heading -->
+        <h1 class="h3 fw-bold mb-3">
+          Registration Submitted Successfully
+        </h1>
+
+
+        <!-- Backend message -->
+        <p class="text-secondary mb-4">
+          {{ submissionDetails.message }}
+        </p>
+
+
+        <!-- Tracking ID -->
+        @if (submissionDetails.trackingId) {
+
+          <div
+            class="
+              tracking-box
+              rounded
+              p-3
+              mb-4
+            "
+          >
+            <span
+              class="
+                d-block
+                small
+                text-secondary
+                mb-1
+              "
+            >
+              Tracking ID
+            </span>
+
+            <strong
+              class="
+                text-primary
+                fs-5
+                text-break
+              "
+            >
+              {{ submissionDetails.trackingId }}
+            </strong>
+          </div>
+        }
+
+
+        <!-- Submission information -->
+        <div class="row g-3 text-start mb-4">
+
+          <div class="col-12 col-md-6">
+            <span class="detail-label">
+              Status
+            </span>
+
+            <p class="detail-value">
+              <span class="badge text-bg-success">
+                {{ submissionDetails.status }}
+              </span>
+            </p>
+          </div>
+
+
+          @if (submissionDetails.submittedAt) {
+
+            <div class="col-12 col-md-6">
+              <span class="detail-label">
+                Submitted At
+              </span>
+
+              <p class="detail-value">
+                {{
+                  submissionDetails.submittedAt
+                    | date: 'medium'
+                }}
+              </p>
+            </div>
+          }
+
+        </div>
+
+
+        <!-- Final information -->
+        <div
+          class="
+            alert
+            alert-info
+            text-start
+            small
+            mb-4
+          "
+          role="alert"
+        >
+          Please save your tracking ID for future
+          communication. Our team will review your
+          application and get back to you.
+        </div>
+
+
+        <!-- Home button -->
+        <a
+          routerLink="/"
+          class="btn btn-primary px-4"
+        >
+          Return to Home
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</section>
