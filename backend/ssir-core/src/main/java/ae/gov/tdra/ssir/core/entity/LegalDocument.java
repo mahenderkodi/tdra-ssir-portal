@@ -3,7 +3,9 @@ package ae.gov.tdra.ssir.core.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "legal_documents")
@@ -22,14 +24,18 @@ public class LegalDocument {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "registration_id", nullable = true, foreignKey = @ForeignKey(name = "fk_doc_reg"))
+    @JsonIgnore
     private RegistrationRequest registrationRequest; // Nullable during draft uploads
 
     @Column(name = "document_type", nullable = false, length = 50)
-    private String documentType; // e.g., TRADE_LICENSE, SIGNATORY_LETTER
+    private String documentType; 
 
     @Column(name = "file_name", nullable = false)
     private String fileName;
-
+    
+    @Transient
+    private String presignedUrl;
+    
     @Column(name = "file_storage_path", nullable = false)
     private String fileStoragePath; // Key/Path inside the MinIO bucket
 

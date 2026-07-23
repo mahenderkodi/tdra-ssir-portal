@@ -16,4 +16,7 @@ public interface RegistrationService {
     List<RegistrationRequest> getAllRegistrations();
     
     RegistrationRequest updateRegistrationStatus(Long id, String status, String comments);
+    
+ // Fetches a single registration with all documents pre-signed
+    RegistrationRequest getRegistrationWithPresignedUrls(Long id);
 }

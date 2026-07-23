@@ -92,6 +92,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 }
             }
         }
+        
 
         // 6. Save History Log
         RegistrationStatusHistory history = RegistrationStatusHistory.builder()
@@ -104,6 +105,24 @@ public class RegistrationServiceImpl implements RegistrationService {
         historyRepository.save(history);
 
         return savedRequest;
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public RegistrationRequest getRegistrationWithPresignedUrls(Long id) {
+        // 1. Fetch the request from MySQL
+        RegistrationRequest request = registrationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Registration Request not found with ID: " + id));
+
+        // 2. Generate a secure pre-signed MinIO URL for each associated document dynamically
+        if (request.getDocuments() != null) {
+            for (LegalDocument doc : request.getDocuments()) {
+                String secureUrl = storageService.generatePresignedUrl(doc.getFileStoragePath());
+                doc.setPresignedUrl(secureUrl); // Populate the transient in-memory field
+            }
+        }
+
+        return request;
     }
 
     // Helper method to convert 'tradeLicense' -> 'TRADE_LICENSE'

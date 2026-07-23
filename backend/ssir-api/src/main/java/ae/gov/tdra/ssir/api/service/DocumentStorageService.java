@@ -107,6 +107,22 @@ public class DocumentStorageService {
         }
     }
 
+ // --- NEW: GENERATE SECURE TEMPORARY S3 URL ---
+    public String generatePresignedUrl(String storagePath) {
+        try {
+            return minioClient.getPresignedObjectUrl(
+                    io.minio.GetPresignedObjectUrlArgs.builder()
+                            .method(io.minio.http.Method.GET)
+                            .bucket(bucketName)
+                            .object(storagePath)
+                            .expiry(60 * 15) // The URL expires automatically after 15 minutes
+                            .build()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate secure presigned URL: " + e.getMessage(), e);
+        }
+    }
+    
     // --- SUPPORT METHOD C: Document Retrieval Stream ---
     public InputStream getDocumentStream(String storagePath) {
         try {
