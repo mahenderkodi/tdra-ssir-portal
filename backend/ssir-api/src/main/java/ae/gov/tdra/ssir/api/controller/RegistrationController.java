@@ -27,7 +27,7 @@ public class RegistrationController {
         RegistrationRequestDto dto = objectMapper.readValue(registrationDataJson, RegistrationRequestDto.class);
 
         RegistrationRequest savedRequest = registrationService.submitRegistrationWithFiles(dto, request.getMultiFileMap());
-     // 2. Map directly to your clean success DTO
+     
         RegistrationSuccessResponse successResponse = RegistrationSuccessResponse.builder()
                 .trackingId(savedRequest.getTrackingId())
                 .status(savedRequest.getCurrentStatus())

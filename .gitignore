@@ -27,3 +27,4 @@ Thumbs.db
 
 # Sensitive local configurations
 **/environment.development.ts:
+/.metadata/
