@@ -30,8 +30,7 @@ public class RegistrationRequest {
     @JoinColumn(name = "company_id", foreignKey = @ForeignKey(name = "fk_reg_company"))
     private Company company;
 
-    // --- NEW BIDIRECTIONAL RELATIONSHIP ---
-    // Automatically fetches and nests all uploaded files in the GET request payload
+  
     @OneToMany(mappedBy = "registrationRequest", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @Builder.Default
     @JsonIgnoreProperties("registrationRequest") // Prevents circular JSON loop

@@ -1,6 +1,7 @@
 package ae.gov.tdra.ssir.api.controller;
 
 import ae.gov.tdra.ssir.api.dto.RegistrationRequestDto;
+import ae.gov.tdra.ssir.api.dto.RegistrationSuccessResponse;
 import ae.gov.tdra.ssir.api.service.RegistrationService;
 import ae.gov.tdra.ssir.core.entity.RegistrationRequest;
 import org.springframework.http.MediaType;
@@ -18,32 +19,36 @@ public class RegistrationController {
     @Autowired
     private RegistrationService registrationService;
 
-    // 1. Submit Registration API
+   
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<RegistrationRequest> submitRegistration(
-            @RequestPart("registrationData") String registrationDataJson,
-            MultipartHttpServletRequest request) throws Exception {
+    public ResponseEntity<RegistrationSuccessResponse> submitRegistration(@RequestPart("registrationData") String registrationDataJson, MultipartHttpServletRequest request) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
         RegistrationRequestDto dto = objectMapper.readValue(registrationDataJson, RegistrationRequestDto.class);
 
         RegistrationRequest savedRequest = registrationService.submitRegistrationWithFiles(dto, request.getMultiFileMap());
-        return new ResponseEntity<>(savedRequest, HttpStatus.CREATED);
+     // 2. Map directly to your clean success DTO
+        RegistrationSuccessResponse successResponse = RegistrationSuccessResponse.builder()
+                .trackingId(savedRequest.getTrackingId())
+                .status(savedRequest.getCurrentStatus())
+                .message("Your onboarding application has been successfully submitted to TDRA.")
+                .submittedAt(savedRequest.getCreatedAt())
+                .build();
+
+        return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
     }
     
-    // 4. Secure Inspection Endpoint (Updated with explicit "id" name mapping)
     @GetMapping("/{id}")
-    public ResponseEntity<RegistrationRequest> getRegistrationById(@PathVariable("id") Long id) { // Added "id"
+    public ResponseEntity<RegistrationRequest> getRegistrationById(@PathVariable("id") Long id) { 
         RegistrationRequest request = registrationService.getRegistrationWithPresignedUrls(id);
         return ResponseEntity.ok(request);
     }
     
-    // 3. Update Status API (Updated with explicit parameter name mappings)
     @PutMapping("/{id}/status")
     public ResponseEntity<RegistrationRequest> updateStatus(
-            @PathVariable("id") Long id, // Added "id"
-            @RequestParam("status") String status, // Added "status"
-            @RequestParam(value = "comments", required = false) String comments) { // Added "comments"
+            @PathVariable("id") Long id, 
+            @RequestParam("status") String status, 
+            @RequestParam(value = "comments", required = false) String comments) {
         
         RegistrationRequest updated = registrationService.updateRegistrationStatus(id, status, comments);
         return ResponseEntity.ok(updated);

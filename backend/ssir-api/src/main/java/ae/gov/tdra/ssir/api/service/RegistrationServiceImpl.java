@@ -1,7 +1,9 @@
 package ae.gov.tdra.ssir.api.service;
 
+import ae.gov.tdra.ssir.api.dto.AccountDto;
 import ae.gov.tdra.ssir.api.dto.CompanyDto;
 import ae.gov.tdra.ssir.api.dto.RegistrationRequestDto;
+import ae.gov.tdra.ssir.api.dto.RepresentativeDto;
 import ae.gov.tdra.ssir.core.entity.*;
 import ae.gov.tdra.ssir.core.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Autowired
     private DocumentStorageService storageService;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     @Transactional
@@ -65,6 +70,27 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .build();
         
         company.setAddress(address);
+        
+     
+        RepresentativeDto repDto = dto.getRepresentative();
+        if (repDto != null && repDto.getFirstName() != null && !repDto.getFirstName().trim().isEmpty()) {
+            CompanyContact contact = CompanyContact.builder()
+                    .company(company)
+                    .firstName(repDto.getFirstName())
+                    .lastName(repDto.getLastName())
+                    .designation(repDto.getDesignation())
+                    .department(repDto.getDepartment())
+                    .officialEmail(repDto.getOfficialEmail())
+                    .mobileNumber(repDto.getMobileNumber())
+                    .officeNumber(repDto.getOfficeNumber())
+                    .address(repDto.getAddress())
+                    .uaePassId(repDto.getUaePassId())
+                    .passportEmiratesId(repDto.getPassportOrEmiratesId())
+                    .build();
+            
+            company.getContacts().add(contact); 
+        }
+        
 
         // 4. Build Registration Request
         String trackingId = "REG-" + LocalDateTime.now().getYear() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
@@ -76,8 +102,28 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .build();
 
         RegistrationRequest savedRequest = registrationRepository.save(request);
+        
+  
+        AccountDto accountDto = dto.getAccount();
+        if (accountDto != null && accountDto.getUsername() != null && !accountDto.getUsername().trim().isEmpty()) {
+            User pendingUser = User.builder()
+                    .company(company)
+                    .username(accountDto.getUsername())
+                    .email(repDto != null ? repDto.getOfficialEmail() : companyDto.getCompanyEmail())
+                    .passwordHash("PENDING_SETUP_TOKEN") 
+                    .userIdString("USR" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
+                    .status("PENDING_ACTIVATION")
+                    .preferredLanguage(accountDto.getPreferredLanguage() != null ? accountDto.getPreferredLanguage() : "EN")
+                    .timeZone(accountDto.getTimeZone() != null ? accountDto.getTimeZone() : "Asia/Dubai")
+                    .mfaPreference(accountDto.getMfaPreference() != null ? accountDto.getMfaPreference() : "EMAIL")
+                    .notificationPreference(accountDto.getNotificationPreference() != null ? accountDto.getNotificationPreference() : "BOTH")
+                    .build();
+            
+            userRepository.save(pendingUser);
+        }
+        
 
-        // 5. LOOP OVER ALL UPLOADED FILES DYNAMICALLY AND PERSIST THEM
+      
         if (fileMap != null && !fileMap.isEmpty()) {
             for (String formKey : fileMap.keySet()) {
                 List<MultipartFile> files = fileMap.get(formKey);
@@ -93,8 +139,6 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
         }
         
-
-        // 6. Save History Log
         RegistrationStatusHistory history = RegistrationStatusHistory.builder()
                 .registrationRequest(savedRequest)
                 .fromStatus("DRAFT")
@@ -110,15 +154,14 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     @Transactional(readOnly = true)
     public RegistrationRequest getRegistrationWithPresignedUrls(Long id) {
-        // 1. Fetch the request from MySQL
+       
         RegistrationRequest request = registrationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Registration Request not found with ID: " + id));
 
-        // 2. Generate a secure pre-signed MinIO URL for each associated document dynamically
         if (request.getDocuments() != null) {
             for (LegalDocument doc : request.getDocuments()) {
                 String secureUrl = storageService.generatePresignedUrl(doc.getFileStoragePath());
-                doc.setPresignedUrl(secureUrl); // Populate the transient in-memory field
+                doc.setPresignedUrl(secureUrl); 
             }
         }
 

@@ -2,10 +2,10 @@ package ae.gov.tdra.ssir.core.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import ae.gov.tdra.ssir.core.entity.*;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -13,7 +13,9 @@ import ae.gov.tdra.ssir.core.entity.*;
     @Index(name = "idx_user_email", columnList = "email"),
     @Index(name = "idx_user_uae_pass", columnList = "uae_pass_uuid")
 })
-@Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Getter 
+@Setter 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -25,7 +27,7 @@ public class User {
     private Long id;
 
     @Column(name = "user_id_string", unique = true, nullable = false, length = 30)
-    private String userIdString; // e.g., USR000123
+    private String userIdString; 
 
     @Column(name = "username", unique = true, nullable = false, length = 50)
     private String username;
@@ -37,14 +39,32 @@ public class User {
     private String passwordHash;
 
     @Column(name = "uae_pass_uuid", unique = true, length = 100)
-    private String uaePassUuid; // Nullable for standard local accounts
+    private String uaePassUuid;
 
     @Column(name = "status", nullable = false, length = 30)
-    private String status; // e.g., PENDING_ACTIVATION, ACTIVE, LOCKED, DISABLED
+    private String status; 
+
+    // --- NEW ACCOUNT PREFERENCE FIELDS ---
+    @Column(name = "preferred_language", nullable = false, length = 10)
+    @Builder.Default
+    private String preferredLanguage = "EN"; // Default to English
+
+    @Column(name = "time_zone", nullable = false, length = 30)
+    @Builder.Default
+    private String timeZone = "Asia/Dubai"; // Default to UAE standard time
+
+    @Column(name = "mfa_preference", nullable = false, length = 20)
+    @Builder.Default
+    private String mfaPreference = "EMAIL"; // e.g., NONE, EMAIL, SMS, APP
+
+    @Column(name = "notification_preference", nullable = false, length = 20)
+    @Builder.Default
+    private String notificationPreference = "BOTH"; // e.g., EMAIL, SMS, BOTH, NONE
+    
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", foreignKey = @ForeignKey(name = "fk_user_company"))
-    private Company company; // Nullable for TDRA internal users
+    private Company company; 
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
