@@ -30,6 +30,12 @@ export class AuthService {
     );
   }
 
+  
+   isAuthenticated(): boolean {
+    return Boolean(
+      this.tokenStorage.getAccessToken()
+    );
+  }
   // Executes token rotation handshake with the backend
   refreshToken(): Observable<any> {
     const refreshTokenValue = this.tokenStorage.getRefreshToken();
