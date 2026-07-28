@@ -50,10 +50,12 @@
                 "input": "modules/sender-registry/public"
               }
             ],
-            "styles": ["node_modules/bootstrap/dist/css/bootstrap.min.css",
-             "modules/common/src/styles/brand-theme.css",
-            "modules/sender-registry/src/styles.css",
-          "@ngxpert/hot-toast/styles.css"]
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "modules/common/src/styles/brand-theme.css",
+              "modules/sender-registry/src/styles.css",
+              "@ngxpert/hot-toast/styles.css"
+            ]
           },
           "configurations": {
             "production": {
@@ -154,6 +156,89 @@
         },
         "test": {
           "builder": "@angular/build:unit-test"
+        }
+      }
+    },
+    "role-based-login": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:class": {
+          "skipTests": true
+        },
+        "@schematics/angular:component": {
+          "skipTests": true
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true
+        },
+        "@schematics/angular:guard": {
+          "skipTests": true
+        },
+        "@schematics/angular:interceptor": {
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": true
+        },
+        "@schematics/angular:resolver": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
+      "root": "modules/role-based-login",
+      "sourceRoot": "modules/role-based-login/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "modules/role-based-login/src/main.ts",
+            "tsConfig": "modules/role-based-login/tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "modules/role-based-login/public"
+              }
+            ],
+            "styles": ["modules/role-based-login/src/styles.css"]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "role-based-login:build:production"
+            },
+            "development": {
+              "buildTarget": "role-based-login:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
         }
       }
     }

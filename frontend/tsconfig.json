@@ -1,7 +1,7 @@
 /* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
 /* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
- "compilerOptions": {
+  "compilerOptions": {
     "paths": {
       "common": ["./modules/common/src/public-api.ts"],
       "common/*": ["./modules/common/src/*"]
@@ -41,6 +41,9 @@
     },
     {
       "path": "./modules/role-login/tsconfig.spec.json"
+    },
+    {
+      "path": "./modules/role-based-login/tsconfig.app.json"
     }
   ]
 }
