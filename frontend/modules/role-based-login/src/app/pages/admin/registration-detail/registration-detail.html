@@ -1,1 +1,105 @@
-<p>registration-detail works!</p>
+<section class="container-fluid" *ngIf="!isLoading() && registration()">
+  <div class="row g-4">
+    
+    <!-- LEFT PANEL: Corporate Profile Details (50% Width) -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center p-3 rounded-top">
+          <h4 class="mb-0 fw-bold">Company Profile Audit</h4>
+          <span class="badge bg-warning text-dark px-3 py-1">{{ registration().currentStatus }}</span>
+        </div>
+        <div class="card-body p-4" style="max-height: 700px; overflow-y: auto;">
+          
+          <div *ngIf="errorMessage()" class="alert alert-danger small" role="alert">
+            {{ errorMessage() }}
+          </div>
+
+          <!-- Section A: Corporate -->
+          <h5 class="text-primary border-bottom pb-2 mb-3 fw-bold">Company Metadata</h5>
+          <dl class="row small mb-4">
+            <dt class="col-sm-4 text-muted">Company Name:</dt>
+            <dd class="col-sm-8 fw-semibold text-dark">{{ registration().company.companyName }}</dd>
+
+            <dt class="col-sm-4 text-muted">Legal Entity Name:</dt>
+            <dd class="col-sm-8">{{ registration().company.legalEntityName }}</dd>
+
+            <dt class="col-sm-4 text-muted">Trade License No:</dt>
+            <dd class="col-sm-8"><code>{{ registration().company.tradeLicenseNumber }}</code></dd>
+
+            <dt class="col-sm-4 text-muted">VAT Number:</dt>
+            <dd class="col-sm-8">{{ registration().company.taxVatNumber }}</dd>
+
+            <dt class="col-sm-4 text-muted">Type / Industry:</dt>
+            <dd class="col-sm-8">{{ registration().company.companyType }} ({{ registration().company.industryType }})</dd>
+          </dl>
+
+          <!-- Section B: Address -->
+          <h5 class="text-primary border-bottom pb-2 mb-3 fw-bold">Registered Office</h5>
+          <dl class="row small mb-4">
+            <dt class="col-sm-4 text-muted">Address Line 1:</dt>
+            <dd class="col-sm-8">{{ registration().company.address?.addressLine1 }}</dd>
+
+            <dt class="col-sm-4 text-muted">City / Emirate:</dt>
+            <dd class="col-sm-8">{{ registration().company.address?.city }}, {{ registration().company.address?.emirate }}</dd>
+
+            <dt class="col-sm-4 text-muted">Country:</dt>
+            <dd class="col-sm-8">{{ registration().company.address?.country }}</dd>
+          </dl>
+
+          <!-- Section C: Uploaded Files Index -->
+          <h5 class="text-primary border-bottom pb-2 mb-3 fw-bold">Uploaded Legal Files (Click to inspect)</h5>
+          <div class="list-group mb-4 small shadow-sm">
+            <button type="button" *ngFor="let doc of registration().documents" 
+                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2"
+                    [class.active]="activeDocName() === doc.documentType"
+                    (click)="previewDocument(doc)">
+              <span class="fw-semibold">📄 {{ doc.documentType }}</span>
+              <span class="badge bg-secondary rounded-pill">{{ (doc.fileSizeBytes / 1024) | number:'1.0-0' }} KB</span>
+            </button>
+          </div>
+
+          <!-- Section D: Administrator Action Footer -->
+          <div class="border-top pt-4 mt-4 d-flex justify-content-around gap-2">
+            <button class="btn btn-danger px-4 fw-semibold" [disabled]="isProcessing()"
+                    (click)="executeAction('REJECTED', 'Trade License signature or formatting invalid.')">
+              Reject
+            </button>
+            <button class="btn btn-warning px-4 fw-semibold" [disabled]="isProcessing()"
+                    (click)="executeAction('INFO_REQUESTED', 'Emirates ID is expired. Please upload a valid card.')">
+              Request Info
+            </button>
+            <button class="btn btn-success px-5 fw-semibold" [disabled]="isProcessing()"
+                    (click)="executeAction('APPROVED', 'All documents successfully audited and verified.')">
+              Approve Onboarding
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: MinIO Document Viewer (50% Width) -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-secondary text-white p-3 rounded-top">
+          <h4 class="mb-0 fw-bold">Audit Preview: {{ activeDocName() }}</h4>
+        </div>
+        <div class="card-body p-0 bg-light" style="height: 700px;">
+          <!-- Safely loads the secure pre-signed MinIO stream in real-time -->
+          <iframe *ngIf="activePreviewUrl()" [src]="activePreviewUrl()" 
+                  width="100%" height="100%" style="border: none;"></iframe>
+          <div *ngIf="!activePreviewUrl()" class="text-center p-5 mt-5">
+            <p class="text-muted">No document selected for auditing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Loader -->
+<div *ngIf="isLoading()" class="text-center p-5 mt-5">
+  <div class="spinner-border text-primary" role="status"></div>
+  <p class="mt-2 text-muted small">Retrieving audit file streams...</p>
+</div>

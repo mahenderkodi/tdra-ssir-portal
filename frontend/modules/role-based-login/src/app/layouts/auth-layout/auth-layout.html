@@ -1,1 +1,6 @@
-<p>auth-layout works!</p>
+<div class="auth-layout-container d-flex align-items-center justify-content-center min-vh-100">
+  <div class="w-100" style="max-width: 480px; padding: 15px;">
+    <!-- Crucial: This is where LoginComponent and CreatePasswordComponent are injected [3] -->
+    <router-outlet></router-outlet>
+  </div>
+</div>

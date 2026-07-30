@@ -5,7 +5,7 @@ import {AuthenticatedUser} from './models/authenticated-user-model';
   providedIn: 'root'
 })
 
-@Service()
+
 export class TokenStorageService {
   private readonly REFRESH_TOKEN_KEY = 'ssir_refresh_token';
   

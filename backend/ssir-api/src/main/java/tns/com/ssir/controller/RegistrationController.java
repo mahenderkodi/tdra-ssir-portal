@@ -2,20 +2,21 @@ package tns.com.ssir.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException; 
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import tns.com.ssir.core.entity.RegistrationRequest;
 import tns.com.ssir.dto.RegistrationRequestDto;
 import tns.com.ssir.dto.RegistrationSuccessResponse;
+import tns.com.ssir.dto.TrackingRequest;
+import tns.com.ssir.dto.TrackingResponse;
 import tns.com.ssir.service.RegistrationService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
 import java.util.List;
 import java.util.Set;
 
@@ -40,10 +41,8 @@ public class RegistrationController {
             throw new ConstraintViolationException(violations); 
         }
 
-       
         RegistrationRequest savedRequest = registrationService.submitRegistrationWithFiles(dto, request.getMultiFileMap());
 
-        
         RegistrationSuccessResponse successResponse = RegistrationSuccessResponse.builder()
                 .trackingId(savedRequest.getTrackingId())
                 .status(savedRequest.getCurrentStatus())
@@ -54,20 +53,18 @@ public class RegistrationController {
         return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
     }
     
-	 // 2. Get All Registrations API (TDRA Admin Queue View)
-	    // Map to the base path "/api/v1/registrations" with no sub-path [3]
-	    @GetMapping
-	    public ResponseEntity<List<RegistrationRequest>> getAllRegistrations() {
-	        List<RegistrationRequest> list = registrationService.getAllRegistrations();
-	        return ResponseEntity.ok(list);
-	    }
+
+	@GetMapping
+	public ResponseEntity<List<RegistrationRequest>> getAllRegistrations() {
+	     List<RegistrationRequest> list = registrationService.getAllRegistrations();
+	     return ResponseEntity.ok(list);
+	   }
     
     @GetMapping("/{id}")
     public ResponseEntity<RegistrationRequest> getRegistrationById(@PathVariable("id") Long id) {
         RegistrationRequest request = registrationService.getRegistrationWithPresignedUrls(id);
         return ResponseEntity.ok(request);
     }
-
     
     @PutMapping("/{id}/status")
     public ResponseEntity<RegistrationRequest> updateStatus(
@@ -77,5 +74,22 @@ public class RegistrationController {
         
         RegistrationRequest updated = registrationService.updateRegistrationStatus(id, status, comments);
         return ResponseEntity.ok(updated);
+    }
+    
+ // 5. Secure Public Tracking API [3]
+    @PostMapping("/track")
+    public ResponseEntity<TrackingResponse> trackApplication(@Valid @RequestBody TrackingRequest trackingRequest) {
+        RegistrationRequest request = registrationService.trackApplication(
+                trackingRequest.getTrackingId(),
+                trackingRequest.getTradeLicenseNumber()
+        );
+        
+        TrackingResponse trackingResponse = TrackingResponse.builder()
+        		.trackingId(request.getTrackingId())
+                .companyName(request.getCompany().getCompanyName())
+                .currentStatus(request.getCurrentStatus())
+                .submittedAt(request.getCreatedAt())
+                .build();
+        return ResponseEntity.ok(trackingResponse);
     }
 }

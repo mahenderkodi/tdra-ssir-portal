@@ -16,4 +16,6 @@ public interface RegistrationService {
     RegistrationRequest updateRegistrationStatus(Long id, String status, String comments);
     
     RegistrationRequest getRegistrationWithPresignedUrls(Long id);
+    
+    RegistrationRequest trackApplication(String trackingId, String tradeLicenseNumber);
 }

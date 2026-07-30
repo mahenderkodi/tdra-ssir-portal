@@ -6,7 +6,6 @@ import tns.com.ssir.dto.AccountDto;
 import tns.com.ssir.dto.CompanyDto;
 import tns.com.ssir.dto.RegistrationRequestDto;
 import tns.com.ssir.dto.RepresentativeDto;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -168,8 +167,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         return savedRequest;
     }
     
-    
-    
+   
     
     
     @Override
@@ -195,20 +193,37 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
     
     
-    
-    
-    
 
     @Override
     @Transactional(readOnly = true)
     public List<RegistrationRequest> getAllRegistrations() {
         return registrationRepository.findAll();
     }
-    
-    
-    
-    
+       
+    @Override
+    @Transactional(readOnly = true)
+    public RegistrationRequest trackApplication(String trackingId, String tradeLicenseNumber) {
+        // 1. Fetch the request by tracking ID
+        RegistrationRequest request = registrationRepository.findByTrackingId(trackingId)
+                .orElseThrow(() -> new IllegalArgumentException("No onboarding request found with Tracking ID: " + trackingId));
 
+        // 2. DUAL-FACTOR SECURITY CHECK: Verify that the trade license matches [3]
+        if (!request.getCompany().getTradeLicenseNumber().equalsIgnoreCase(tradeLicenseNumber.trim())) {
+            throw new IllegalArgumentException("Access Denied: The provided Trade License Number does not match this tracking ID.");
+        }
+
+        // 3. Generate secure, temporary viewing links for their uploaded documents [1.1.2]
+        if (request.getDocuments() != null) {
+            for (LegalDocument doc : request.getDocuments()) {
+                String secureUrl = storageService.generatePresignedUrl(doc.getFileStoragePath());
+                doc.setPresignedUrl(secureUrl); // Attached in transient memory [1.1.2]
+            }
+        }
+
+        return request;
+    }
+    
+    
     @Override
     @Transactional
     public RegistrationRequest updateRegistrationStatus(Long id, String status, String comments) {

@@ -4,66 +4,37 @@ import { authGuard } from './core/auth/auth-guard';
 import { roleGuard } from './core/auth/role-guard';
 
 // Layouts
-import { AuthLayout } from './layouts/auth-layout/auth-layout';
-import { AdminLayout } from './layouts/admin-layout/admin-layout';
+import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
+import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout';
 import { PortalLayout } from './layouts/portal-layout/portal-layout';
 
 // Authentication pages
 import { Login } from './pages/auth/login/login';
-import {
-  CreatePassword
-} from './pages/auth/create-password/create-password';
+import { CreatePassword } from './pages/auth/create-password/create-password';
 
 // Admin pages
-import {
-  Dashboard as AdminDashboard
-} from './pages/admin/dashboard/dashboard';
-
-import {
-  Registrations
-} from './pages/admin/registrations/registrations';
-
-import {
-  RegistrationDetail
-} from './pages/admin/registration-detail/registration-detail';
-
-import {
-  Users as AdminUsers
-} from './pages/admin/users/users';
+import { AdminDashboardComponent } from './pages/admin/dashboard/dashboard'; 
+import { AdminRegistrationsComponent } from './pages/admin/registrations/registrations';
+import { AdminRegistrationDetailComponent } from './pages/admin/registration-detail/registration-detail';
+import { AdminUsersComponent } from './pages/admin/users/users';
 
 // Portal pages
-import {
-  Dashboard as PortalDashboard
-} from './pages/portal/dashboard/dashboard';
-
-import {
-  Profile
-} from './pages/portal/profile/profile';
-
-import {
-  SenderIds
-} from './pages/portal/sender-ids/sender-ids';
-
-import {
-  SenderIdNew
-} from './pages/portal/sender-id-new/sender-id-new';
-
-import {
-  Users as PortalUsers
-} from './pages/portal/users/users';
+import { Dashboard as PortalDashboard } from './pages/portal/dashboard/dashboard';
+import { Profile } from './pages/portal/profile/profile';
+import { SenderIds } from './pages/portal/sender-ids/sender-ids';
+import { SenderIdNew } from './pages/portal/sender-id-new/sender-id-new';
+import { Users as PortalUsers } from './pages/portal/users/users';
 
 // Other pages
-import {
-  Unauthorized
-} from './pages/unauthorized/unauthorized';
+import { Unauthorized } from './pages/unauthorized/unauthorized';
 
 export const routes: Routes = [
   /*
-   * Public authentication pages
+   * Public authentication pages (Wrapped in AuthLayoutComponent)
    */
   {
     path: '',
-    component: AuthLayout,
+    component: AuthLayoutComponent,
     children: [
       {
         path: '',
@@ -83,22 +54,23 @@ export const routes: Routes = [
 
   /*
    * TDRA administrator pages
+   * Updated: Allowed roles expanded to include all TDRA staff roles [1]
    */
   {
     path: 'admin',
-    component: AdminLayout,
-
+    component: AdminLayoutComponent,
     canActivate: [
       authGuard,
       roleGuard
     ],
-
     data: {
       roles: [
-        'ROLE_TDRA_SUPER_ADMIN'
+        'ROLE_TDRA_SUPER_ADMIN',
+        'ROLE_TDRA_REVIEWER',
+        'ROLE_TDRA_APPROVER',
+        'ROLE_TDRA_AUDITOR'
       ]
     },
-
     children: [
       {
         path: '',
@@ -107,41 +79,41 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
-        component: AdminDashboard
+        component: AdminDashboardComponent
       },
       {
         path: 'registrations',
-        component: Registrations
+        component: AdminRegistrationsComponent
       },
       {
         path: 'registrations/:id',
-        component: RegistrationDetail
+        component: AdminRegistrationDetailComponent
       },
       {
         path: 'users',
-        component: AdminUsers
+        component: AdminUsersComponent
       }
     ]
   },
 
   /*
    * Company portal pages
+   * Updated: Allowed roles expanded to include all corporate roles [1]
    */
   {
     path: 'portal',
     component: PortalLayout,
-
     canActivate: [
       authGuard,
       roleGuard
     ],
-
     data: {
       roles: [
-        'ROLE_COMPANY_ADMIN'
+        'ROLE_COMPANY_ADMIN',
+        'ROLE_COMPANY_USER',
+        'ROLE_COMPANY_VIEWER'
       ]
     },
-
     children: [
       {
         path: '',
@@ -187,4 +159,3 @@ export const routes: Routes = [
     redirectTo: 'login'
   }
 ];
- 

@@ -1,9 +1,33 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AdminRegistrationService } from '../../../core/services/admin-registration';
 
 @Component({
-  selector: 'app-dashboard',
-  imports: [],
+  selector: 'app-admin-dashboard',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
 })
-export class Dashboard {}
+export class AdminDashboardComponent implements OnInit {
+  private adminService = inject(AdminRegistrationService);
+
+  totalCount = signal(0);
+  pendingCount = signal(0);
+  approvedCount = signal(0);
+  isLoading = signal(true);
+
+  ngOnInit(): void {
+    this.adminService.getAllRegistrations().subscribe({
+      next: (data) => {
+        this.totalCount.set(data.length);
+        this.pendingCount.set(data.filter(r => r.currentStatus === 'SUBMITTED' || r.currentStatus === 'UNDER_REVIEW').length);
+        this.approvedCount.set(data.filter(r => r.currentStatus === 'APPROVED').length);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.isLoading.set(false);
+      }
+    });
+  }
+}
+

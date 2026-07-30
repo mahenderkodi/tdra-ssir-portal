@@ -27,7 +27,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Enables fine-grained method security: @PreAuthorize("hasRole('...')")
+@EnableMethodSecurity 
 public class SecurityConfig {
 
     @Autowired
@@ -43,7 +43,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Strong industry-standard hashing algorithm
+        return new BCryptPasswordEncoder(); 
     }
 
     @Bean
@@ -85,6 +85,11 @@ public class SecurityConfig {
                 
                 // Only TDRA Admins can execute approvals/rejections (PUT status transitions)
                 .requestMatchers(HttpMethod.PUT, "/api/v1/registrations/**").hasRole("TDRA_SUPER_ADMIN")
+                
+             // 2. Public whitelists
+                .requestMatchers("/api/v1/auth/**").permitAll() // Login, OAuth, refresh tokens
+                .requestMatchers(HttpMethod.POST, "/api/v1/registrations", "/api/v1/registrations/track").permitAll()
+                .requestMatchers("/error").permitAll()
                 
                 .anyRequest().authenticated()
             );

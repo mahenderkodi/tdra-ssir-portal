@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-users',
-  imports: [],
-  templateUrl: './users.html',
-  styleUrl: './users.css',
+  selector: 'app-admin-users',
+  standalone: true,
+  templateUrl: './users.html'
 })
-export class Users {}
+export class AdminUsersComponent {}

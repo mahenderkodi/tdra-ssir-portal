@@ -1,0 +1,49 @@
+.admin-wrapper {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.admin-sidebar {
+  width: 280px;
+  min-width: 280px;
+  background-color: #0f172a; /* Deep Slate 900 */
+  border-right: 1px solid #1e293b;
+}
+
+.logo-badge {
+  width: 40px;
+  height: 40px;
+  background-color: #0d6efd !important;
+}
+
+.sidebar-link {
+  color: #94a3b8;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.sidebar-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #f8fafc;
+}
+
+.sidebar-link.active {
+  background-color: #0d6efd !important; /* Premium Blue */
+  color: #ffffff !important;
+}
+
+.py-2-5 {
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  background-color: #334155 !important;
+}
+
+.admin-main {
+  max-height: 100vh;
+}

@@ -1,1 +1,38 @@
-<p>dashboard works!</p>
+<div class="container-fluid">
+  <div class="mb-4">
+    <h2 class="fw-bold mb-1">TDRA Admin Control Board</h2>
+    <p class="text-secondary small">Overview of SMS Sender ID Registry Onboarding Operations</p>
+  </div>
+
+  <div *ngIf="isLoading()" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-2 text-muted small">Loading metric cards...</p>
+  </div>
+
+  <!-- Metric Grid -->
+  <div *ngIf="!isLoading()" class="row g-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm bg-warning text-dark p-4">
+        <h6 class="text-uppercase fw-bold text-muted small mb-2">Pending Reviews</h6>
+        <h1 class="display-4 fw-bold mb-0">{{ pendingCount() }}</h1>
+        <p class="small mb-0 mt-2 text-black-50">Applications awaiting audit</p>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm bg-success text-white p-4">
+        <h6 class="text-uppercase fw-bold text-white-50 small mb-2">Approved Entities</h6>
+        <h1 class="display-4 fw-bold mb-0">{{ approvedCount() }}</h1>
+        <p class="small mb-0 mt-2 text-white-50">Active corporate registries</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm bg-dark text-white p-4">
+        <h6 class="text-uppercase fw-bold text-white-50 small mb-2">Total Submissions</h6>
+        <h1 class="display-4 fw-bold mb-0">{{ totalCount() }}</h1>
+        <p class="small mb-0 mt-2 text-white-50">Cumulative registrations processed</p>
+      </div>
+    </div>
+  </div>
+</div>

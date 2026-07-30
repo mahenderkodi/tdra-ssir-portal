@@ -1,1 +1,51 @@
-<p>login works!</p>
+<div class="card shadow border-0">
+  <div class="card-header bg-primary text-white text-center p-4 rounded-top">
+    <h3 class="mb-0 fw-bold">Sign In</h3>
+    <p class="small mb-0 text-white-50 mt-1">TDRA SMS Sender ID Registry Portal</p>
+  </div>
+  <div class="card-body p-4">
+
+    <!-- Modern @if control flow replaces *ngIf [2] -->
+    @if (errorMessage()) {
+      <div class="alert alert-danger small" role="alert">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <!-- Credentials Login Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label class="form-label fw-bold small">Username or Email *</label>
+        <input type="text" class="form-control" formControlName="usernameOrEmail" placeholder="admin_masdar">
+      </div>
+      <div class="mb-4">
+        <label class="form-label fw-bold small">Password *</label>
+        <input type="password" class="form-control" formControlName="password" placeholder="••••••••">
+      </div>
+
+      <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-primary btn-lg fs-6" [disabled]="isSubmitting()">
+          @if (isSubmitting()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          }
+          Sign In
+        </button>
+      </div>
+    </form>
+
+    <div class="text-center text-muted my-3 small position-relative">
+      <span class="bg-white px-3 position-relative z-1 text-uppercase">OR</span>
+      <hr class="position-absolute w-100 top-50 start-0 m-0 z-0">
+    </div>
+
+    <!-- UAE PASS SSO Handshake -->
+    <div class="d-grid">
+      <button type="button" class="btn btn-outline-dark d-flex align-items-center justify-content-center gap-1" (click)="loginWithUaePass()">
+        <span class="fw-bold text-danger">UAE</span>
+        <span class="fw-bold text-dark">PASS</span>
+        <span class="small ms-2 fw-semibold">Single Sign-On</span>
+      </button>
+    </div>
+
+  </div>
+</div>

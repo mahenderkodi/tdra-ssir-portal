@@ -1,9 +1,80 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, inject, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { AdminRegistrationService } from '../../../core/services/admin-registration';
+import { HotToastService } from '@ngxpert/hot-toast'; 
+import { timer, Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-registrations',
-  imports: [],
+  selector: 'app-admin-registrations',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './registrations.html',
-  styleUrl: './registrations.css',
+  styleUrl: './registrations.css'
 })
-export class Registrations {}
+export class AdminRegistrationsComponent implements OnInit, OnDestroy {
+  private adminService = inject(AdminRegistrationService);
+  private toast = inject(HotToastService);
+  private pollSubscription?: Subscription;
+
+  registrations = signal<any[]>([]);
+  isLoading = signal(true);
+  actionInProgressId = signal<number | null>(null);
+
+  // Computed signals for top cards
+  totalCount = signal(0);
+  pendingCount = signal(0);
+  approvedCount = signal(0);
+
+  ngOnInit(): void {
+    // Poll the backend every 15 seconds to keep the admin queue updated in real-time [3]
+    this.pollSubscription = timer(0, 15000).pipe(
+      switchMap(() => this.adminService.getAllRegistrations())
+    ).subscribe({
+      next: (data) => {
+        this.registrations.set(data);
+        this.calculateMetrics(data);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.toast.error('Failed to synchronize registrations queue.');
+      }
+    });
+  }
+
+  // Calculates metrics dynamically based on active dataset
+  calculateMetrics(data: any[]): void {
+    this.totalCount.set(data.length);
+    this.pendingCount.set(data.filter(r => r.currentStatus === 'SUBMITTED' || r.currentStatus === 'UNDER_REVIEW').length);
+    this.approvedCount.set(data.filter(r => r.currentStatus === 'APPROVED').length);
+  }
+
+  // Executes inline quick-approvals directly from the table row [3]
+  approveCompany(id: number): void {
+    this.actionInProgressId.set(id);
+
+    this.adminService.updateRegistrationStatus(id, 'APPROVED', 'Quick approved via Admin Queue Dashboard').subscribe({
+      next: (response) => {
+        this.actionInProgressId.set(null);
+        this.toast.success(`Application ${response.trackingId} successfully approved!`);
+        
+        // Refresh local memory state instantly without full page reload
+        const updatedList = this.registrations().map(r => r.id === id ? response : r);
+        this.registrations.set(updatedList);
+        this.calculateMetrics(updatedList);
+      },
+      error: (err) => {
+        this.actionInProgressId.set(null);
+        this.toast.error(err.error?.message || 'Failed to approve application.');
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.pollSubscription) {
+      this.pollSubscription.unsubscribe();
+    }
+  }
+}
