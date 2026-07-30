@@ -1,4 +1,4 @@
 export interface SetupPasswordRequest {
-  token: string;
+  // token: string;
   password: string;
 }

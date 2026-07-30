@@ -6,6 +6,7 @@ import { LoginResponse } from './models/login-response-model';
 import { SetupPasswordRequest } from './models/setup-password-model';
 import { AuthenticatedUser } from './models/authenticated-user-model';
 import { TokenStorageService } from './token-storage';
+import {MessageResponse} from './models/message-response-model';
 
 @Injectable({
   providedIn: 'root'
@@ -44,9 +45,14 @@ export class AuthService {
     );
   }
 
-  setupPassword(request: SetupPasswordRequest): Observable<any> {
-    return this.http.post<any>(`${this.AUTH_API}/setup-password`, request);
-  }
+  setupPassword(
+  request: SetupPasswordRequest
+): Observable<MessageResponse> {
+  return this.http.post<MessageResponse>(
+    `${this.AUTH_API}/setup-password`,
+    request
+  );
+}
 
   logout(): void {
     this.tokenStorage.clearSession();

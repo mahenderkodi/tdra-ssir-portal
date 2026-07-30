@@ -13,8 +13,8 @@ import { AuthService } from '../../../core/auth/auth-service';
 })
 export class Login {
   private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   errorMessage = signal('');
   isSubmitting = signal(false);
@@ -25,24 +25,54 @@ export class Login {
   });
 
   onSubmit(): void {
-    if (this.loginForm.invalid) {
-      return;
-    }
+  this.errorMessage.set('');
 
-    this.isSubmitting.set(true);
-    this.errorMessage.set('');
+  if (this.loginForm.invalid) {
+    this.loginForm.markAllAsTouched();
+    return;
+  }
 
-    this.authService.login(this.loginForm.value).subscribe({
+  this.isSubmitting.set(true);
+
+  const credentials =
+    this.loginForm.getRawValue();
+
+  this.authService
+    .login(credentials)
+    .subscribe({
       next: (response) => {
+  console.log(
+    'Login response:',
+    response
+  );
+
+  this.isSubmitting.set(false);
+
+  if (response.firstTimeLogin) {
+    void this.router.navigate([
+      '/create-password'
+    ]);
+
+    return;
+  }
+
+  this.redirectUserByRole(response.roles);
+},
+
+      error: (error) => {
+        console.error(
+          'Login error:',
+          error
+        );
+
         this.isSubmitting.set(false);
-        this.redirectUserByRole(response.roles);
-      },
-      error: (err) => {
-        this.isSubmitting.set(false);
-        this.errorMessage.set(err.error?.message || 'Authentication failed. Please verify your credentials.');
+
+        this.errorMessage.set(
+          'Invalid username/email or password.'
+        );
       }
     });
-  }
+}
 
   private redirectUserByRole(roles: string[]): void {
     if (roles.includes('ROLE_TDRA_SUPER_ADMIN') || roles.includes('ROLE_TDRA_REVIEWER') || roles.includes('ROLE_TDRA_APPROVER')) {

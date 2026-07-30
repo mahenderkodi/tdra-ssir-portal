@@ -37,10 +37,10 @@
       "path": "./modules/sender-registry/tsconfig.spec.json"
     },
     {
-      "path": "./modules/role-login/tsconfig.app.json"
+      "path": "./modules/role-based-login/tsconfig.app.json"
     },
     {
-      "path": "./modules/role-login/tsconfig.spec.json"
+      "path": "./modules/role-based-login/tsconfig.spec.json"
     },
     {
       "path": "./modules/role-based-login/tsconfig.app.json"

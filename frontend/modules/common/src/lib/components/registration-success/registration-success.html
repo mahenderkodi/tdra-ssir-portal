@@ -118,29 +118,105 @@
 
 
         <!-- Final information -->
-        <div
-          class="
-            alert
-            alert-info
-            text-start
-            small
-            mb-4
-          "
-          role="alert"
-        >
-          Please save your tracking ID for future
-          communication. Our team will review your
-          application and get back to you.
-        </div>
+<div
+  class="
+    alert
+    alert-info
+    text-start
+    small
+    mb-4
+  "
+  role="alert"
+>
+  Please save your tracking ID for future
+  communication. Our team will review your
+  application and get back to you.
+</div>
 
 
-        <!-- Home button -->
-        <a
-          routerLink="/"
-          class="btn btn-primary px-4"
-        >
-          Return to Home
-        </a>
+@if (
+  submissionDetails.username &&
+  submissionDetails.tempPassword
+) {
+  <div
+    class="
+      credentials-box
+      border
+      rounded
+      text-start
+      p-3
+      p-md-4
+      mb-4
+    "
+  >
+    <h2 class="h6 fw-bold text-primary mb-3">
+      Temporary Login Credentials
+    </h2>
+
+    <div class="mb-3">
+      <span class="detail-label">
+        Username
+      </span>
+
+      <p class="detail-value text-break mb-0">
+        {{ submissionDetails.username }}
+      </p>
+    </div>
+
+    <div>
+      <span class="detail-label">
+        Temporary Password
+      </span>
+
+      <p class="detail-value font-monospace mb-0">
+        {{ submissionDetails.tempPassword }}
+      </p>
+    </div>
+  </div>
+
+  <div
+  class="
+    alert
+    alert-warning
+    text-start
+    small
+    mb-4
+  "
+  role="alert"
+>
+  <strong>Important:</strong>
+
+  Please save your username, temporary password
+  and tracking ID securely. You will be required
+  to create a permanent password after your first
+  login.
+</div>
+}
+
+
+<div
+  class="
+    d-flex
+    flex-column
+    flex-sm-row
+    justify-content-center
+    gap-2
+  "
+>
+  <a
+    href="http://localhost:4200/login"
+    class="btn btn-primary px-4"
+  >
+    Continue to Login
+  </a>
+
+  <a
+    routerLink="/"
+    class="btn btn-outline-primary px-4"
+  >
+    Return to Home
+  </a>
+</div>
 
       </div>
     </div>

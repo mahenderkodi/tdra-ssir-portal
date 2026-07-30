@@ -11,11 +11,14 @@ import {
 } from '@angular/router';
 
 
-interface RegistrationSuccessDetails {
+export interface RegistrationSuccessDetails {
   trackingId: string;
   status: string;
   message: string;
   submittedAt: string;
+
+  username: string;
+  tempPassword: string;
 }
 
 
@@ -38,19 +41,26 @@ export class RegistrationSuccessComponent {
    * but we only use the four properties we need.
    */
   readonly submissionDetails:
-    RegistrationSuccessDetails = {
+  RegistrationSuccessDetails = {
 
-      trackingId:
-        history.state.trackingId ?? '',
+    trackingId:
+      history.state.trackingId ?? '',
 
-      status:
-        history.state.status ?? 'SUBMITTED',
+    status:
+      history.state.status ?? 'SUBMITTED',
 
-      message:
-        history.state.message ??
-        'Your onboarding application has been successfully submitted.',
+    message:
+      history.state.message ??
+      'Your onboarding application has been successfully submitted.',
 
-      submittedAt:
-        history.state.submittedAt ?? ''
-    };
+    submittedAt:
+      history.state.submittedAt ?? '',
+
+    username:
+      history.state.username ?? '',
+
+    tempPassword:
+      history.state.tempPassword ?? ''
+  };
+
 }

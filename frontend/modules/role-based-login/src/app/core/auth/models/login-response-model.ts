@@ -5,4 +5,5 @@ export interface LoginResponse {
   username: string;
   roles: string[];
   companyId: number | null;
+  firstTimeLogin: boolean;
 }

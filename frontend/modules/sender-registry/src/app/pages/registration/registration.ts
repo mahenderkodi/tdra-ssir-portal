@@ -140,86 +140,22 @@ import { Router } from '@angular/router';
 export class Registration {
 
   @ViewChild(LegalDocuments)
-private legalDocumentsComponent?: LegalDocuments;
-  /*
-  |--------------------------------------------------------------------------
-  | Dependency injection
-  |--------------------------------------------------------------------------
-  |
-  | formBuilder:
-  | Used to create the complete registration reactive form.
-  |
-  | registrationService:
-  | Used to send the registration request to the backend.
-  |
-  | private:
-  | These properties are only used inside this TypeScript class.
-  |
-  | readonly:
-  | The service references should not be replaced after creation.
-  |
-  */
+  private legalDocumentsComponent?: LegalDocuments;
   private readonly formBuilder = inject(FormBuilder);
-
   private readonly toast =
-  inject(HotToastService);
+    inject(HotToastService);
   private readonly router =
-  inject(Router);
-
+    inject(Router);
   private readonly registrationService =
     inject(RegistrationService);
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | Submission-state signals
-  |--------------------------------------------------------------------------
-  |
-  | Signals are values that Angular can track.
-  |
-  | In HTML, signals are read using parentheses:
-  |
-  | isSubmitting()
-  | successMessage()
-  | errorMessage()
-  |
-  */
 
-  /*
-  | true  = API submission is in progress
-  | false = no API submission is in progress
-  */
   readonly isSubmitting = signal(false);
-
-  /*
-  | Stores the success message returned after a successful submission.
-  */
   readonly successMessage = signal('');
-
-  /*
-  | Stores the message shown when the API request fails.
-  */
   readonly errorMessage = signal('');
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | Registration-step state
-  |--------------------------------------------------------------------------
-  |
-  | currentStep controls which child component is displayed.
-  |
-  | 1 = Company Registration
-  | 2 = Legal Documents
-  | 3 = Authorized Representative
-  | 4 = Account Setup
-  |
-  */
   readonly currentStep = signal(1);
 
-  /*
-  | Used by the HTML stepper to display the step number and title.
-  */
   readonly steps = [
     {
       number: 1,
@@ -239,45 +175,11 @@ private legalDocumentsComponent?: LegalDocuments;
     },
   ];
 
-
-  /*
-  |--------------------------------------------------------------------------
-  | Main registration form
-  |--------------------------------------------------------------------------
-  |
-  | This is the parent FormGroup for the complete four-step form.
-  |
-  | registrationForm
-  | ├── company
-  | ├── documents
-  | ├── representative
-  | └── account
-  |
-  | Each child component receives only the FormGroup belonging to its step.
-  |
-  */
   readonly registrationForm = this.formBuilder.group({
-
-    /*
-    |--------------------------------------------------------------------------
-    | Step 1: Company form group
-    |--------------------------------------------------------------------------
-    |
-    | nonNullable.group is used because company text fields should contain
-    | strings instead of string | null.
-    |
-    | IMPORTANT:
-    | The values below are temporary test values.
-    |
-    | Before pushing production-ready code:
-    | 1. Replace test values with empty strings.
-    | 2. Uncomment Validators.required.
-    |
-    */
     company: this.formBuilder.nonNullable.group({
       companyName: [
         '',
-         Validators.required
+        Validators.required
       ],
 
       legalEntityName: [
@@ -292,7 +194,7 @@ private legalDocumentsComponent?: LegalDocuments;
 
       registrationNumber: [
         '',
-       Validators.required 
+        Validators.required
 
       ],
 
@@ -303,27 +205,27 @@ private legalDocumentsComponent?: LegalDocuments;
 
       companyType: [
         '',
-         Validators.required
+        Validators.required
       ],
       industry: [
         '',
         Validators.required
       ],
 
-     
+
       dateOfIncorporation: [
         '',
-         Validators.required 
+        Validators.required
       ],
 
       registeredAddress: [
         '',
-         Validators.required
+        Validators.required
       ],
 
       country: [
         'United Arab Emirates',
-         Validators.required
+        Validators.required
       ],
 
       emirateState: [
@@ -333,7 +235,7 @@ private legalDocumentsComponent?: LegalDocuments;
 
       city: [
         '',
-      Validators.required 
+        Validators.required
       ],
 
       postalCode: [
@@ -349,12 +251,12 @@ private legalDocumentsComponent?: LegalDocuments;
       companyEmail: [
         '',
         [
-           Validators.required, 
+          Validators.required,
           Validators.email
         ]
       ],
 
-      
+
       companyPhone: [
         '',
         [
@@ -366,26 +268,12 @@ private legalDocumentsComponent?: LegalDocuments;
       ],
     }),
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Step 2: Legal-documents form group
-    |--------------------------------------------------------------------------
-    |
-    | Each single-document control stores either:
-    |
-    | File  = a file has been selected
-    | null  = no file has been selected
-    |
-    | Validators.required is temporarily disabled for testing.
-    |
-    */
     documents: this.formBuilder.group({
 
       tradeLicense:
         this.formBuilder.control<File | null>(
           null,
-          Validators.required 
+          Validators.required
         ),
 
       certificateOfIncorporation:
@@ -403,7 +291,7 @@ private legalDocumentsComponent?: LegalDocuments;
       authorizedSignatoryLetter:
         this.formBuilder.control<File | null>(
           null,
-          Validators.required 
+          Validators.required
         ),
 
       /*
@@ -418,7 +306,7 @@ private legalDocumentsComponent?: LegalDocuments;
       businessRegistrationCertificate:
         this.formBuilder.control<File | null>(
           null,
-          Validators.required 
+          Validators.required
         ),
 
       /*
@@ -434,125 +322,112 @@ private legalDocumentsComponent?: LegalDocuments;
     }),
 
 
-   
+
     representative:
-  this.formBuilder.nonNullable.group({
+      this.formBuilder.nonNullable.group({
 
-    firstName: [
-      '',
-       Validators.required 
-    ],
+        firstName: [
+          '',
+          Validators.required
+        ],
 
-    lastName: [
-      '',
-       Validators.required 
-    ],
+        lastName: [
+          '',
+          Validators.required
+        ],
 
-    designation: [
-      '',
-      Validators.required 
-    ],
+        designation: [
+          '',
+          Validators.required
+        ],
 
-    department: [
-      '',
-      Validators.required 
-    ],
+        department: [
+          '',
+          Validators.required
+        ],
 
-    officialEmail: [
-      '',
-      [
-        Validators.required, 
-        Validators.email
-      ]
-    ],
+        officialEmail: [
+          '',
+          [
+            Validators.required,
+            Validators.email
+          ]
+        ],
 
-    mobileNumber: [
-      '',
-      [
-        Validators.required, 
-        Validators.pattern(
-          /^[0-9+\-\s()]{7,20}$/
-        )
-      ]
-    ],
+        mobileNumber: [
+          '',
+          [
+            Validators.required,
+            Validators.pattern(
+              /^[0-9+\-\s()]{7,20}$/
+            )
+          ]
+        ],
 
-    officeNumber: [
-      '',
-      [
-        Validators.required,
-        Validators.pattern(
-          /^[0-9+\-\s()]{7,20}$/
-        )
-      ]
-    ],
+        officeNumber: [
+          '',
+          [
+            Validators.required,
+            Validators.pattern(
+              /^[0-9+\-\s()]{7,20}$/
+            )
+          ]
+        ],
 
-    address: [
-      '',
-      Validators.required
-    ],
+        address: [
+          '',
+          Validators.required
+        ],
 
-    uaePassId: [
-      '',
-      Validators.required
-    ],
+        uaePassId: [
+          '',
+          Validators.required
+        ],
 
-    passportOrEmiratesId: [
-      '',
-      Validators.required
-    ]
-  }),
+        passportOrEmiratesId: [
+          '',
+          Validators.required
+        ]
+      }),
 
     account:
-  this.formBuilder.nonNullable.group({
+      this.formBuilder.nonNullable.group({
 
-    Username: [
-      '',
-      [
-        
-        Validators.required, 
-        Validators.minLength(4),
-        Validators.maxLength(30),
-        Validators.pattern(
-          /^[a-zA-Z0-9._-]+$/
-        )
-      ]
-    ],
+        Username: [
+          '',
+          [
 
-    PreferredLanguage: [
-      '',
-      Validators.required
-    ],
+            Validators.required,
+            Validators.minLength(4),
+            Validators.maxLength(30),
+            Validators.pattern(
+              /^[a-zA-Z0-9._-]+$/
+            )
+          ]
+        ],
 
-    TimeZone: [
-      '',
-      Validators.required
-    ],
+        PreferredLanguage: [
+          '',
+          Validators.required
+        ],
 
-    MfaPreference: [
-      '',
-       Validators.required 
-    ],
+        TimeZone: [
+          '',
+          Validators.required
+        ],
 
-    NotificationPreference: [
-      '',
-    Validators.required
-    ]
-  }),
+        MfaPreference: [
+          '',
+          Validators.required
+        ],
+
+        NotificationPreference: [
+          '',
+          Validators.required
+        ]
+      }),
   });
 
-
-  /*
-  |--------------------------------------------------------------------------
-  | Build the backend registration payload
-  |--------------------------------------------------------------------------
-  |
-  | This method converts the Angular reactive-form values into the
-  | RegistrationRequest format expected by RegistrationService.
-  |
-  | private:
-  | This method is used only inside this component.
-  |
-  */
   private buildRegistrationPayload():
     RegistrationRequest {
 
@@ -568,9 +443,6 @@ private legalDocumentsComponent?: LegalDocuments;
     const account =
       this.registrationForm.controls.account.getRawValue();
 
-    /*
-    | Return an object that follows RegistrationRequest.
-    */
     return {
       company: {
         companyName:
@@ -623,31 +495,15 @@ private legalDocumentsComponent?: LegalDocuments;
           company.companyPhone ?? ''
       },
 
-      /*
-      | IMPORTANT:
-      |
-      | Documents are currently not added to this payload.
-      |
-      | Selected files exist in:
-      |
-      | registrationForm.controls.documents
-      |
-      | But this method currently sends an empty documents object.
-      |
-      | File-upload integration will be implemented separately.
-      */
       documents: {},
 
-      /*
-      | These remain empty until Steps 3 and 4 are developed.
-      */
       representative: {
         firstName: representative.firstName ?? '',
         lastName: representative.lastName ?? '',
         designation: representative.designation ?? '',
         department: representative.department ?? '',
         officialEmail: representative.officialEmail ?? '',
-        mobileNumber: representative.mobileNumber ?? '', 
+        mobileNumber: representative.mobileNumber ?? '',
         officeNumber: representative.officeNumber ?? '',
         address: representative.address ?? '',
         uaePassId: representative.uaePassId ?? '',
@@ -667,33 +523,18 @@ private legalDocumentsComponent?: LegalDocuments;
   private buildRegistrationFormData(): FormData {
     const formData = new FormData();
 
-    /*
-     * First multipart request part:
-     *
-     * Backend:
-     * @RequestPart("registrationData")
-     */
     const payload = this.buildRegistrationPayload();
-
+    //.append(...) add new key-value pair
     formData.append(
       'registrationData',
       JSON.stringify(payload)
     );
 
-    /*
-     * Read all selected documents from Step 2.
-     */
+
     const documents =
       this.registrationForm.controls.documents.getRawValue();
 
-    /*
-     * Second multipart request-part name:
-     *
-     * Backend:
-     * @RequestPart("file")
-     *
-     * The same key is added once for every selected file.
-     */
+
     if (documents.tradeLicense) {
       formData.append(
         'file',
@@ -750,9 +591,7 @@ private legalDocumentsComponent?: LegalDocuments;
       );
     }
 
-    /*
-     * This control is non-nullable, so its value is always File[].
-     */
+
     documents.additionalSupportingDocuments.forEach(file => {
       formData.append(
         'file',
@@ -765,38 +604,24 @@ private legalDocumentsComponent?: LegalDocuments;
   }
 
   private resetDocuments(): void {
-  /*
-   * Clear all File objects stored in the reactive form.
-   */
-  this.registrationForm.controls.documents.reset({
-    tradeLicense: null,
-    certificateOfIncorporation: null,
-    taxRegistrationCertificate: null,
-    authorizedSignatoryLetter: null,
-    signatoryIdentityDocument: null,
-    businessRegistrationCertificate: null,
-    companyLogo: null,
-    additionalSupportingDocuments: []
-  });
 
-  /*
-   * Clear the visible native file-input values.
-   *
-   * The component may not exist when another registration step is open,
-   * so optional chaining is used.
-   */
-  this.legalDocumentsComponent
-    ?.clearFileInputs();
-}
+    this.registrationForm.controls.documents.reset({
+      tradeLicense: null,
+      certificateOfIncorporation: null,
+      taxRegistrationCertificate: null,
+      authorizedSignatoryLetter: null,
+      signatoryIdentityDocument: null,
+      businessRegistrationCertificate: null,
+      companyLogo: null,
+      additionalSupportingDocuments: []
+    });
 
-  /*
-  |--------------------------------------------------------------------------
-  | Move to the previous step
-  |--------------------------------------------------------------------------
-  |
-  | The step number cannot go below 1.
-  |
-  */
+
+    this.legalDocumentsComponent
+      ?.clearFileInputs();
+  }
+
+
   previousStep(): void {
 
     if (this.currentStep() > 1) {
@@ -807,94 +632,65 @@ private legalDocumentsComponent?: LegalDocuments;
   }
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | Move to the next step
-  |--------------------------------------------------------------------------
-  |
-  | Before leaving Step 1:
-  |
-  | 1. Mark every company control as touched.
-  | 2. Check whether the company group is invalid.
-  | 3. Stop navigation if validation fails.
-  |
-  */
+
   nextStep(): void {
 
-    /*
-    | Step 1 validation
-    */
+
     if (this.currentStep() === 1) {
 
       const companyGroup =
         this.registrationForm.controls.company;
 
-      /*
-      | Marking controls as touched allows validation messages
-      | to appear in the child component.
-      */
+
       companyGroup.markAllAsTouched();
 
-      /*
-      | Stop here when any company control is invalid.
-      */
       if (companyGroup.invalid) {
         return;
       }
     }
 
-    
+
 
 
     if (this.currentStep() === 2) {
 
-  const documentsGroup =
-    this.registrationForm.controls.documents;
+      const documentsGroup =
+        this.registrationForm.controls.documents;
 
-  documentsGroup.markAllAsTouched();
+      documentsGroup.markAllAsTouched();
 
-  if (documentsGroup.invalid) {
-    return;
-  }
-}
+      if (documentsGroup.invalid) {
+        return;
+      }
+    }
 
-     if (this.currentStep() === 3){
+    if (this.currentStep() === 3) {
       const representativeGroup =
         this.registrationForm.controls.representative;
 
-      /*
-      | Marking controls as touched allows validation messages
-      | to appear in the child component.
-      */
       representativeGroup.markAllAsTouched();
 
-      /*
-      | Stop here when any representative control is invalid.
-      */
+
       if (representativeGroup.invalid) {
         return;
       }
-     }
+    }
 
-     if (this.currentStep() === 4){
+    if (this.currentStep() === 4) {
       const representativeGroup =
         this.registrationForm.controls.account;
 
-    
+
       representativeGroup.markAllAsTouched();
 
-      
+
       if (representativeGroup.invalid) {
         return;
       }
-     }
+    }
 
-      
-    
 
-    /*
-    | Increase the step only when it is below Step 4.
-    */
+
     if (this.currentStep() < 4) {
       this.currentStep.update(
         step => step + 1
@@ -911,135 +707,139 @@ private legalDocumentsComponent?: LegalDocuments;
   | This method is called by the form's ngSubmit event.
   |
   | Current submission:
-  | - Validates Step 1
+  | - Validates Steps
   | - Builds the company JSON payload
   | - Sends the payload to the registration API
   |
   |
   */
- submitRegistration(): void {
+  submitRegistration(): void {
 
-  const companyGroup =
-    this.registrationForm.controls.company;
+    const companyGroup =
+      this.registrationForm.controls.company;
 
-  companyGroup.markAllAsTouched();
+    companyGroup.markAllAsTouched();
 
-  if (companyGroup.invalid) {
-    this.currentStep.set(1);
-    return;
-  }
+    if (companyGroup.invalid) {
+      this.currentStep.set(1);
+      return;
+    }
 
-   const documentsGroup =
-  this.registrationForm.controls.documents;
+    const documentsGroup =
+      this.registrationForm.controls.documents;
 
-documentsGroup.markAllAsTouched();
+    documentsGroup.markAllAsTouched();
 
-if (documentsGroup.invalid) {
-  this.currentStep.set(2);
-  return;
-}
+    if (documentsGroup.invalid) {
+      this.currentStep.set(2);
+      return;
+    }
 
-  const representativeGroup =
-    this.registrationForm.controls.representative;
+    const representativeGroup =
+      this.registrationForm.controls.representative;
 
-  representativeGroup.markAllAsTouched();
+    representativeGroup.markAllAsTouched();
 
-  if (representativeGroup.invalid) {
-    this.currentStep.set(3);
-    return;
-  }
+    if (representativeGroup.invalid) {
+      this.currentStep.set(3);
+      return;
+    }
 
- 
 
-  const accountGroup =
-    this.registrationForm.controls.account;
 
-  accountGroup.markAllAsTouched();
+    const accountGroup =
+      this.registrationForm.controls.account;
 
-  if (accountGroup.invalid) {
-    this.currentStep.set(4);
-    return;
-  }
+    accountGroup.markAllAsTouched();
 
-  const formData =
-    this.buildRegistrationFormData();
+    if (accountGroup.invalid) {
+      this.currentStep.set(4);
+      return;
+    }
 
-  this.isSubmitting.set(true);
-  this.successMessage.set('');
-  this.errorMessage.set('');
+    const formData =
+      this.buildRegistrationFormData();
 
-  formData.forEach((value, key) => {
-    console.log(key, value);
-  });
+    this.isSubmitting.set(true);
+    this.successMessage.set('');
+    this.errorMessage.set('');
 
-  this.registrationService
-    .createRegistration(formData)
-    .subscribe({
-
-      next: (response) => {
-        console.log(
-          'Backend response:',
-          response
-        );
-
-        this.isSubmitting.set(false);
-
-        /*
-         * Clear documents only after successful submission.
-         */
-        this.resetDocuments();
-
-        this.successMessage.set(
-          'Registration and documents submitted successfully.'
-        );
-
-         this.toast.success(
-          'Registration submitted successfully.'
-        );
-
-         void this.router.navigate(
-        ['/registration-success'],
-        {
-          state: {
-            trackingId:
-              response.trackingId,
-
-            status:
-              response.status,
-
-            message:
-              response.message,
-
-            submittedAt:
-              response.submittedAt
-          }
-        }
-      );
-    
-      },
-
-      error: (error) => {
-        console.error(
-          'Registration API error:',
-          error
-        );
-
-        this.isSubmitting.set(false);
-
-      
-
-        /*
-         * Do not reset documents here.
-         * The user may retry the submission.
-         */
-        this.errorMessage.set(
-          'Registration could not be submitted. Please try again.'
-        );
-
-           this.toast.error(
-        'Registration could not be submitted. Please try again.'
-      );
-      }
+    formData.forEach((value, key) => {
+      console.log(key, value);
     });
-}
+
+    this.registrationService
+      .createRegistration(formData)
+      .subscribe({
+
+        next: (response) => {
+          console.log(
+            'Backend response:',
+            response
+          );
+
+          this.isSubmitting.set(false);
+
+          /*
+           * Clear documents only after successful submission.
+           */
+          this.resetDocuments();
+
+          this.successMessage.set(
+            'Registration and documents submitted successfully.'
+          );
+
+          this.toast.success(
+            'Registration submitted successfully.'
+          );
+
+
+          void this.router.navigate(
+            ['/registration-success'],
+            {
+              state: {
+                trackingId:
+                  response.trackingId,
+
+                status:
+                  response.status,
+
+                message:
+                  response.message,
+
+                submittedAt:
+                  response.submittedAt,
+
+                username: response.username,
+                tempPassword: response.tempPassword
+              }
+            }
+          );
+
+        },
+
+        error: (error) => {
+          console.error(
+            'Registration API error:',
+            error
+          );
+
+          this.isSubmitting.set(false);
+
+
+
+          /*
+           * Do not reset documents here.
+           * The user may retry the submission.
+           */
+          this.errorMessage.set(
+            'Registration could not be submitted. Please try again.'
+          );
+
+          this.toast.error(
+            'Registration could not be submitted. Please try again.'
+          );
+        }
+      });
+  }
 }

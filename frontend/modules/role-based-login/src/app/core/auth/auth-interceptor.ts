@@ -1,22 +1,51 @@
-import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { TokenStorageService } from './token-storage';
+import {
+  HttpInterceptorFn
+} from '@angular/common/http';
 
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const tokenService = inject(TokenStorageService);
-  const token = tokenService.accessToken();
+import {
+  inject
+} from '@angular/core';
 
-  // Skip appending authorization headers for public auth endpoints
-  const isAuthUrl = req.url.includes('/api/v1/auth/');
+import {
+  TokenStorageService
+} from './token-storage';
 
-  if (token && !isAuthUrl) {
-    const clonedRequest = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    return next(clonedRequest);
-  }
+export const authInterceptor:
+  HttpInterceptorFn = (req, next) => {
 
-  return next(req);
-};
+    const tokenStorage =
+      inject(TokenStorageService);
+
+    const accessToken =
+      tokenStorage.getAccessToken();
+
+    /*
+     * These endpoints do not require
+     * an existing access token.
+     */
+    const isPublicAuthRequest =
+      req.url.includes('/api/v1/auth/login') ||
+      req.url.includes('/api/v1/auth/refresh') ||
+      req.url.includes('/api/v1/auth/forgot-password');
+
+    /*
+     * setup-password is not excluded,
+     * so it receives the Bearer token.
+     */
+    if (
+      accessToken &&
+      !isPublicAuthRequest
+    ) {
+      const authenticatedRequest =
+        req.clone({
+          setHeaders: {
+            Authorization:
+              `Bearer ${accessToken}`
+          }
+        });
+
+      return next(authenticatedRequest);
+    }
+
+    return next(req);
+  };

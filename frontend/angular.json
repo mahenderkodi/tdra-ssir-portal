@@ -98,67 +98,7 @@
         }
       }
     },
-    "role-login": {
-      "projectType": "application",
-      "schematics": {},
-      "root": "modules/role-login",
-      "sourceRoot": "modules/role-login/src",
-      "prefix": "app",
-      "architect": {
-        "build": {
-          "builder": "@angular/build:application",
-          "options": {
-            "browser": "modules/role-login/src/main.ts",
-            "tsConfig": "modules/role-login/tsconfig.app.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "modules/role-login/public"
-              }
-            ],
-            "styles": ["modules/role-login/src/styles.css"]
-          },
-          "configurations": {
-            "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "development": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "serve": {
-          "builder": "@angular/build:dev-server",
-          "configurations": {
-            "production": {
-              "buildTarget": "role-login:build:production"
-            },
-            "development": {
-              "buildTarget": "role-login:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "test": {
-          "builder": "@angular/build:unit-test"
-        }
-      }
-    },
+   
     "role-based-login": {
       "projectType": "application",
       "schematics": {
@@ -202,7 +142,8 @@
                 "input": "modules/role-based-login/public"
               }
             ],
-            "styles": ["modules/role-based-login/src/styles.css"]
+            "styles": ["node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "modules/common/src/styles/brand-theme.css","modules/role-based-login/src/styles.css"]
           },
           "configurations": {
             "production": {

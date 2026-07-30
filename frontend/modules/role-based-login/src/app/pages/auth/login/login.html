@@ -15,11 +15,11 @@
     <!-- Credentials Login Form -->
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="mb-3">
-        <label class="form-label fw-bold small">Username or Email *</label>
+        <label class="form-label fw-bold small">Username or Email  <span class="text-danger">*</span></label>
         <input type="text" class="form-control" formControlName="usernameOrEmail" placeholder="admin_masdar">
       </div>
       <div class="mb-4">
-        <label class="form-label fw-bold small">Password *</label>
+        <label class="form-label fw-bold small">Password  <span class="text-danger">*</span></label>
         <input type="password" class="form-control" formControlName="password" placeholder="••••••••">
       </div>
 
