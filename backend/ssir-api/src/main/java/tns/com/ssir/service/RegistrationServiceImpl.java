@@ -202,15 +202,15 @@ public class RegistrationServiceImpl implements RegistrationService {
        
     @Override
     @Transactional(readOnly = true)
-    public RegistrationRequest trackApplication(String trackingId, String tradeLicenseNumber) {
+    public RegistrationRequest trackApplication(String trackingId) {
         // 1. Fetch the request by tracking ID
         RegistrationRequest request = registrationRepository.findByTrackingId(trackingId)
                 .orElseThrow(() -> new IllegalArgumentException("No onboarding request found with Tracking ID: " + trackingId));
 
         // 2. DUAL-FACTOR SECURITY CHECK: Verify that the trade license matches [3]
-        if (!request.getCompany().getTradeLicenseNumber().equalsIgnoreCase(tradeLicenseNumber.trim())) {
-            throw new IllegalArgumentException("Access Denied: The provided Trade License Number does not match this tracking ID.");
-        }
+//        if (!request.getCompany().getTradeLicenseNumber().equalsIgnoreCase(tradeLicenseNumber.trim())) {
+//            throw new IllegalArgumentException("Access Denied: The provided Trade License Number does not match this tracking ID.");
+//        }
 
         // 3. Generate secure, temporary viewing links for their uploaded documents [1.1.2]
         if (request.getDocuments() != null) {

@@ -80,8 +80,8 @@ public class RegistrationController {
     @PostMapping("/track")
     public ResponseEntity<TrackingResponse> trackApplication(@Valid @RequestBody TrackingRequest trackingRequest) {
         RegistrationRequest request = registrationService.trackApplication(
-                trackingRequest.getTrackingId(),
-                trackingRequest.getTradeLicenseNumber()
+                trackingRequest.getTrackingId()
+                
         );
         
         TrackingResponse trackingResponse = TrackingResponse.builder()
