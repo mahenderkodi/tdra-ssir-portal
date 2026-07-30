@@ -23,15 +23,23 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import tns.com.ssir.security.CustomUserDetailsService;
 import tns.com.ssir.security.JwtAuthenticationFilter;
+//import tns.com.ssir.api.security.CustomAuthenticationEntryPoint; // Imported
+//import tns.com.ssir.api.security.CustomAccessDeniedHandler;         // Imported
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity 
+@EnableMethodSecurity // Enables fine-grained method security: @PreAuthorize("hasRole('...')")
 public class SecurityConfig {
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
+    //@Autowired
+   // private CustomAuthenticationEntryPoint authenticationEntryPoint; // Injected [1]
+
+   // @Autowired
+    // private CustomAccessDeniedHandler accessDeniedHandler; // Injected [1]
 
     @Value("${cors.allowed-origins:http://localhost:4200}")
     private List<String> allowedOrigins;
@@ -43,7 +51,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); 
+        return new BCryptPasswordEncoder(12); // Hardened to 12 rounds of hashing for production
     }
 
     @Bean
@@ -65,31 +73,38 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
             
-            // Configure stateless session management (JWT handles the session, not the server)
+            // Configure stateless session management
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
+            // Register exception handlers to return our unified ErrorResponse DTO globally [1, 2]
+//            .exceptionHandling(exception -> exception
+//                .authenticationEntryPoint(authenticationEntryPoint)
+//                .accessDeniedHandler(accessDeniedHandler)
+//            )
+//            
             .authorizeHttpRequests(auth -> auth
                 // 1. Always allow preflight OPTIONS handshakes globally
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 
-                // 2. Public whitelists
+                // 2. Merged Public Whitelist [1, 3]
                 .requestMatchers("/api/v1/auth/**").permitAll() // Login, OAuth, refresh tokens
-                .requestMatchers(HttpMethod.POST, "/api/v1/registrations").permitAll() // Public registration submit
+                .requestMatchers(HttpMethod.POST, "/api/v1/registrations", "/api/v1/registrations/track").permitAll() // Onboarding & Tracking submissions whitelisted [3]
                 .requestMatchers("/error").permitAll()
                 
                 // 3. SECURE ENDPOINTS
-                // Only TDRA Staff (Admins and Reviewers) can fetch registration lists or specific request details
-                // Updated to explicitly include the base path "/api/v1/registrations" alongside the wildcard
+                // Rule A: Specific tracking endpoint must be evaluated FIRST [1]
+                .requestMatchers(HttpMethod.GET, "/api/v1/registrations/my-status")
+                .hasAnyRole("COMPANY_PENDING", "COMPANY_ADMIN", "COMPANY_USER")
+                
+                // Rule B: Broader administrative GET endpoints evaluated SECOND [1]
                 .requestMatchers(HttpMethod.GET, "/api/v1/registrations", "/api/v1/registrations/**")
                 .hasAnyRole("TDRA_SUPER_ADMIN", "REVIEWER")
                 
                 // Only TDRA Admins can execute approvals/rejections (PUT status transitions)
                 .requestMatchers(HttpMethod.PUT, "/api/v1/registrations/**").hasRole("TDRA_SUPER_ADMIN")
                 
-             // 2. Public whitelists
-                .requestMatchers("/api/v1/auth/**").permitAll() // Login, OAuth, refresh tokens
-                .requestMatchers(HttpMethod.POST, "/api/v1/registrations", "/api/v1/registrations/track").permitAll()
-                .requestMatchers("/error").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/setup-password")
+                .hasRole("COMPANY_PENDING") 
                 
                 .anyRequest().authenticated()
             );

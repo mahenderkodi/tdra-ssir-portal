@@ -36,23 +36,23 @@ public class SSIRApplication {
         return args -> {
             try {
                 // 1. List of all 9 enterprise roles defined across the 3 Security Domains
-                List<String> expectedRoles = Arrays.asList(
-                    // Group A: TDRA Regulator Domain (Internal Staff)
-                    "ROLE_TDRA_SUPER_ADMIN",
-                    "ROLE_TDRA_REVIEWER",
-                    "ROLE_TDRA_APPROVER",
-                    "ROLE_TDRA_AUDITOR",
-                    
-                    // Group B: Enterprise Client Domain (Multi-Tenant Corporate Users)
-                    "ROLE_COMPANY_ADMIN",
-                    "ROLE_COMPANY_USER",
-                    "ROLE_COMPANY_VIEWER",
-                    
-                    // Group C: Telecom Operator Domain (Network Carriers)
-                    "ROLE_MNO_ADMIN",
-                    "ROLE_MNO_OPERATOR"
-                );
-
+            	List<String> expectedRoles = Arrays.asList(
+                        // Group A: TDRA Regulator Domain
+                        "ROLE_TDRA_SUPER_ADMIN",
+                        "ROLE_TDRA_REVIEWER",
+                        "ROLE_TDRA_APPROVER",
+                        "ROLE_TDRA_AUDITOR",
+                        
+                        // Group B: Enterprise Client Domain
+                        "ROLE_COMPANY_PENDING", // Added: Restricted role for unapproved applicants [1]
+                        "ROLE_COMPANY_ADMIN",   // Elevated role post-approval [1]
+                        "ROLE_COMPANY_USER",
+                        "ROLE_COMPANY_VIEWER",
+                        
+                        // Group C: Telecom Operator Domain
+                        "ROLE_MNO_ADMIN",
+                        "ROLE_MNO_OPERATOR"
+                    );
                 // 2. Seed all 9 roles safely (idempotent checks prevent duplicate key errors)
                 for (String roleName : expectedRoles) {
                     if (roleRepository.findByRoleName(roleName).isEmpty()) {

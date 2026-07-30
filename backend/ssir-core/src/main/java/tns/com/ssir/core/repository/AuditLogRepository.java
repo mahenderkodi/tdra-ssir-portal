@@ -1,12 +1,11 @@
-/*
- * package ae.gov.tdra.ssir.core.repository;
- * 
- * import ae.gov.tdra.ssir.core.entity.AuditLog; import
- * org.springframework.data.jpa.repository.JpaRepository;
- * 
- * public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
- * 
- * }
- */
+package tns.com.ssir.core.repository;
+  
+import org.springframework.data.jpa.repository.JpaRepository;
+import tns.com.ssir.core.entity.AuditLog;
+ 
+  public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
+  
+  }
+ 
 
 

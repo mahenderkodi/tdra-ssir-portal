@@ -8,6 +8,8 @@ import tns.com.ssir.dto.ErrorResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
@@ -77,7 +79,7 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    @org.springframework.web.bind.annotation.ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(
             org.springframework.security.authentication.BadCredentialsException ex, 
             jakarta.servlet.http.HttpServletRequest request) {
@@ -93,5 +95,53 @@ public class GlobalExceptionHandler {
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+    
+ // 5. Intercepts Spring Security Disabled User Exceptions
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ErrorResponse> handleDisabledException(
+            org.springframework.security.authentication.DisabledException ex, 
+            jakarta.servlet.http.HttpServletRequest request) {
+        
+        log.warn("Disabled user authentication attempt at {}: {}", request.getRequestURI(), ex.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .error("Unauthorized")
+                .message("Your account is pending activation or has been disabled. Please contact the system administrator.")
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+    
+ // 6. Intercepts Spring's Automated Controller @RequestBody Validation Failures [1]
+    @org.springframework.web.bind.annotation.ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+            org.springframework.web.bind.MethodArgumentNotValidException ex, 
+            jakarta.servlet.http.HttpServletRequest request) {
+        
+        log.warn("Request body validation failed at {}: {}", request.getRequestURI(), ex.getMessage());
+
+        List<String> details = new java.util.ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+
+        for (org.springframework.validation.FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+            String errorMsg = fieldError.getField() + ": " + fieldError.getDefaultMessage();
+            details.add(errorMsg);
+            sb.append(errorMsg).append("; ");
+        }
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value()) // Returns 400 instead of 500
+                .error("Bad Request (Validation Failed)")
+                .message(sb.toString())
+                .details(details)
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

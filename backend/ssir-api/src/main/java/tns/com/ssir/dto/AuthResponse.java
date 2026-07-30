@@ -14,4 +14,5 @@ public class AuthResponse {
     private String username;
     private List<String> roles;
     private Long companyId;
+    private boolean firstTimeLogin;
 }

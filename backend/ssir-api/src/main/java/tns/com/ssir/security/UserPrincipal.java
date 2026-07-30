@@ -76,5 +76,8 @@ public class UserPrincipal implements UserDetails {
     public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() { return "ACTIVE".equalsIgnoreCase(status); }
+    public boolean isEnabled() { 
+        // Allows both fully active users and pending onboarding applicants to authenticate [1]
+        return "ACTIVE".equalsIgnoreCase(status) || "PENDING_ACTIVATION".equalsIgnoreCase(status); 
+    }
 }

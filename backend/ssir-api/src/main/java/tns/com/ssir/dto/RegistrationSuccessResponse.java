@@ -10,5 +10,7 @@ public class RegistrationSuccessResponse {
     private String trackingId;
     private String status;
     private String message;
+    private String username;     // The representative's email acting as username
+    private String tempPassword; // Plain-text temporary password shown once on the success screen
     private LocalDateTime submittedAt;
 }

@@ -74,6 +74,10 @@ public class User {
     )
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
+    
+    @Column(name = "first_time_login", nullable = false)
+    @Builder.Default
+    private boolean firstTimeLogin = true; // Default to true for newly seeded/onboarded users
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

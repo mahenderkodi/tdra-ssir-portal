@@ -7,9 +7,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import tns.com.ssir.core.entity.RegistrationRequest;
 import tns.com.ssir.dto.RegistrationRequestDto;
+import tns.com.ssir.dto.RegistrationStatusUpdateResponse;
 import tns.com.ssir.dto.RegistrationSuccessResponse;
 import tns.com.ssir.dto.TrackingRequest;
 import tns.com.ssir.dto.TrackingResponse;
+import tns.com.ssir.security.UserPrincipal;
 import tns.com.ssir.service.RegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,13 +42,26 @@ public class RegistrationController {
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations); 
         }
-
+        
         RegistrationRequest savedRequest = registrationService.submitRegistrationWithFiles(dto, request.getMultiFileMap());
+
+        // Extract the generated plain-text temp password we temporarily stored in the entity
+        String tempPassword = savedRequest.getRejectionReason();
+        savedRequest.setRejectionReason(null); // Clean up entity field
+
+        // --- NEW: DYNAMICALLY RESOLVE THE CORRECT USERNAME ---
+        // Reads the representative's official email if present; otherwise, falls back to company email [1]
+        String generatedUsername = (savedRequest.getCompany().getContacts() != null && !savedRequest.getCompany().getContacts().isEmpty())
+                ? savedRequest.getCompany().getContacts().get(0).getOfficialEmail()
+                : savedRequest.getCompany().getEmail();
+        // -----------------------------------------------------
 
         RegistrationSuccessResponse successResponse = RegistrationSuccessResponse.builder()
                 .trackingId(savedRequest.getTrackingId())
                 .status(savedRequest.getCurrentStatus())
-                .message("Your onboarding application has been successfully submitted to TDRA.")
+                .message("Your onboarding application has been successfully submitted.")
+                .username(generatedUsername) // Updated to use the correctly resolved username [1]
+                .tempPassword(tempPassword)
                 .submittedAt(savedRequest.getCreatedAt())
                 .build();
 
@@ -67,14 +82,35 @@ public class RegistrationController {
     }
     
     @PutMapping("/{id}/status")
-    public ResponseEntity<RegistrationRequest> updateStatus(
+    public ResponseEntity<RegistrationStatusUpdateResponse> updateStatus(
             @PathVariable("id") Long id,
             @RequestParam("status") String status,
             @RequestParam(value = "comments", required = false) String comments) {
         
-        RegistrationRequest updated = registrationService.updateRegistrationStatus(id, status, comments);
-        return ResponseEntity.ok(updated);
+        RegistrationStatusUpdateResponse response = registrationService.updateRegistrationStatus(id, status, comments);
+        return ResponseEntity.ok(response);
     }
+    
+    @GetMapping("/my-status")
+    public ResponseEntity<TrackingResponse> getMyStatus(
+            @org.springframework.security.core.annotation.AuthenticationPrincipal UserPrincipal principal) {
+        
+        if (principal.getCompanyId() == null) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "No company associated with this user account.");
+        }
+
+        RegistrationRequest request = registrationService.getRegistrationByCompanyId(principal.getCompanyId());
+        TrackingResponse trackingResponse = TrackingResponse.builder()
+        		.trackingId(request.getTrackingId())
+                .companyName(request.getCompany().getCompanyName())
+                .currentStatus(request.getCurrentStatus())
+                .submittedAt(request.getCreatedAt())
+                .build();
+        return ResponseEntity.ok(trackingResponse);
+    }
+    
+    
     
  // 5. Secure Public Tracking API [3]
     @PostMapping("/track")
