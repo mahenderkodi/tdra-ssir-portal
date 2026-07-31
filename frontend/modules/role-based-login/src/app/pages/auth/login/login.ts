@@ -48,15 +48,31 @@ export class Login {
 
   this.isSubmitting.set(false);
 
-  if (response.firstTimeLogin) {
-    void this.router.navigate([
-      '/create-password'
-    ]);
+  if (response.firstTimeLogin === true) {
 
-    return;
-  }
+  void this.router.navigate(['/create-password']);
+
+  return;
+
+}
+ 
+if (response.firstTimeLogin === false) {
 
   this.redirectUserByRole(response.roles);
+
+  return;
+
+}
+ 
+this.errorMessage.set(
+
+  'Login succeeded, but the account status was not provided.'
+
+);
+ 
+  console.log("check 1");
+  this.redirectUserByRole(response.roles);
+   console.log("check 2");
 },
 
       error: (error) => {
