@@ -14,6 +14,7 @@ export class AdminDashboardComponent implements OnInit {
   totalCount = signal(0);
   pendingCount = signal(0);
   approvedCount = signal(0);
+   rejectedCount = signal(0);
   isLoading = signal(true);
 
   ngOnInit(): void {
@@ -22,6 +23,7 @@ export class AdminDashboardComponent implements OnInit {
         this.totalCount.set(data.length);
         this.pendingCount.set(data.filter(r => r.currentStatus === 'SUBMITTED' || r.currentStatus === 'UNDER_REVIEW').length);
         this.approvedCount.set(data.filter(r => r.currentStatus === 'APPROVED').length);
+        this.rejectedCount.set(data.filter(r => r.currentStatus === 'REJECTED').length); 
         this.isLoading.set(false);
       },
       error: () => {

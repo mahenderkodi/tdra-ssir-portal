@@ -1,13 +1,13 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth-service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule], // Registers form directives
+  imports: [CommonModule, ReactiveFormsModule,RouterLink], // Registers form directives
   templateUrl: './login.html',
   styleUrl: './login.css' // Mapped to login.css
 })

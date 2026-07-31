@@ -5,11 +5,15 @@ import tns.com.ssir.core.repository.*;
 import tns.com.ssir.dto.AccountDto;
 import tns.com.ssir.dto.CompanyDto;
 import tns.com.ssir.dto.CreateCredentialsRequest;
+import tns.com.ssir.dto.ForgotPasswordRequest;
 import tns.com.ssir.dto.MockEmailDetails;
 import tns.com.ssir.dto.RegistrationRequestDto;
 import tns.com.ssir.dto.RegistrationStatusUpdateResponse;
 import tns.com.ssir.dto.RepresentativeDto;
+import tns.com.ssir.dto.ResetPasswordRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -439,5 +443,73 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .mockEmailDetails(emailDetails)
                 .build();
     }
+    
+    @Override
+    @Transactional
+    public void processForgotPassword(ForgotPasswordRequest request) {
+        String email = request.getEmail().trim();
+
+        // 1. Look up the user by email
+        java.util.Optional<User> userOpt = userRepository.findByEmail(email);
+
+        // SECURITY BEST PRACTICE: If the email does not exist, do NOT throw an error.
+        // Returning a generic success message prevents hackers from harvesting active administrative emails [1].
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+
+            // 2. Delete any existing password reset tokens for this user
+            tokenRepository.deleteByUser(user);
+
+            // 3. Generate a secure, short-lived (15 minutes) reset token [1]
+            String secureToken = UUID.randomUUID().toString();
+            PasswordResetToken resetToken = PasswordResetToken.builder()
+                    .token(secureToken)
+                    .user(user)
+                    .expiryDate(LocalDateTime.now().plusMinutes(15)) // 15-minute expiration [1]
+                    .build();
+
+            tokenRepository.save(resetToken);
+
+            // 4. MOCK EMAIL: Print the secure password-reset link to the console [1]
+            System.out.println("\n=================================================================================");
+            System.out.println(">>> MOCK EMAIL NOTIFICATION SYSTEM [PASSWORD RESET REQUESTED] <<<");
+            System.out.println("To: " + user.getEmail());
+            System.out.println("Subject: SSIR Registry - Reset Your Password");
+            System.out.println("Dear " + user.getUsername() + ",");
+            System.out.println("We received a request to reset your password.");
+            System.out.println("Please click the link below to set a new password. This link is valid for 15 minutes:");
+            System.out.println("http://localhost:4200/auth/reset-password?token=" + secureToken); // Port 4200 Angular link
+            System.out.println("=================================================================================\n");
+        } else {
+            // Log locally for debugging, but still return success to the client
+            System.out.println(">>> FORGOT PASSWORD ATTEMPT: Email not found in database: " + email);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        // 1. Verify if the token exists
+        PasswordResetToken resetToken = tokenRepository.findByToken(request.getToken())
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Invalid or expired password reset token."));
+
+        // 2. Check if the token has expired
+        if (resetToken.isExpired()) {
+            tokenRepository.delete(resetToken);
+            throw new org.springframework.web.server.ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "This password-reset link has expired. Please request a new one.");
+        }
+
+        // 3. Fetch user and update password with new BCrypt hash [1]
+        User user = resetToken.getUser();
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        // 4. Delete the used token
+        tokenRepository.delete(resetToken);
+        System.out.println(">>> PASSWORD RESET SUCCESS: Successfully updated password for user: " + user.getUsername());
+    }
+
 
 }

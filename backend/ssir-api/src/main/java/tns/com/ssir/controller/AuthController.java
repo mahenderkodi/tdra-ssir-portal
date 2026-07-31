@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import tns.com.ssir.dto.*;
 import tns.com.ssir.security.JwtTokenProvider;
 import tns.com.ssir.security.UserPrincipal;
+import tns.com.ssir.service.RegistrationService;
 import tns.com.ssir.core.entity.User;
 import tns.com.ssir.core.repository.UserRepository;
 import java.util.List;
@@ -33,6 +34,9 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private RegistrationService registrationService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -94,4 +98,18 @@ public class AuthController {
 
         return ResponseEntity.ok("{\"message\": \"Your permanent password has been set successfully.\"}");
     }
+ // --- FORGOT PASSWORD ENDPOINT ---
+ // Production Secure: Returns a generic message regardless of email existence [1]
+ @PostMapping("/forgot-password")
+ public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+     registrationService.processForgotPassword(request);
+     return ResponseEntity.ok("{\"message\": \"If an account exists for this email, a password reset link has been sent.\"}");
+ }
+
+ // --- RESET PASSWORD ENDPOINT ---
+ @PostMapping("/reset-password")
+ public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+     registrationService.resetPassword(request);
+     return ResponseEntity.ok("{\"message\": \"Your password has been successfully updated. You can now log in.\"}");
+ }
 }

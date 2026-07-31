@@ -53,6 +53,11 @@
   border: 1px solid #fecaca !important;
 }
 
+.custom-card.bg-rejected {
+  background-color: #fef2f2;
+  border-left-color: #dc3545 !important; /* Premium Bootstrap Red */
+}
+
 .fs-7 {
   font-size: 0.75rem;
 }

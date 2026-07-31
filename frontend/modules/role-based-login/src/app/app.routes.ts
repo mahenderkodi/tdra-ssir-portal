@@ -11,6 +11,8 @@ import { PortalLayout } from './layouts/portal-layout/portal-layout';
 // Authentication pages
 import { Login } from './pages/auth/login/login';
 import { CreatePassword } from './pages/auth/create-password/create-password';
+import { ForgotPassword } from './pages/auth/forgot-password/forgot-password';
+import { ResetPassword } from './pages/auth/reset-password/reset-password';
 
 // Admin pages
 import { AdminDashboardComponent } from './pages/admin/dashboard/dashboard'; 
@@ -29,40 +31,47 @@ import { Users as PortalUsers } from './pages/portal/users/users';
 import { Unauthorized } from './pages/unauthorized/unauthorized';
 
 export const routes: Routes = [
-  /*
-   * Public authentication pages (Wrapped in AuthLayoutComponent)
-   */
+  // 1. BASE REDIRECT TO SIGN-IN [1]
   {
     path: '',
+    pathMatch: 'full',
+    redirectTo: 'auth/login'
+  },
+
+  // 2. PUBLIC AUTHENTICATION ROUTING (Unified Namespace under AuthLayoutComponent) [1, 3]
+  {
+    path: 'auth',
     component: AuthLayoutComponent,
     children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'login'
-      },
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
       {
         path: 'login',
-        component: Login
+        component: Login,
+        title: 'Sign In'
       },
       {
         path: 'create-password',
-        component: CreatePassword
+        component: CreatePassword,
+        title: 'Setup Password'
+      },
+      {
+        path: 'forgot-password',
+        component: ForgotPassword,
+        title: 'Forgot Password'
+      },
+      {
+        path: 'reset-password',
+        component: ResetPassword,
+        title: 'Reset Password'
       }
     ]
   },
 
-  /*
-   * TDRA administrator pages
-   * Updated: Allowed roles expanded to include all TDRA staff roles [1]
-   */
+  // 3. SECURE TDRA ADMINISTRATOR PORTAL [1, 3]
   {
     path: 'admin',
     component: AdminLayoutComponent,
-    canActivate: [
-      authGuard,
-      roleGuard
-    ],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: [
         'ROLE_TDRA_SUPER_ADMIN',
@@ -72,41 +81,37 @@ export const routes: Routes = [
       ]
     },
     children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'registrations'
-      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
-        component: AdminDashboardComponent
+        component: AdminDashboardComponent,
+        title: 'TDRA Admin Dashboard'
       },
       {
         path: 'registrations',
-        component: AdminRegistrationsComponent
+        component: AdminRegistrationsComponent,
+        title: 'Onboarding Queue'
       },
       {
         path: 'registrations/:id',
-        component: AdminRegistrationDetailComponent
+        component: AdminRegistrationDetailComponent,
+        title: 'Inspect Request'
       },
       {
         path: 'users',
-        component: AdminUsersComponent
+        component: AdminUsersComponent,
+        canActivate: [roleGuard],
+        data: { expectedRoles: ['ROLE_TDRA_SUPER_ADMIN'] },
+        title: 'Manage Staff'
       }
     ]
   },
 
-  /*
-   * Company portal pages
-   * Updated: Allowed roles expanded to include all corporate roles [1]
-   */
+  // 4. SECURE COMPANY PORTAL PAGES [1, 3]
   {
     path: 'portal',
     component: PortalLayout,
-    canActivate: [
-      authGuard,
-      roleGuard
-    ],
+    canActivate: [authGuard, roleGuard],
     data: {
       roles: [
         'ROLE_COMPANY_ADMIN',
@@ -115,11 +120,7 @@ export const routes: Routes = [
       ]
     },
     children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'dashboard'
-      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
         component: PortalDashboard
@@ -138,24 +139,23 @@ export const routes: Routes = [
       },
       {
         path: 'users',
-        component: PortalUsers
+        component: PortalUsers,
+        canActivate: [roleGuard],
+        data: { expectedRoles: ['ROLE_COMPANY_ADMIN'] } // Restricted to Company Admin [1]
       }
     ]
   },
 
-  /*
-   * User is logged in but does not have the role.
-   */
+  // 5. UN-AUTHORIZED ACCESS VIEW
   {
     path: 'unauthorized',
-    component: Unauthorized
+    component: Unauthorized,
+    title: 'Access Denied'
   },
 
-  /*
-   * Unknown URL
-   */
+  // 6. DEFAULT FALLBACK
   {
     path: '**',
-    redirectTo: 'login'
+    redirectTo: 'auth/login'
   }
 ];

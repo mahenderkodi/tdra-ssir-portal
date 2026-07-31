@@ -26,6 +26,7 @@ export class AdminRegistrationsComponent implements OnInit, OnDestroy {
   totalCount = signal(0);
   pendingCount = signal(0);
   approvedCount = signal(0);
+  rejectedCount = signal(0);
 
   ngOnInit(): void {
     // Poll the backend every 15 seconds to keep the admin queue updated in real-time [3]
@@ -49,6 +50,7 @@ export class AdminRegistrationsComponent implements OnInit, OnDestroy {
     this.totalCount.set(data.length);
     this.pendingCount.set(data.filter(r => r.currentStatus === 'SUBMITTED' || r.currentStatus === 'UNDER_REVIEW').length);
     this.approvedCount.set(data.filter(r => r.currentStatus === 'APPROVED').length);
+    this.rejectedCount.set(data.filter(r => r.currentStatus === 'REJECTED').length);
   }
 
   // Executes inline quick-approvals directly from the table row [3]

@@ -1,4 +1,4 @@
-<section class="container-fluid" *ngIf="!isLoading() && registration()">
+<section class="container-fluid py-4" *ngIf="!isLoading() && registration()">
   <div class="row g-4">
     
     <!-- LEFT PANEL: Corporate Profile Details (50% Width) -->
@@ -33,7 +33,7 @@
             <dd class="col-sm-8">{{ registration().company.companyType }} ({{ registration().company.industryType }})</dd>
           </dl>
 
-          <!-- Section B: Address -->
+          <!-- Section B: Registered Address -->
           <h5 class="text-primary border-bottom pb-2 mb-3 fw-bold">Registered Office</h5>
           <dl class="row small mb-4">
             <dt class="col-sm-4 text-muted">Address Line 1:</dt>
@@ -46,7 +46,32 @@
             <dd class="col-sm-8">{{ registration().company.address?.country }}</dd>
           </dl>
 
-          <!-- Section C: Uploaded Files Index -->
+          <!-- Section C: Authorized Representative [3] -->
+          <h5 class="text-primary border-bottom pb-2 mb-3 fw-bold">Authorized Representative</h5>
+          <dl class="row small mb-4" *ngIf="registration().company.contacts && registration().company.contacts.length > 0">
+            <dt class="col-sm-4 text-muted">First Name:</dt>
+            <dd class="col-sm-8 fw-semibold text-dark">{{ registration().company.contacts[0].firstName }}</dd>
+
+            <dt class="col-sm-4 text-muted">Last Name:</dt>
+            <dd class="col-sm-8 fw-semibold text-dark">{{ registration().company.contacts[0].lastName }}</dd>
+
+            <dt class="col-sm-4 text-muted">Designation:</dt>
+            <dd class="col-sm-8">{{ registration().company.contacts[0].designation }} ({{ registration().company.contacts[0].department || 'Executive' }})</dd>
+
+            <dt class="col-sm-4 text-muted">Official Email:</dt>
+            <dd class="col-sm-8">{{ registration().company.contacts[0].officialEmail }}</dd>
+
+            <dt class="col-sm-4 text-muted">Mobile Number:</dt>
+            <dd class="col-sm-8"><code>{{ registration().company.contacts[0].mobileNumber }}</code></dd>
+
+            <dt class="col-sm-4 text-muted">Emirates ID / Passport:</dt>
+            <dd class="col-sm-8"><code>{{ registration().company.contacts[0].passportEmiratesId }}</code></dd>
+          </dl>
+          <div *ngIf="!registration().company.contacts || registration().company.contacts.length === 0" class="alert alert-light border small text-muted mb-4">
+            No authorized representative data registered for this application.
+          </div>
+
+          <!-- Section D: Uploaded Files Index -->
           <h5 class="text-primary border-bottom pb-2 mb-3 fw-bold">Uploaded Legal Files (Click to inspect)</h5>
           <div class="list-group mb-4 small shadow-sm">
             <button type="button" *ngFor="let doc of registration().documents" 
@@ -58,7 +83,7 @@
             </button>
           </div>
 
-          <!-- Section D: Administrator Action Footer -->
+          <!-- Section E: Administrator Action Footer -->
           <div class="border-top pt-4 mt-4 d-flex justify-content-around gap-2">
             <button class="btn btn-danger px-4 fw-semibold" [disabled]="isProcessing()"
                     (click)="executeAction('REJECTED', 'Trade License signature or formatting invalid.')">

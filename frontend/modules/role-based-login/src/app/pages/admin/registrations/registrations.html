@@ -1,44 +1,58 @@
 <div class="container-fluid py-4">
 
   <!-- TOP SECTION: Metrics Grid (SaaS Dashboard Style) -->
+  <!-- TOP SECTION: Metrics Grid (Updated to 4 columns) [3] -->
   <div class="row g-4 mb-5" *ngIf="!isLoading()">
-    <div class="col-md-4">
+    <div class="col-xl-3 col-sm-6">
       <div class="card h-100 border-0 shadow-sm custom-card bg-pending">
         <div class="card-body p-4 d-flex flex-column justify-content-between">
           <div>
             <h6 class="text-uppercase text-muted fw-bold mb-2 tracking-wider small">Pending Reviews</h6>
-            <h1 class="display-4 fw-bold text-dark mb-0">{{ pendingCount() }}</h1>
+            <h2 class="display-6 fw-bold text-dark mb-0">{{ pendingCount() }}</h2>
           </div>
-          <p class="small mb-0 text-secondary mt-3">Applications currently awaiting audit</p>
+          <p class="small mb-0 text-secondary mt-3">Applications awaiting audit</p>
         </div>
       </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-xl-3 col-sm-6">
       <div class="card h-100 border-0 shadow-sm custom-card bg-approved">
         <div class="card-body p-4 d-flex flex-column justify-content-between">
           <div>
             <h6 class="text-uppercase text-muted fw-bold mb-2 tracking-wider small">Approved Entities</h6>
-            <h1 class="display-4 fw-bold text-dark mb-0">{{ approvedCount() }}</h1>
+            <h2 class="display-6 fw-bold text-dark mb-0">{{ approvedCount() }}</h2>
           </div>
-          <p class="small mb-0 text-secondary mt-3">Active corporate registries on platform</p>
+          <p class="small mb-0 text-secondary mt-3">Active registries on platform</p>
         </div>
       </div>
     </div>
 
-    <div class="col-md-4">
+    <!-- NEW CARD: Rejected Clients [3] -->
+    <div class="col-xl-3 col-sm-6">
+      <div class="card h-100 border-0 shadow-sm custom-card bg-rejected">
+        <div class="card-body p-4 d-flex flex-column justify-content-between">
+          <div>
+            <h6 class="text-uppercase text-muted fw-bold mb-2 tracking-wider small">Rejected Clients</h6>
+            <h2 class="display-6 fw-bold text-dark mb-0">{{ rejectedCount() }}</h2>
+          </div>
+          <p class="small mb-0 text-secondary mt-3">Applications rejected</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
       <div class="card h-100 border-0 shadow-sm custom-card bg-total">
         <div class="card-body p-4 d-flex flex-column justify-content-between">
           <div>
             <h6 class="text-uppercase text-muted fw-bold mb-2 tracking-wider small">Total Submissions</h6>
-            <h1 class="display-4 fw-bold text-dark mb-0">{{ totalCount() }}</h1>
+            <h2 class="display-6 fw-bold text-dark mb-0">{{ totalCount() }}</h2>
           </div>
-          <p class="small mb-0 text-secondary mt-3">Cumulative onboarding requests processed</p>
+          <p class="small mb-0 text-secondary mt-3">onboarding requests processed</p>
         </div>
       </div>
     </div>
   </div>
-
+  
   <!-- BOTTOM SECTION: Dynamic Queue Table -->
   <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
     <div class="card-header bg-white border-0 py-4 px-4">

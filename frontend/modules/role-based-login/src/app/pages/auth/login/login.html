@@ -5,14 +5,14 @@
   </div>
   <div class="card-body p-4">
 
-    <!-- Modern @if control flow replaces *ngIf [2] -->
+    <!-- Modern @if control flow handles security error outputs [2] -->
     @if (errorMessage()) {
       <div class="alert alert-danger small" role="alert">
         {{ errorMessage() }}
       </div>
     }
 
-    <!-- Credentials Login Form -->
+    <!-- Single, Consolidated Credentials Login Form [2] -->
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="mb-3">
         <label class="form-label fw-bold small">Username or Email  <span class="text-danger">*</span></label>
@@ -22,13 +22,20 @@
         <label class="form-label fw-bold small">Password  <span class="text-danger">*</span></label>
         <input type="password" class="form-control" formControlName="password" placeholder="••••••••">
       </div>
+ 
+      <!-- Forgot Password Link [3] -->
+      <div class="text-end mb-4">
+        <a routerLink="/auth/forgot-password" class="small text-decoration-none fw-semibold">Forgot password?</a>
+      </div>
 
       <div class="d-grid mb-3">
         <button type="submit" class="btn btn-primary btn-lg fs-6" [disabled]="isSubmitting()">
           @if (isSubmitting()) {
             <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            Signing In...
+          } @else {
+            Sign In
           }
-          Sign In
         </button>
       </div>
     </form>

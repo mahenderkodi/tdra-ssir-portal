@@ -1,21 +1,23 @@
 import { Component, OnInit, signal, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router'; // Imported ActivatedRoute
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AdminRegistrationService } from '../../../core/services/admin-registration';
+
 
 @Component({
   selector: 'app-admin-registration-detail',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './registration-detail.html'
+  templateUrl: './registration-detail.html',
+  styleUrl: './registration-detail.css' 
 })
 export class AdminRegistrationDetailComponent implements OnInit {
   private router = inject(Router);
+  private route = inject(ActivatedRoute); // Injected ActivatedRoute [3]
   private sanitizer = inject(DomSanitizer);
   private adminService = inject(AdminRegistrationService);
 
-  // Maps route parameter ':id' directly to this variable via withComponentInputBinding()
   @Input() id!: string;
 
   registration = signal<any | null>(null);
@@ -26,8 +28,12 @@ export class AdminRegistrationDetailComponent implements OnInit {
   errorMessage = signal('');
 
   ngOnInit(): void {
-    if (this.id) {
-      this.loadRegistrationDetails(Number(this.id));
+    // SAFE FALLBACK: If Router Component Input binding is not enabled in app.config.ts,
+    // we retrieve the ':id' parameter directly from the active route snapshot [3]!
+    const resolvedId = this.id || this.route.snapshot.paramMap.get('id');
+
+    if (resolvedId) {
+      this.loadRegistrationDetails(Number(resolvedId));
     } else {
       this.errorMessage.set('Missing registration identifier.');
       this.isLoading.set(false);
@@ -44,7 +50,8 @@ export class AdminRegistrationDetailComponent implements OnInit {
 
   // Executes state-machine triggers (APPROVE / REJECT / INFO_REQUESTED)
   executeAction(status: string, comments: string): void {
-    const regId = Number(this.id);
+    const resolvedId = this.id || this.route.snapshot.paramMap.get('id');
+    const regId = Number(resolvedId);
     if (!regId) return;
 
     this.isProcessing.set(true);
