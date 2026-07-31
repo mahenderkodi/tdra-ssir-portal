@@ -23,7 +23,7 @@ import tns.com.ssir.core.repository.UserRepository;
 @EnableJpaRepositories(basePackages = "tns.com.ssir.core.repository")
 @EntityScan(basePackages = "tns.com.ssir.core.entity")
 public class SSIRApplication {
-
+	//main class 
     public static void main(String[] args) {
         SpringApplication.run(SSIRApplication.class, args);
     }
