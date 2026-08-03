@@ -13,15 +13,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import lombok.extern.log4j.Log4j2;
 import tns.com.ssir.core.entity.Role;
 import tns.com.ssir.core.entity.User;
 import tns.com.ssir.core.repository.RoleRepository;
 import tns.com.ssir.core.repository.UserRepository;
+import tns.com.ssir.service.RegistrationServiceImpl;
 
 @SpringBootApplication(scanBasePackages = "tns.com.ssir")
 @EnableJpaAuditing
 @EnableJpaRepositories(basePackages = "tns.com.ssir.core.repository")
 @EntityScan(basePackages = "tns.com.ssir.core.entity")
+@Log4j2 
 public class SSIRApplication {
 	//main class 
     public static void main(String[] args) {
@@ -57,7 +61,7 @@ public class SSIRApplication {
                 for (String roleName : expectedRoles) {
                     if (roleRepository.findByRoleName(roleName).isEmpty()) {
                         roleRepository.save(Role.builder().roleName(roleName).build());
-                        System.out.println(">>> SECURITY SEEDER: Registered role: " + roleName);
+                        log.info(">>> SECURITY SEEDER: Registered role: " + roleName);
                     }
                 }
 
@@ -82,12 +86,12 @@ public class SSIRApplication {
                             .build();
 
                     userRepository.save(admin);
-                    System.out.println(">>> SECURITY SEEDER: Successfully auto-created 'tdra_admin' with password 'Password123!'");
+                    log.info(">>> SECURITY SEEDER: Successfully auto-created 'tdra_admin' with password 'Password123!'");
                 } else {
-                    System.out.println(">>> SECURITY SEEDER: 'tdra_admin' record already exists.");
+                    log.info(">>> SECURITY SEEDER: 'tdra_admin' record already exists.");
                 }
             } catch (Exception e) {
-                System.err.println(">>> SECURITY SEEDER FAILURE: " + e.getMessage());
+                log.info(">>> SECURITY SEEDER FAILURE: " + e.getMessage());
             }
         };
     }

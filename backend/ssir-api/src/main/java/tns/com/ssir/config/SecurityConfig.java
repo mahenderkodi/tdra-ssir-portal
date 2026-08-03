@@ -1,5 +1,9 @@
 package tns.com.ssir.config;
 
+//import tns.com.ssir.api.security.CustomAuthenticationEntryPoint; // Imported
+//import tns.com.ssir.api.security.CustomAccessDeniedHandler;         // Imported
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,114 +25,112 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import tns.com.ssir.security.CustomUserDetailsService;
 import tns.com.ssir.security.JwtAuthenticationFilter;
-//import tns.com.ssir.api.security.CustomAuthenticationEntryPoint; // Imported
-//import tns.com.ssir.api.security.CustomAccessDeniedHandler;         // Imported
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity // Enables fine-grained method security: @PreAuthorize("hasRole('...')")
 public class SecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+	@Autowired
+	private CustomUserDetailsService customUserDetailsService;
 
-    //@Autowired
-   // private CustomAuthenticationEntryPoint authenticationEntryPoint; // Injected [1]
+	// @Autowired
+	// private CustomAuthenticationEntryPoint authenticationEntryPoint; // Injected
+	// [1]
 
-   // @Autowired
-    // private CustomAccessDeniedHandler accessDeniedHandler; // Injected [1]
+	// @Autowired
+	// private CustomAccessDeniedHandler accessDeniedHandler; // Injected [1]
 
-    @Value("${cors.allowed-origins:http://localhost:4200}")
-    private List<String> allowedOrigins;
+	@Value("${cors.allowed-origins:http://localhost:4200}")
+	private List<String> allowedOrigins;
 
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
-    }
+	@Bean
+	public JwtAuthenticationFilter jwtAuthenticationFilter() {
+		return new JwtAuthenticationFilter();
+	}
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12); // Hardened to 12 rounds of hashing for production
-    }
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder(12); // Hardened to 12 rounds of hashing for production
+	}
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(customUserDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
+	@Bean
+	public DaoAuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+		authProvider.setUserDetailsService(customUserDetailsService);
+		authProvider.setPasswordEncoder(passwordEncoder());
+		return authProvider;
+	}
 
-    @Bean(BeanIds.AUTHENTICATION_MANAGER)
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }
+	@Bean(BeanIds.AUTHENTICATION_MANAGER)
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+		return authConfig.getAuthenticationManager();
+	}
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(AbstractHttpConfigurer::disable)
-            
-            // Configure stateless session management
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            
-            // Register exception handlers to return our unified ErrorResponse DTO globally [1, 2]
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(AbstractHttpConfigurer::disable)
+
+				// Configure stateless session management
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+				// Register exception handlers to return our unified ErrorResponse DTO globally
+				// [1, 2]
 //            .exceptionHandling(exception -> exception
 //                .authenticationEntryPoint(authenticationEntryPoint)
 //                .accessDeniedHandler(accessDeniedHandler)
 //            )
 //            
-            .authorizeHttpRequests(auth -> auth
-                // 1. Always allow preflight OPTIONS handshakes globally
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                
-                // 2. Merged Public Whitelist [1, 3]
-                .requestMatchers("/api/v1/auth/**").permitAll() // Login, OAuth, refresh tokens
-                .requestMatchers(HttpMethod.POST, "/api/v1/registrations", "/api/v1/registrations/track").permitAll() // Onboarding & Tracking submissions whitelisted [3]
-                .requestMatchers("/error").permitAll()
-                
-                // 3. SECURE ENDPOINTS
-                // Rule A: Specific tracking endpoint must be evaluated FIRST [1]
-                .requestMatchers(HttpMethod.GET, "/api/v1/registrations/my-status")
-                .hasAnyRole("COMPANY_PENDING", "COMPANY_ADMIN", "COMPANY_USER")
-                
-                // Rule B: Broader administrative GET endpoints evaluated SECOND [1]
-                .requestMatchers(HttpMethod.GET, "/api/v1/registrations", "/api/v1/registrations/**")
-                .hasAnyRole("TDRA_SUPER_ADMIN", "REVIEWER")
-                
-                // Only TDRA Admins can execute approvals/rejections (PUT status transitions)
-                .requestMatchers(HttpMethod.PUT, "/api/v1/registrations/**").hasRole("TDRA_SUPER_ADMIN")
-                
-                .requestMatchers(HttpMethod.POST, "/api/v1/auth/setup-password")
-                .hasRole("COMPANY_PENDING") 
-                
-                .anyRequest().authenticated()
-            );
+				.authorizeHttpRequests(auth -> auth
+						// 1. Always allow preflight OPTIONS handshakes globally
+						.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-        // Inject the database authentication provider
-        http.authenticationProvider(authenticationProvider());
-        
-        // Inject our custom JWT Verification filter before Spring's UsernamePasswordAuthenticationFilter
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+						// 2. Merged Public Whitelist [1, 3]
+						.requestMatchers("/api/v1/auth/**").permitAll() // Login, OAuth, refresh tokens
+						.requestMatchers(HttpMethod.POST, "/api/v1/registrations", "/api/v1/registrations/track")
+						.permitAll() // Onboarding & Tracking submissions whitelisted [3]
+						.requestMatchers("/error").permitAll()
 
-        return http.build();
-    }
+						// 3. SECURE ENDPOINTS
+						// Rule A: Specific tracking endpoint must be evaluated FIRST [1]
+						.requestMatchers(HttpMethod.GET, "/api/v1/registrations/my-status")
+						.hasAnyRole("COMPANY_PENDING", "COMPANY_ADMIN", "COMPANY_USER")
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*")); 
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
+						// Rule B: Broader administrative GET endpoints evaluated SECOND [1]
+						.requestMatchers(HttpMethod.GET, "/api/v1/registrations", "/api/v1/registrations/**")
+						.hasAnyRole("TDRA_SUPER_ADMIN", "REVIEWER")
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+						// Only TDRA Admins can execute approvals/rejections (PUT status transitions)
+						.requestMatchers(HttpMethod.PUT, "/api/v1/registrations/**").hasRole("TDRA_SUPER_ADMIN")
+
+						.requestMatchers(HttpMethod.POST, "/api/v1/auth/setup-password").hasRole("COMPANY_PENDING")
+
+						.anyRequest().authenticated());
+
+		// Inject the database authentication provider
+		http.authenticationProvider(authenticationProvider());
+
+		// Inject our custom JWT Verification filter before Spring's
+		// UsernamePasswordAuthenticationFilter
+		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+		return http.build();
+	}
+
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOriginPatterns(List.of("*"));
+		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		configuration.setAllowedHeaders(List.of("*"));
+		configuration.setAllowCredentials(true);
+		configuration.setMaxAge(3600L);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
 }

@@ -2,7 +2,6 @@ package tns.com.ssir.service;
 
 import tns.com.ssir.core.entity.*;
 import tns.com.ssir.core.repository.*;
-import tns.com.ssir.dto.AccountDto;
 import tns.com.ssir.dto.CompanyDto;
 import tns.com.ssir.dto.CreateCredentialsRequest;
 import tns.com.ssir.dto.ForgotPasswordRequest;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
+import lombok.extern.log4j.Log4j2; // Import Lombok Log4j2 [1]
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
+@Log4j2 
 public class RegistrationServiceImpl implements RegistrationService {
 
     @Autowired
@@ -60,12 +61,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     public RegistrationRequest submitRegistrationWithFiles(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap) {
         CompanyDto companyDto = dto.getCompany();
 
-        
         if (companyRepository.findByTradeLicenseNumber(companyDto.getTradeLicenseNumber()).isPresent()) {
             throw new IllegalArgumentException("A company with this Trade License Number is already registered");
         }
 
-     
         Company company = Company.builder()
                 .companyName(companyDto.getCompanyName())
                 .legalEntityName(companyDto.getLegalEntityName())
@@ -81,7 +80,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .status("DRAFT")
                 .build();
 
-       
         CompanyAddress address = CompanyAddress.builder()
                 .company(company)
                 .addressLine1(companyDto.getRegisteredAddress())
@@ -93,7 +91,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         
         company.setAddress(address);
         
-     
         RepresentativeDto repDto = dto.getRepresentative();
         if (repDto != null && repDto.getFirstName() != null && !repDto.getFirstName().trim().isEmpty()) {
             CompanyContact contact = CompanyContact.builder()
@@ -112,7 +109,6 @@ public class RegistrationServiceImpl implements RegistrationService {
             
             company.getContacts().add(contact); 
         }
-        
 
         String trackingId = "REG-" + LocalDateTime.now().getYear() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         
@@ -123,35 +119,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .build();
 
         RegistrationRequest savedRequest = registrationRepository.save(request);
-        
-  
-//        AccountDto accountDto = dto.getAccount();
-//        if (accountDto != null && accountDto.getUsername() != null && !accountDto.getUsername().trim().isEmpty()) {
-//            
-//            // Fetch the default ROLE_COMPANY_ADMIN role from the database
-//            Role companyAdminRole = roleRepository.findByRoleName("ROLE_COMPANY_ADMIN")
-//                    .orElseThrow(() -> new IllegalStateException("Default role ROLE_COMPANY_ADMIN not found"));
-//            
-//            java.util.Set<Role> roles = new java.util.HashSet<>();
-//            roles.add(companyAdminRole);
-//
-//            User pendingUser = User.builder()
-//                    .company(company)
-//                    .username(accountDto.getUsername())
-//                    .email(repDto != null ? repDto.getOfficialEmail() : companyDto.getCompanyEmail())
-//                    .passwordHash("PENDING_SETUP_TOKEN") 
-//                    .userIdString("USR" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
-//                    .status("PENDING_ACTIVATION")
-//                    .roles(roles) // <-- Map the default role here!
-//                    .preferredLanguage(accountDto.getPreferredLanguage() != null ? accountDto.getPreferredLanguage() : "EN")
-//                    .timeZone(accountDto.getTimeZone() != null ? accountDto.getTimeZone() : "Asia/Dubai")
-//                    .mfaPreference(accountDto.getMfaPreference() != null ? accountDto.getMfaPreference() : "EMAIL")
-//                    .notificationPreference(accountDto.getNotificationPreference() != null ? accountDto.getNotificationPreference() : "BOTH")
-//                    .build();
-//            
-//            userRepository.save(pendingUser);
-//        }
-//        
         
         String rawTempPassword = "tmp" + UUID.randomUUID().toString().substring(0, 5); // e.g., tmpX9a2F
         String representativeEmail = repDto != null ? repDto.getOfficialEmail() : companyDto.getCompanyEmail();
@@ -178,10 +145,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         // Store plain-text temp password temporarily in the returned object metadata
         // so that the controller can retrieve it and return it in the success payload
         savedRequest.setRejectionReason(rawTempPassword); 
-        
-        
 
-      
         if (fileMap != null && !fileMap.isEmpty()) {
             for (String formKey : fileMap.keySet()) {
                 List<MultipartFile> files = fileMap.get(formKey);
@@ -205,19 +169,16 @@ public class RegistrationServiceImpl implements RegistrationService {
         historyRepository.save(history);
 
         return savedRequest;
-        
     }
     
     @Override
     @Transactional
     public User createCredentials(CreateCredentialsRequest request) {
-        // 1. Fetch the associated registration request
         RegistrationRequest regRequest = registrationRepository.findByTrackingId(request.getTrackingId())
                 .orElseThrow(() -> new IllegalArgumentException("Onboarding request not found with Tracking ID: " + request.getTrackingId()));
 
         Company company = regRequest.getCompany();
 
-        // Prevent duplicate user registrations for the same company
         if (userRepository.findByCompany(company).isPresent()) {
             throw new IllegalArgumentException("Credentials have already been created for this company application.");
         }
@@ -225,21 +186,19 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new IllegalArgumentException("Username '" + request.getUsername() + "' is already taken.");
         }
 
-        // 2. Fetch the restricted PENDING role [1]
         Role pendingRole = roleRepository.findByRoleName("ROLE_COMPANY_PENDING")
                 .orElseThrow(() -> new IllegalStateException("Required system role ROLE_COMPANY_PENDING was not found."));
 
         Set<Role> roles = new HashSet<>();
         roles.add(pendingRole);
 
-        // 3. Persist the pending user
         User user = User.builder()
                 .company(company)
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword())) // BCrypt hashed immediately
                 .userIdString("USR" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
-                .status("PENDING_ACTIVATION") // User must be pending until Admin approves company [1]
+                .status("PENDING_ACTIVATION") 
                 .roles(roles)
                 .build();
 
@@ -255,7 +214,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         RegistrationRequest request = registrationRepository.findByCompany(company)
                 .orElseThrow(() -> new IllegalArgumentException("No onboarding request found associated with this company."));
 
-        // Generate temporary pre-signed links for secure status tracking [1.1.2]
         if (request.getDocuments() != null) {
             for (LegalDocument doc : request.getDocuments()) {
                 String secureUrl = storageService.generatePresignedUrl(doc.getFileStoragePath());
@@ -265,12 +223,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         return request;
     }
    
-    
-    
     @Override
     @Transactional(readOnly = true)
     public RegistrationRequest getRegistrationWithPresignedUrls(Long id) {
-       
         RegistrationRequest request = registrationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Registration Request not found with ID: " + id));
 
@@ -284,12 +239,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         return request;
     }
 
-    
     private String convertCamelCaseToUnderscore(String camelCase) {
         return camelCase.replaceAll("(?<!_)(?=[A-Z])", "_");
     }
-    
-    
 
     @Override
     @Transactional(readOnly = true)
@@ -300,28 +252,19 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     @Transactional(readOnly = true)
     public RegistrationRequest trackApplication(String trackingId) {
-        // 1. Fetch the request by tracking ID
         RegistrationRequest request = registrationRepository.findByTrackingId(trackingId)
                 .orElseThrow(() -> new IllegalArgumentException("No onboarding request found with Tracking ID: " + trackingId));
 
-        // 2. DUAL-FACTOR SECURITY CHECK: Verify that the trade license matches [3]
-//        if (!request.getCompany().getTradeLicenseNumber().equalsIgnoreCase(tradeLicenseNumber.trim())) {
-//            throw new IllegalArgumentException("Access Denied: The provided Trade License Number does not match this tracking ID.");
-//        }
-
-        // 3. Generate secure, temporary viewing links for their uploaded documents [1.1.2]
         if (request.getDocuments() != null) {
             for (LegalDocument doc : request.getDocuments()) {
                 String secureUrl = storageService.generatePresignedUrl(doc.getFileStoragePath());
-                doc.setPresignedUrl(secureUrl); // Attached in transient memory [1.1.2]
+                doc.setPresignedUrl(secureUrl); 
             }
         }
 
         return request;
     }
     
-    
-    // --- UPDATED METHOD: Processes status transitions and constructs mock email payloads ---
     @Override
     @Transactional
     public RegistrationStatusUpdateResponse updateRegistrationStatus(Long id, String status, String comments) {
@@ -340,25 +283,21 @@ public class RegistrationServiceImpl implements RegistrationService {
             Company company = request.getCompany();
             company.setStatus("ACTIVE");
 
-            // A. Generate Company ID
             generatedCompanyId = "COMP" + String.format("%06d", company.getId());
             company.setCompanyId(generatedCompanyId);
 
-            // B. Find associated pending User
-            User pendingUser = userRepository.findByCompany(company)
+            User user = userRepository.findByCompany(company)
                     .orElseThrow(() -> new IllegalArgumentException("No pending user account found associated with this company"));
-            generatedUserId = pendingUser.getUserIdString();
+            generatedUserId = user.getUserIdString();
 
-            // C. Generate 24-hour setup token [1]
             String secureToken = UUID.randomUUID().toString();
             PasswordResetToken onboardingToken = PasswordResetToken.builder()
                     .token(secureToken)
-                    .user(pendingUser)
+                    .user(user)
                     .expiryDate(LocalDateTime.now().plusHours(24))
                     .build();
             tokenRepository.save(onboardingToken);
 
-            // D. CONSTRUCT REGULATOR APPROVAL EMAIL PAYLOAD
             String emailBody = String.format(
                     "Dear %s,\n\n" +
                     "Congratulations! Your company onboarding request has been approved by the TDRA.\n\n" +
@@ -367,15 +306,24 @@ public class RegistrationServiceImpl implements RegistrationService {
                     "Please click the link below to set your account password and activate your portal access:\n" +
                     "http://localhost:4200/create-password?token=%s\n\n" +
                     "Regards,\nTDRA Onboarding Team",
-                    pendingUser.getUsername(), generatedCompanyId, generatedUserId, secureToken
+                    user.getUsername(), generatedCompanyId, generatedUserId, secureToken
             );
 
             emailDetails = MockEmailDetails.builder()
-                    .to(pendingUser.getEmail())
+                    .to(user.getEmail())
                     .subject("TDRA Onboarding Approved - Create Your Password")
                     .body(emailBody)
                     .build();
             emailSent = true;
+
+            // Parameterized Log4j2 log output prevents log-injection [1]
+            log.info("\n=================================================================================" +
+                     "\n>>> MOCK EMAIL NOTIFICATION SYSTEM [TDRA ONBOARDING APPROVED] <<<" +
+                     "\nTo: {}" +
+                     "\nSubject: {}" +
+                     "\n{}" +
+                     "\n=================================================================================\n",
+                     emailDetails.getTo(), emailDetails.getSubject(), emailDetails.getBody());
 
         } else if ("REJECTED".equalsIgnoreCase(status) || "INFO_REQUESTED".equalsIgnoreCase(status)) {
             Company company = request.getCompany();
@@ -387,13 +335,11 @@ public class RegistrationServiceImpl implements RegistrationService {
                 request.setInfoRequestComments(comments);
             }
 
-            // E. CONSTRUCT REGULATOR ALERT EMAIL PAYLOAD
             String emailBody = String.format(
                     "Dear Applicant,\n\n" +
                     "Your company registration request (Tracking ID: %s) has been %s.\n\n" +
                     "Reviewer Comments & Feedback:\n" +
                     "\"%s\"\n\n" +
-                    "Please review the comments above and take appropriate action on the SSIR portal.\n\n" +
                     "Regards,\nTDRA Onboarding Team",
                     request.getTrackingId(), status.toLowerCase(), comments
             );
@@ -404,11 +350,18 @@ public class RegistrationServiceImpl implements RegistrationService {
                     .body(emailBody)
                     .build();
             emailSent = true;
+
+            log.info("\n=================================================================================" +
+                     "\n>>> MOCK EMAIL NOTIFICATION SYSTEM [TDRA ONBOARDING {}] <<<" +
+                     "\nTo: {}" +
+                     "\nSubject: {}" +
+                     "\n{}" +
+                     "\n=================================================================================\n",
+                     status.toUpperCase(), emailDetails.getTo(), emailDetails.getSubject(), emailDetails.getBody());
         }
 
         RegistrationRequest updatedRequest = registrationRepository.save(request);
 
-        // System Audit Logger
         String adminUsername = "SYSTEM";
         org.springframework.security.core.Authentication auth = 
                 org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
@@ -433,7 +386,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .build();
         historyRepository.save(history);
 
-        // Return the clean, formatted response carrying your mock email details!
         return RegistrationStatusUpdateResponse.builder()
                 .trackingId(updatedRequest.getTrackingId())
                 .currentStatus(updatedRequest.getCurrentStatus())
@@ -449,67 +401,55 @@ public class RegistrationServiceImpl implements RegistrationService {
     public void processForgotPassword(ForgotPasswordRequest request) {
         String email = request.getEmail().trim();
 
-        // 1. Look up the user by email
         java.util.Optional<User> userOpt = userRepository.findByEmail(email);
 
-        // SECURITY BEST PRACTICE: If the email does not exist, do NOT throw an error.
-        // Returning a generic success message prevents hackers from harvesting active administrative emails [1].
         if (userOpt.isPresent()) {
             User user = userOpt.get();
 
-            // 2. Delete any existing password reset tokens for this user
             tokenRepository.deleteByUser(user);
 
-            // 3. Generate a secure, short-lived (15 minutes) reset token [1]
             String secureToken = UUID.randomUUID().toString();
             PasswordResetToken resetToken = PasswordResetToken.builder()
                     .token(secureToken)
                     .user(user)
-                    .expiryDate(LocalDateTime.now().plusMinutes(15)) // 15-minute expiration [1]
+                    .expiryDate(LocalDateTime.now().plusMinutes(15)) 
                     .build();
 
             tokenRepository.save(resetToken);
 
-            // 4. MOCK EMAIL: Print the secure password-reset link to the console [1]
-            System.out.println("\n=================================================================================");
-            System.out.println(">>> MOCK EMAIL NOTIFICATION SYSTEM [PASSWORD RESET REQUESTED] <<<");
-            System.out.println("To: " + user.getEmail());
-            System.out.println("Subject: SSIR Registry - Reset Your Password");
-            System.out.println("Dear " + user.getUsername() + ",");
-            System.out.println("We received a request to reset your password.");
-            System.out.println("Please click the link below to set a new password. This link is valid for 15 minutes:");
-            System.out.println("http://localhost:4200/auth/reset-password?token=" + secureToken); // Port 4200 Angular link
-            System.out.println("=================================================================================\n");
+            log.info("\n=================================================================================" +
+                     "\n>>> MOCK EMAIL NOTIFICATION SYSTEM [PASSWORD RESET REQUESTED] <<<" +
+                     "\nTo: {}" +
+                     "\nSubject: SSIR Registry - Reset Your Password" +
+                     "\nDear {}," +
+                     "\nWe received a request to reset your password." +
+                     "\nPlease click the link below to set a new password. This link is valid for 15 minutes:" +
+                     "\nhttp://localhost:4200/auth/reset-password?token={}" +
+                     "\n=================================================================================\n",
+                     user.getEmail(), user.getUsername(), secureToken);
         } else {
-            // Log locally for debugging, but still return success to the client
-            System.out.println(">>> FORGOT PASSWORD ATTEMPT: Email not found in database: " + email);
+            log.warn(">>> FORGOT PASSWORD ATTEMPT: Email not found in database: {}", email);
         }
     }
 
     @Override
     @Transactional
     public void resetPassword(ResetPasswordRequest request) {
-        // 1. Verify if the token exists
         PasswordResetToken resetToken = tokenRepository.findByToken(request.getToken())
                 .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "Invalid or expired password reset token."));
 
-        // 2. Check if the token has expired
         if (resetToken.isExpired()) {
             tokenRepository.delete(resetToken);
             throw new org.springframework.web.server.ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "This password-reset link has expired. Please request a new one.");
         }
 
-        // 3. Fetch user and update password with new BCrypt hash [1]
         User user = resetToken.getUser();
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
 
-        // 4. Delete the used token
         tokenRepository.delete(resetToken);
-        System.out.println(">>> PASSWORD RESET SUCCESS: Successfully updated password for user: " + user.getUsername());
+        log.info(">>> PASSWORD RESET SUCCESS: Successfully updated password for user: {}", user.getUsername());
     }
-
-
 }
