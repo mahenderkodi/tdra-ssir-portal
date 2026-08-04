@@ -21,7 +21,7 @@ import { AdminRegistrationDetailComponent } from './pages/admin/registration-det
 import { AdminUsersComponent } from './pages/admin/users/users';
 
 // Portal pages
-import { Dashboard as PortalDashboard } from './pages/portal/dashboard/dashboard';
+import { PortalDashboard as PortalDashboard } from './pages/portal/dashboard/dashboard';
 import { Profile } from './pages/portal/profile/profile';
 import { SenderIds } from './pages/portal/sender-ids/sender-ids';
 import { SenderIdNew } from './pages/portal/sender-id-new/sender-id-new';
@@ -111,14 +111,14 @@ export const routes: Routes = [
   {
     path: 'portal',
     component: PortalLayout,
-    canActivate: [authGuard, roleGuard],
-    data: {
-      roles: [
-        'ROLE_COMPANY_ADMIN',
-        'ROLE_COMPANY_USER',
-        'ROLE_COMPANY_VIEWER'
-      ]
-    },
+    canActivate: [authGuard/*, roleGuard*/],
+    // data: {
+    //   roles: [
+    //     'ROLE_COMPANY_ADMIN',
+    //     'ROLE_COMPANY_USER',
+    //     'ROLE_COMPANY_VIEWER'
+    //   ]
+    // },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {

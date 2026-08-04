@@ -1,1 +1,668 @@
-<p>dashboard works!</p>
+<section class="portal-page py-4 py-md-5">
+
+  <div class="container-fluid px-3 px-md-4">
+
+    <!-- Page heading -->
+    <div
+      class="
+        d-flex
+        flex-column
+        flex-lg-row
+        justify-content-between
+        align-items-lg-center
+        gap-3
+        mb-4
+      "
+    >
+      <div>
+        <h1 class="h3 fw-bold mb-1">
+          My Applications
+        </h1>
+
+        <p class="text-secondary mb-0">
+          View submitted applications and track
+          their current status.
+        </p>
+      </div>
+
+      <a
+        href="http://localhost:4200"
+        class="btn btn-primary"
+      >
+        Submit New Application
+      </a>
+    </div>
+
+
+    <!-- Summary cards -->
+    <div class="row g-3 mb-4">
+
+      <!-- Total -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div
+          class="
+            card
+            summary-card
+            border-0
+            shadow-sm
+            h-100
+          "
+        >
+          <div class="card-body p-4">
+
+            <div
+              class="
+                d-flex
+                justify-content-between
+                align-items-center
+              "
+            >
+              <div>
+                <div
+                  class="
+                    text-secondary
+                    small
+                    fw-semibold
+                    mb-1
+                  "
+                >
+                  Total Applications
+                </div>
+
+                <div class="fs-3 fw-bold">
+                  {{ totalApplications() }}
+                </div>
+              </div>
+
+              <div class="summary-icon">
+                #
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Under review -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div
+          class="
+            card
+            summary-card
+            border-0
+            shadow-sm
+            h-100
+          "
+        >
+          <div class="card-body p-4">
+
+            <div
+              class="
+                d-flex
+                justify-content-between
+                align-items-center
+              "
+            >
+              <div>
+                <div
+                  class="
+                    text-secondary
+                    small
+                    fw-semibold
+                    mb-1
+                  "
+                >
+                  Under Review
+                </div>
+
+                <div class="fs-3 fw-bold">
+                  {{ underReviewCount() }}
+                </div>
+              </div>
+
+              <div class="summary-icon">
+                ⏱
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Action required -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div
+          class="
+            card
+            summary-card
+            border-0
+            shadow-sm
+            h-100
+          "
+        >
+          <div class="card-body p-4">
+
+            <div
+              class="
+                d-flex
+                justify-content-between
+                align-items-center
+              "
+            >
+              <div>
+                <div
+                  class="
+                    text-secondary
+                    small
+                    fw-semibold
+                    mb-1
+                  "
+                >
+                  Action Required
+                </div>
+
+                <div class="fs-3 fw-bold">
+                  {{ actionRequiredCount() }}
+                </div>
+              </div>
+
+              <div class="summary-icon">
+                !
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Approved -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div
+          class="
+            card
+            summary-card
+            border-0
+            shadow-sm
+            h-100
+          "
+        >
+          <div class="card-body p-4">
+
+            <div
+              class="
+                d-flex
+                justify-content-between
+                align-items-center
+              "
+            >
+              <div>
+                <div
+                  class="
+                    text-secondary
+                    small
+                    fw-semibold
+                    mb-1
+                  "
+                >
+                  Approved
+                </div>
+
+                <div class="fs-3 fw-bold">
+                  {{ approvedCount() }}
+                </div>
+              </div>
+
+              <div class="summary-icon">
+                ✓
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- Track application -->
+    <div
+      class="
+        card
+        tracking-card
+        border-0
+        shadow-sm
+        mb-4
+      "
+    >
+      <div class="card-body p-4">
+
+        <div class="row align-items-end g-3">
+
+          <div class="col-12 col-lg-7">
+
+            <label
+              for="trackingNumber"
+              class="form-label fw-bold"
+            >
+              Track an Application
+            </label>
+
+            <p class="text-secondary small mb-2">
+              Enter the tracking number received
+              after submitting the application.
+            </p>
+
+            <input
+              id="trackingNumber"
+              type="text"
+              class="form-control"
+              [formControl]="trackingNumberControl"
+              placeholder="Example: REG-2026-E60F0BDD"
+              autocomplete="off"
+              [class.is-invalid]="
+                trackingNumberControl.touched &&
+                trackingNumberControl.invalid
+              "
+            >
+
+            @if (
+              trackingNumberControl.touched &&
+              trackingNumberControl.invalid
+            ) {
+              <div class="invalid-feedback">
+                Tracking number is required.
+              </div>
+            }
+
+          </div>
+
+
+          <div class="col-12 col-lg-5">
+
+            <div
+              class="
+                d-flex
+                flex-column
+                flex-sm-row
+                gap-2
+              "
+            >
+              <button
+                type="button"
+                class="btn btn-primary flex-grow-1"
+                (click)="trackApplication()"
+              >
+                Track Application
+              </button>
+
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="clearTracking()"
+              >
+                Clear
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        @if (trackingMessage()) {
+          <div
+            class="alert mt-3 mb-0"
+            [class.alert-success]="
+              !trackingError()
+            "
+            [class.alert-danger]="
+              trackingError()
+            "
+            role="alert"
+          >
+            {{ trackingMessage() }}
+          </div>
+        }
+
+      </div>
+    </div>
+
+
+    <!-- Application list -->
+    <div
+      class="
+        card
+        border-0
+        shadow-sm
+        mb-4
+      "
+    >
+      <div
+        class="
+          card-header
+          bg-white
+          border-bottom
+          p-4
+        "
+      >
+        <h2 class="h5 fw-bold mb-1">
+          Submitted Applications
+        </h2>
+
+        <p class="text-secondary small mb-0">
+          Applications submitted under your
+          company account.
+        </p>
+      </div>
+
+
+      <div class="table-responsive">
+
+        <table
+          class="
+            table
+            table-hover
+            align-middle
+            mb-0
+          "
+        >
+          <thead class="table-light">
+            <tr>
+              <th class="ps-4">
+                Tracking Number
+              </th>
+
+              <th>
+                Application
+              </th>
+
+              <th>
+                Submitted
+              </th>
+
+              <th>
+                Status
+              </th>
+
+              <th class="text-end pe-4">
+                Action
+              </th>
+            </tr>
+          </thead>
+
+
+          <tbody>
+
+            @for (
+              application of applications();
+              track application.trackingId
+            ) {
+              <tr>
+
+                <td class="ps-4">
+                  <span
+                    class="
+                      fw-semibold
+                      text-primary
+                      text-break
+                    "
+                  >
+                    {{ application.trackingId }}
+                  </span>
+                </td>
+
+
+                <td>
+                  <div class="fw-semibold">
+                    {{ application.applicationType }}
+                  </div>
+
+                  <div class="small text-secondary">
+                    {{ application.companyName }}
+                  </div>
+                </td>
+
+
+                <td>
+                  {{
+                    application.submittedAt
+                      | date: 'mediumDate'
+                  }}
+                </td>
+
+
+                <td>
+                  <span
+                    class="badge"
+                    [class]="
+                      getStatusBadgeClass(
+                        application.status
+                      )
+                    "
+                  >
+                    {{
+                      getStatusLabel(
+                        application.status
+                      )
+                    }}
+                  </span>
+                </td>
+
+
+                <td class="text-end pe-4">
+                  <button
+                    type="button"
+                    class="
+                      btn
+                      btn-sm
+                      btn-outline-primary
+                    "
+                    (click)="
+                      viewApplication(application)
+                    "
+                  >
+                    View Details
+                  </button>
+                </td>
+
+              </tr>
+            } @empty {
+              <tr>
+                <td
+                  colspan="5"
+                  class="
+                    text-center
+                    text-secondary
+                    py-5
+                  "
+                >
+                  No applications have been submitted.
+                </td>
+              </tr>
+            }
+
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+
+    <!-- Selected application details -->
+    @if (
+      selectedApplication();
+      as application
+    ) {
+      <div
+        id="application-details"
+        class="
+          card
+          application-details-card
+          border-0
+          shadow-sm
+        "
+      >
+        <div
+          class="
+            card-header
+            bg-primary
+            text-white
+            p-4
+          "
+        >
+          <div
+            class="
+              d-flex
+              flex-column
+              flex-md-row
+              justify-content-between
+              gap-3
+            "
+          >
+            <div>
+              <div
+                class="
+                  small
+                  text-white-50
+                  mb-1
+                "
+              >
+                Tracking Number
+              </div>
+
+              <h2 class="h5 fw-bold mb-0">
+                {{ application.trackingId }}
+              </h2>
+            </div>
+
+            <div>
+              <span
+                class="badge"
+                [class]="
+                  getStatusBadgeClass(
+                    application.status
+                  )
+                "
+              >
+                {{
+                  getStatusLabel(
+                    application.status
+                  )
+                }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="card-body p-4">
+
+          <div class="row g-4 mb-4">
+
+            <div class="col-12 col-md-6">
+              <div class="detail-label">
+                Company
+              </div>
+
+              <div class="detail-value">
+                {{ application.companyName }}
+              </div>
+            </div>
+
+
+            <div class="col-12 col-md-6">
+              <div class="detail-label">
+                Application Type
+              </div>
+
+              <div class="detail-value">
+                {{ application.applicationType }}
+              </div>
+            </div>
+
+
+            <div class="col-12 col-md-6">
+              <div class="detail-label">
+                Submitted At
+              </div>
+
+              <div class="detail-value">
+                {{
+                  application.submittedAt
+                    | date: 'medium'
+                }}
+              </div>
+            </div>
+
+
+            <div class="col-12 col-md-6">
+              <div class="detail-label">
+                Last Updated
+              </div>
+
+              <div class="detail-value">
+                {{
+                  application.lastUpdatedAt
+                    | date: 'medium'
+                }}
+              </div>
+            </div>
+
+
+            <div class="col-12 col-md-6">
+              <div class="detail-label">
+                Assigned Department
+              </div>
+
+              <div class="detail-value">
+                {{
+                  application.assignedDepartment
+                }}
+              </div>
+            </div>
+
+
+            <div class="col-12 col-md-6">
+              <div class="detail-label">
+                Current Status
+              </div>
+
+              <div class="detail-value">
+                {{
+                  getStatusLabel(
+                    application.status
+                  )
+                }}
+              </div>
+            </div>
+
+          </div>
+
+
+          <div
+            class="
+              application-status-message
+              rounded
+              p-3
+              p-md-4
+            "
+          >
+            <div class="fw-bold mb-1">
+              Status Update
+            </div>
+
+            <p class="mb-0 text-secondary">
+              {{ application.statusMessage }}
+            </p>
+          </div>
+
+        </div>
+      </div>
+    }
+
+  </div>
+
+</section>

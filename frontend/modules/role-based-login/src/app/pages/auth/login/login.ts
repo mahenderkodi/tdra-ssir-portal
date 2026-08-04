@@ -50,7 +50,7 @@ export class Login {
 
   if (response.firstTimeLogin === true) {
 
-  void this.router.navigate(['/create-password']);
+  void this.router.navigate(['/auth/create-password']);
 
   return;
 
@@ -93,7 +93,7 @@ this.errorMessage.set(
   private redirectUserByRole(roles: string[]): void {
     if (roles.includes('ROLE_TDRA_SUPER_ADMIN') || roles.includes('ROLE_TDRA_REVIEWER') || roles.includes('ROLE_TDRA_APPROVER')) {
       this.router.navigate(['/admin/dashboard']);
-    } else if (roles.includes('ROLE_COMPANY_ADMIN') || roles.includes('ROLE_COMPANY_USER')) {
+    } else if (!roles.includes('ROLE_COMPANY_ADMIN') || roles.includes('ROLE_COMPANY_USER')) {
       this.router.navigate(['/portal/dashboard']);
     } else {
       this.router.navigate(['/auth/login']);

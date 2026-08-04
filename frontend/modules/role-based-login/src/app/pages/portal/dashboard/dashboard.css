@@ -1,0 +1,110 @@
+.portal-page {
+  min-height: 100%;
+  background-color: var(--bs-tertiary-bg);
+}
+
+
+.summary-card {
+  border-radius: 0.75rem;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.summary-card:hover {
+  transform: translateY(-2px);
+}
+
+
+.summary-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  color: var(--bs-primary);
+
+  background-color:
+    rgba(
+      var(--bs-primary-rgb),
+      0.1
+    );
+
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+
+.tracking-card {
+  border-top:
+    0.25rem solid var(--bs-primary) !important;
+
+  border-radius: 0.75rem;
+}
+
+
+.application-details-card {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+
+.detail-label {
+  margin-bottom: 0.25rem;
+
+  color: var(--bs-secondary-color);
+
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+
+.detail-value {
+  color: var(--bs-body-color);
+  font-weight: 600;
+}
+
+
+.application-status-message {
+  border-left:
+    0.25rem solid var(--bs-primary);
+
+  background-color:
+    rgba(
+      var(--bs-primary-rgb),
+      0.06
+    );
+}
+
+
+.table th {
+  white-space: nowrap;
+
+  color: var(--bs-secondary-color);
+
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+
+.table td {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+
+@media (max-width: 767.98px) {
+
+  .table {
+    min-width: 850px;
+  }
+}
