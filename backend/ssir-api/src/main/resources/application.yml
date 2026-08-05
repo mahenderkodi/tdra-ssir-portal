@@ -27,3 +27,11 @@ security:
     secret: dG5zLWNvbS1zc2lyLWVudGVycHJpc2Utc2VjdXJpdHktZmlsdGVyLWNoYWluLWtleS0yMDI2LXByb2Q=
     access-token-expiration-ms: 900000
     refresh-token-expiration-ms: 604800000
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha

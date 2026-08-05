@@ -13,6 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import io.swagger.v3.oas.annotations.Operation; // Import Operation
+import io.swagger.v3.oas.annotations.tags.Tag;       // Import Tag
 import tns.com.ssir.dto.*;
 import tns.com.ssir.security.JwtTokenProvider;
 import tns.com.ssir.security.UserPrincipal;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@Tag(name = "Authentication Portal", description = "Endpoints for user logins, credential setups, and token refreshes") // Groups endpoints [1]
 public class AuthController {
 
     @Autowired
@@ -42,6 +45,7 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
+    @Operation(summary = "Authenticate User", description = "Verifies credentials against the database and returns short-lived access tokens and refresh tokens.") // Documents method [1]
     public ResponseEntity<AuthResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
@@ -80,6 +84,7 @@ public class AuthController {
     // --- SECURE AUTHENTICATED PASSWORD UPDATE ENDPOINT ---
     // Reads user identity dynamically from the Bearer token [1]
     @PostMapping("/setup-password")
+    @Operation(summary = "Setup Permanent Password", description = "Securely overwrites temporary credentials with a permanent BCrypt-hashed password.") // Documents method [1]
     public ResponseEntity<?> setupPassword(
             @Valid @RequestBody PasswordSetupRequest passwordRequest, // Updated [1]
             @org.springframework.security.core.annotation.AuthenticationPrincipal UserPrincipal principal) { 

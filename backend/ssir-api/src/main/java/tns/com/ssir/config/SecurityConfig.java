@@ -93,6 +93,12 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.POST, "/api/v1/registrations", "/api/v1/registrations/track")
 						.permitAll() // Onboarding & Tracking submissions whitelisted [3]
 						.requestMatchers("/error").permitAll()
+						
+						// --- ADDED SWAGGER UI WHITELISTS [1] ---
+		                .requestMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll()
+		                .requestMatchers("/swagger-ui", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+		                // ---------------------------------------
+		                
 
 						// 3. SECURE ENDPOINTS
 						// Rule A: Specific tracking endpoint must be evaluated FIRST [1]
