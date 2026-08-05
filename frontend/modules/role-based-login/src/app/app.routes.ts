@@ -26,6 +26,7 @@ import { Profile } from './pages/portal/profile/profile';
 import { SenderIds } from './pages/portal/sender-ids/sender-ids';
 import { SenderIdNew } from './pages/portal/sender-id-new/sender-id-new';
 import { Users as PortalUsers } from './pages/portal/users/users';
+import { TrackStatus } from './pages/portal/track-status/track-status';
 
 // Other pages
 import { Unauthorized } from './pages/unauthorized/unauthorized';
@@ -109,42 +110,39 @@ export const routes: Routes = [
 
   // 4. SECURE COMPANY PORTAL PAGES [1, 3]
   {
-    path: 'portal',
-    component: PortalLayout,
-    canActivate: [authGuard/*, roleGuard*/],
-    // data: {
-    //   roles: [
-    //     'ROLE_COMPANY_ADMIN',
-    //     'ROLE_COMPANY_USER',
-    //     'ROLE_COMPANY_VIEWER'
-    //   ]
-    // },
-    children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      {
-        path: 'dashboard',
-        component: PortalDashboard
+  path: 'portal',
+  component: PortalLayout,
+  canActivate: [authGuard],
+
+  children: [
+    {
+      path: 'track-status',
+      component: TrackStatus,
+      canActivate: [roleGuard],
+
+      data: {
+        roles: [
+          'ROLE_COMPANY_PENDING'
+        ]
       },
-      {
-        path: 'profile',
-        component: Profile
+
+      title: 'Application Status'
+    },
+    {
+      path: 'dashboard',
+      component: PortalDashboard,
+      canActivate: [roleGuard],
+
+      data: {
+        roles: [
+          'ROLE_COMPANY_ADMIN'
+        ]
       },
-      {
-        path: 'sender-ids',
-        component: SenderIds
-      },
-      {
-        path: 'sender-ids/new',
-        component: SenderIdNew
-      },
-      {
-        path: 'users',
-        component: PortalUsers,
-        canActivate: [roleGuard],
-        data: { expectedRoles: ['ROLE_COMPANY_ADMIN'] } // Restricted to Company Admin [1]
-      }
-    ]
-  },
+
+      title: 'Corporate Dashboard'
+    }
+  ]
+},
 
   // 5. UN-AUTHORIZED ACCESS VIEW
   {

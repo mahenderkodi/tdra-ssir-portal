@@ -40,39 +40,49 @@ export class Login {
   this.authService
     .login(credentials)
     .subscribe({
-      next: (response) => {
+     next: response => {
   console.log(
     'Login response:',
     response
   );
 
+  console.log(
+    'Roles received:',
+    response.roles
+  );
+
+  console.log(
+    'First-time login:',
+    response.firstTimeLogin
+  );
+
   this.isSubmitting.set(false);
 
-  if (response.firstTimeLogin === true) {
+  if (
+    response.firstTimeLogin === true
+  ) {
+    void this.router.navigate([
+      '/auth/create-password'
+    ]);
 
-  void this.router.navigate(['/auth/create-password']);
+    return;
+  }
 
-  return;
+  if (
+    response.firstTimeLogin === false
+  ) {
+    this.redirectUserByRole(
+      response.roles
+    );
 
-}
- 
-if (response.firstTimeLogin === false) {
+    return;
+  }
 
-  this.redirectUserByRole(response.roles);
+  this.errorMessage.set(
+    'Login succeeded, but the account status was not provided.'
+  );
 
-  return;
-
-}
- 
-this.errorMessage.set(
-
-  'Login succeeded, but the account status was not provided.'
-
-);
- 
-  console.log("check 1");
-  this.redirectUserByRole(response.roles);
-   console.log("check 2");
+  this.authService.logout();
 },
 
       error: (error) => {
@@ -90,15 +100,40 @@ this.errorMessage.set(
     });
 }
 
-  private redirectUserByRole(roles: string[]): void {
-    if (roles.includes('ROLE_TDRA_SUPER_ADMIN') || roles.includes('ROLE_TDRA_REVIEWER') || roles.includes('ROLE_TDRA_APPROVER')) {
-      this.router.navigate(['/admin/dashboard']);
-    } else if (!roles.includes('ROLE_COMPANY_ADMIN') || roles.includes('ROLE_COMPANY_USER')) {
-      this.router.navigate(['/portal/dashboard']);
-    } else {
-      this.router.navigate(['/auth/login']);
-    }
+ private redirectUserByRole(
+  roles: string[]
+): void {
+
+  if (
+    roles.includes(
+      'ROLE_COMPANY_PENDING'
+    )
+  ) {
+    void this.router.navigate([
+      '/portal/track-status'
+    ]);
+
+    return;
   }
+
+
+  if (
+    roles.includes(
+      'ROLE_COMPANY_ADMIN'
+    )
+  ) {
+    void this.router.navigate([
+      '/portal/dashboard'
+    ]);
+
+    return;
+  }
+
+
+  void this.router.navigate([
+    '/unauthorized'
+  ]);
+}
 
   loginWithUaePass(): void {
     window.location.href = 'https://id.uaepass.ae/idp/v1/user/authorize?response_type=code&client_id=...';

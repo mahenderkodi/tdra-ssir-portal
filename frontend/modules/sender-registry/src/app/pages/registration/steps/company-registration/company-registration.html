@@ -496,5 +496,29 @@
       }
     </div>
 
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="proposedSenderId" class="form-label fw-semibold">
+        Proposed Sender ID
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="proposedSenderId"
+        type="text"
+        class="form-control"
+        formControlName="proposedSenderId"
+        placeholder="Enter proposed sender ID"
+      />
+
+      @if (
+        group.get('proposedSenderId')?.touched &&
+        group.get('proposedSenderId')?.invalid
+      ) {
+        <div class="invalid-feedback">
+          Proposed sender ID is required.
+        </div>
+      }
+    </div>
+
   </div>
 </section>

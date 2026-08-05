@@ -266,6 +266,11 @@ export class Registration {
           )
         ]
       ],
+
+      proposedSenderId : [
+        '',
+        Validators.required
+      ]
     }),
 
     documents: this.formBuilder.group({
@@ -492,7 +497,9 @@ export class Registration {
           company.companyEmail ?? '',
 
         companyPhone:
-          company.companyPhone ?? ''
+          company.companyPhone ?? '',
+        proposedSenderId:
+          company.proposedSenderId ?? ''
       },
 
       documents: {},

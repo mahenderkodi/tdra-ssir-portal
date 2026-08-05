@@ -1,341 +1,109 @@
 import {
   Component,
-  computed,
+  OnInit,
+  inject,
   signal
 } from '@angular/core';
 
-import {
-  DatePipe
-} from '@angular/common';
+import { SenderId } from '../../../core/services/sender-id';
 
-import {
-  FormControl,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
-
-
-type ApplicationStatus =
-  | 'SUBMITTED'
-  | 'UNDER_REVIEW'
-  | 'INFO_REQUESTED'
-  | 'APPROVED'
-  | 'REJECTED';
-
-
-interface PortalApplication {
-  trackingId: string;
-  companyName: string;
-  applicationType: string;
-  status: ApplicationStatus;
-  submittedAt: string;
-  lastUpdatedAt: string;
-  assignedDepartment: string;
-  statusMessage: string;
-}
+import { DashboardStatsResponse } from '../../../core/services/dashboard-stats-response';
 
 
 @Component({
   selector: 'app-portal-dashboard',
   standalone: true,
 
-  imports: [
-    ReactiveFormsModule,
-    DatePipe
-  ],
+  imports: [],
 
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-export class PortalDashboard {
+export class PortalDashboard
+  implements OnInit {
 
   /*
-   * Temporary mock data.
-   *
-   * Later replace this with an API response.
+   * Service responsible for Sender ID APIs.
    */
-  readonly applications =
-    signal<PortalApplication[]>([
-      {
-        trackingId:
-          'REG-2026-E60F0BDD',
-
-        companyName:
-          'Elevate Core Technologies',
-
-        applicationType:
-          'Company Onboarding',
-
-        status:
-          'UNDER_REVIEW',
-
-        submittedAt:
-          '2026-07-30T19:27:02.7755373',
-
-        lastUpdatedAt:
-          '2026-07-31T10:30:00',
-
-        assignedDepartment:
-          'TDRA Registration Team',
-
-        statusMessage:
-          'Your application and submitted documents are currently under review.'
-      },
-
-      {
-        trackingId:
-          'REG-2026-B17A92C4',
-
-        companyName:
-          'Elevate Core Technologies',
-
-        applicationType:
-          'Sender ID Registration',
-
-        status:
-          'INFO_REQUESTED',
-
-        submittedAt:
-          '2026-07-25T11:15:00',
-
-        lastUpdatedAt:
-          '2026-07-29T15:45:00',
-
-        assignedDepartment:
-          'Compliance Review Team',
-
-        statusMessage:
-          'Additional information is required before the application can proceed.'
-      },
-
-      {
-        trackingId:
-          'REG-2026-A41D802E',
-
-        companyName:
-          'Elevate Core Technologies',
-
-        applicationType:
-          'Sender ID Registration',
-
-        status:
-          'APPROVED',
-
-        submittedAt:
-          '2026-07-18T09:40:00',
-
-        lastUpdatedAt:
-          '2026-07-23T12:20:00',
-
-        assignedDepartment:
-          'TDRA Registration Team',
-
-        statusMessage:
-          'Your application has been approved successfully.'
-      }
-    ]);
+  private readonly senderIdService =
+    inject(SenderId);
 
 
-  readonly trackingNumberControl =
-    new FormControl(
-      '',
-      {
-        nonNullable: true,
-        validators: [
-          Validators.required
-        ]
-      }
+  /*
+   * Stores the statistics returned by:
+   *
+   * GET /api/v1/sender-ids/stats
+   */
+  readonly stats =
+    signal<DashboardStatsResponse | null>(
+      null
     );
 
 
-  readonly selectedApplication =
-    signal<PortalApplication | null>(null);
+  /*
+   * Controls the loading spinner.
+   */
+  readonly loading =
+    signal(true);
 
 
-  readonly trackingMessage =
+  /*
+   * Stores a user-friendly API error.
+   */
+  readonly errorMessage =
     signal('');
 
 
-  readonly trackingError =
-    signal(false);
+  /*
+   * Runs automatically when the dashboard
+   * component is initialized.
+   */
+  ngOnInit(): void {
+  console.log(
+    '[PortalDashboard] ngOnInit called'
+  );
+
+  this.loadDashboardStats();
+}
 
 
-  readonly totalApplications =
-    computed(
-      () => this.applications().length
-    );
+  /*
+   * Fetches the approved company's
+   * dashboard statistics.
+   */
+  private loadDashboardStats(): void {
+    this.loading.set(true);
+    this.errorMessage.set('');
 
+    this.senderIdService
+      .getDashboardStats()
+      .subscribe({
+        next: response => {
+          this.stats.set(response);
+          this.loading.set(false);
+        },
 
-  readonly underReviewCount =
-    computed(
-      () =>
-        this.applications().filter(
-          application =>
-            application.status ===
-              'UNDER_REVIEW' ||
-            application.status ===
-              'SUBMITTED'
-        ).length
-    );
+        error: error => {
+          console.error(
+            'Failed to load dashboard statistics:',
+            error
+          );
 
+          this.loading.set(false);
 
-  readonly actionRequiredCount =
-    computed(
-      () =>
-        this.applications().filter(
-          application =>
-            application.status ===
-            'INFO_REQUESTED'
-        ).length
-    );
-
-
-  readonly approvedCount =
-    computed(
-      () =>
-        this.applications().filter(
-          application =>
-            application.status ===
-            'APPROVED'
-        ).length
-    );
-
-
-  trackApplication(): void {
-    this.trackingMessage.set('');
-    this.trackingError.set(false);
-    this.selectedApplication.set(null);
-
-    if (
-      this.trackingNumberControl.invalid
-    ) {
-      this.trackingNumberControl
-        .markAsTouched();
-
-      this.trackingMessage.set(
-        'Please enter a tracking number.'
-      );
-
-      this.trackingError.set(true);
-
-      return;
-    }
-
-    const trackingNumber =
-      this.trackingNumberControl.value
-        .trim()
-        .toUpperCase();
-
-
-    const application =
-      this.applications().find(
-        item =>
-          item.trackingId.toUpperCase() ===
-          trackingNumber
-      );
-
-
-    if (!application) {
-      this.trackingMessage.set(
-        'No application was found for this tracking number.'
-      );
-
-      this.trackingError.set(true);
-
-      return;
-    }
-
-
-    this.selectedApplication.set(
-      application
-    );
-
-    this.trackingMessage.set(
-      'Application found successfully.'
-    );
+          this.errorMessage.set(
+            error.error?.message ??
+            'Unable to load dashboard information.'
+          );
+        }
+      });
   }
 
 
-  viewApplication(
-    application: PortalApplication
-  ): void {
-    this.selectedApplication.set(
-      application
-    );
-
-    this.trackingMessage.set('');
-    this.trackingError.set(false);
-
-    /*
-     * Scroll to the details section.
-     */
-    setTimeout(() => {
-      document
-        .getElementById(
-          'application-details'
-        )
-        ?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-    });
-  }
-
-
-  clearTracking(): void {
-    this.trackingNumberControl.reset();
-    this.selectedApplication.set(null);
-    this.trackingMessage.set('');
-    this.trackingError.set(false);
-  }
-
-
-  getStatusLabel(
-    status: ApplicationStatus
-  ): string {
-    switch (status) {
-      case 'SUBMITTED':
-        return 'Submitted';
-
-      case 'UNDER_REVIEW':
-        return 'Under Review';
-
-      case 'INFO_REQUESTED':
-        return 'Information Required';
-
-      case 'APPROVED':
-        return 'Approved';
-
-      case 'REJECTED':
-        return 'Rejected';
-
-      default:
-        return status;
-    }
-  }
-
-
-  getStatusBadgeClass(
-    status: ApplicationStatus
-  ): string {
-    switch (status) {
-      case 'SUBMITTED':
-        return 'text-bg-secondary';
-
-      case 'UNDER_REVIEW':
-        return 'text-bg-warning';
-
-      case 'INFO_REQUESTED':
-        return 'text-bg-danger';
-
-      case 'APPROVED':
-        return 'text-bg-success';
-
-      case 'REJECTED':
-        return 'text-bg-dark';
-
-      default:
-        return 'text-bg-secondary';
-    }
+  /*
+   * Allows the user to retry when the API fails.
+   */
+  retry(): void {
+    this.loadDashboardStats();
   }
 }

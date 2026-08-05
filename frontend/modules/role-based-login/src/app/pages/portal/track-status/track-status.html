@@ -1,0 +1,231 @@
+<section class="py-4 py-md-5">
+
+  <div class="container">
+
+    <div class="mb-4">
+      <h1 class="h3 fw-bold mb-1">
+        Application Status
+      </h1>
+
+      <p class="text-secondary mb-0">
+        Track your company onboarding application.
+      </p>
+    </div>
+
+
+    @if (loading()) {
+      <div class="text-center py-5">
+        <div
+          class="spinner-border text-primary"
+          role="status"
+        >
+          <span class="visually-hidden">
+            Loading
+          </span>
+        </div>
+      </div>
+    }
+
+
+    @if (errorMessage()) {
+      <div
+        class="alert alert-danger"
+        role="alert"
+      >
+        {{ errorMessage() }}
+      </div>
+    }
+
+
+    @if (statusData(); as application) {
+
+      <div
+        class="
+          card
+          border-0
+          shadow-sm
+        "
+      >
+        <div
+          class="
+            card-header
+            bg-primary
+            text-white
+            p-4
+          "
+        >
+          <div
+            class="
+              d-flex
+              flex-column
+              flex-md-row
+              justify-content-between
+              align-items-md-center
+              gap-3
+            "
+          >
+            <div>
+              <div class="small text-white-50">
+                Tracking ID
+              </div>
+
+              <div class="h5 fw-bold mb-0">
+                {{ application.trackingId }}
+              </div>
+            </div>
+
+            <span
+              class="badge fs-6"
+              [class]="
+                getStatusClass(
+                  application.currentStatus
+                )
+              "
+            >
+              {{
+                getStatusLabel(
+                  application.currentStatus
+                )
+              }}
+            </span>
+          </div>
+        </div>
+
+
+        <div class="card-body p-4">
+
+          <div class="row g-4">
+
+            <div class="col-12 col-md-6">
+              <div class="text-secondary small">
+                Company Name
+              </div>
+
+              <div class="fw-semibold">
+                {{ application.companyName }}
+              </div>
+            </div>
+
+
+            <div class="col-12 col-md-6">
+              <div class="text-secondary small">
+                Submitted At
+              </div>
+
+              <div class="fw-semibold">
+                {{
+                  application.submittedAt
+                    | date: 'medium'
+                }}
+              </div>
+            </div>
+
+          </div>
+
+
+          <hr class="my-4">
+
+
+          <div class="status-stepper">
+
+            <div class="status-step completed">
+              <div class="step-circle">
+                ✓
+              </div>
+
+              <div class="fw-semibold">
+                Submitted
+              </div>
+            </div>
+
+
+            <div
+              class="status-line"
+              [class.completed]="
+                application.currentStatus !==
+                'SUBMITTED'
+              "
+            ></div>
+
+
+            <div
+              class="status-step"
+              [class.completed]="
+                application.currentStatus ===
+                  'UNDER_REVIEW' ||
+                application.currentStatus ===
+                  'INFO_REQUESTED' ||
+                application.currentStatus ===
+                  'APPROVED' ||
+                application.currentStatus ===
+                  'REJECTED'
+              "
+            >
+              <div class="step-circle">
+                2
+              </div>
+
+              <div class="fw-semibold">
+                Under Review
+              </div>
+            </div>
+
+
+            <div
+              class="status-line"
+              [class.completed]="
+                application.currentStatus ===
+                  'APPROVED' ||
+                application.currentStatus ===
+                  'REJECTED'
+              "
+            ></div>
+
+
+            <div
+              class="status-step"
+              [class.completed]="
+                application.currentStatus ===
+                  'APPROVED' ||
+                application.currentStatus ===
+                  'REJECTED'
+              "
+            >
+              <div class="step-circle">
+                3
+              </div>
+
+              <div class="fw-semibold">
+                Final Decision
+              </div>
+            </div>
+
+          </div>
+
+
+          <div
+            class="
+              alert
+              alert-light
+              border
+              mt-4
+              mb-0
+            "
+          >
+            Your application is currently
+            <strong>
+              {{
+                getStatusLabel(
+                  application.currentStatus
+                )
+              }}
+            </strong>.
+          </div>
+
+        </div>
+      </div>
+    }
+
+  </div>
+
+</section>
