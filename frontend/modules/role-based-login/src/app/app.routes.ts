@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-
+import {guestGuard} from './core/auth/guest-guard';
 import { authGuard } from './core/auth/auth-guard';
 import { roleGuard } from './core/auth/role-guard';
 
@@ -48,7 +48,8 @@ export const routes: Routes = [
       {
         path: 'login',
         component: Login,
-        title: 'Sign In'
+        title: 'Sign In',
+        canActivate: [guestGuard]
       },
       {
         path: 'create-password',

@@ -1,1 +1,99 @@
-<router-outlet></router-outlet>
+<div class="portal-shell">
+
+  <!-- Shared portal header -->
+  <header
+    class="
+      portal-header
+      bg-white
+      border-bottom
+      sticky-top
+    "
+  >
+    <nav
+      class="
+        container-fluid
+        px-3
+        px-md-4
+        py-3
+        d-flex
+        justify-content-between
+        align-items-center
+        gap-3
+      "
+    >
+
+      <!-- Portal identity -->
+      <a
+        class="
+          portal-brand
+          text-decoration-none
+          d-flex
+          align-items-center
+          gap-2
+        "
+        routerLink="/portal"
+      >
+        <div class="brand-mark">
+          TDRA
+        </div>
+
+        <div>
+          <div class="fw-bold text-dark">
+            Sender Registry
+          </div>
+
+          <div
+            class="
+              small
+              text-secondary
+              d-none
+              d-sm-block
+            "
+          >
+            Company Portal
+          </div>
+        </div>
+      </a>
+
+
+      <!-- Right-side actions -->
+      <div
+        class="
+          d-flex
+          align-items-center
+          gap-3
+        "
+      >
+        <span
+          class="
+            small
+            text-secondary
+            d-none
+            d-md-inline
+          "
+        >
+          Secure company session
+        </span>
+
+        <button
+          type="button"
+          class="btn btn-outline-danger"
+          (click)="logout()"
+        >
+          Sign Out
+        </button>
+      </div>
+
+    </nav>
+  </header>
+
+
+  <!-- Child portal page -->
+  <main class="portal-content">
+
+    <router-outlet>
+    </router-outlet>
+
+  </main>
+
+</div>

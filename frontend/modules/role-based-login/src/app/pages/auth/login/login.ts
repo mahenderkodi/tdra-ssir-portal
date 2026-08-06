@@ -25,6 +25,17 @@ export class Login {
   });
 
   onSubmit(): void {
+
+  if (
+    this.authService.isAuthenticated()
+  ) {
+    const roles =
+      this.authService.getCurrentRoles();
+
+    this.redirectUserByRole(roles);
+
+    return;
+  }
   this.errorMessage.set('');
 
   if (this.loginForm.invalid) {
@@ -104,6 +115,31 @@ export class Login {
   roles: string[]
 ): void {
 
+  /*
+   * TDRA administrator roles
+   */
+  const isTdraUser =
+    roles.some(role =>
+      [
+        'ROLE_TDRA_SUPER_ADMIN',
+        'ROLE_TDRA_REVIEWER',
+        'ROLE_TDRA_APPROVER',
+        'ROLE_TDRA_AUDITOR'
+      ].includes(role)
+    );
+
+  if (isTdraUser) {
+    void this.router.navigate([
+      '/admin/dashboard'
+    ]);
+
+    return;
+  }
+
+
+  /*
+   * Company registration is still pending.
+   */
   if (
     roles.includes(
       'ROLE_COMPANY_PENDING'
@@ -117,6 +153,9 @@ export class Login {
   }
 
 
+  /*
+   * Approved company account.
+   */
   if (
     roles.includes(
       'ROLE_COMPANY_ADMIN'
@@ -130,6 +169,9 @@ export class Login {
   }
 
 
+  /*
+   * No recognized role.
+   */
   void this.router.navigate([
     '/unauthorized'
   ]);

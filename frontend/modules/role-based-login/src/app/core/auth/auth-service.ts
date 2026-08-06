@@ -22,7 +22,39 @@ export class AuthService {
   readonly isLoggedIn = computed(() => this.tokenStorage.accessToken() !== null);
 
   constructor() {
-    this.autoInitializeSession();
+    // this.autoInitializeSession();
+      window.addEventListener(
+    'storage',
+    event => {
+
+      /*
+       * This event runs in other tabs when
+       * the refresh token is removed.
+       */
+      if (
+        event.key === 'ssir_refresh_token' &&
+        event.newValue === null
+      ) {
+        console.log(
+          '[AuthService] Logout detected from another tab'
+        );
+
+        /*
+         * Clear this tab's in-memory access token
+         * and logged-in user.
+         */
+        this.tokenStorage.clearSession();
+        this.currentUser.set(null);
+
+        /*
+         * Immediately open the sign-in page.
+         */
+        window.location.replace(
+          '/auth/login'
+        );
+      }
+    }
+  );
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
@@ -74,18 +106,113 @@ export class AuthService {
   }
 
   private initializeUserSession(accessToken: string, refreshToken: string): void {
+
+     console.log(
+    '[AuthService] Access token received:',
+    Boolean(accessToken)
+  );
+
+  console.log(
+    '[AuthService] Refresh token received:',
+    Boolean(refreshToken)
+  );
     this.tokenStorage.saveAccessToken(accessToken);
     this.tokenStorage.saveRefreshToken(refreshToken);
     const decodedUser = this.tokenStorage.decodeUserFromToken(accessToken);
     this.currentUser.set(decodedUser);
   }
 
-  private autoInitializeSession(): void {
-    const hasRefreshToken = this.tokenStorage.getRefreshToken() !== null;
-    if (hasRefreshToken) {
-      this.refreshToken().subscribe({
-        error: () => this.logout() // Force session invalidation if refresh token has expired
-      });
-    }
+ private autoInitializeSession(): void {
+
+  const refreshToken =
+    this.tokenStorage.getRefreshToken();
+
+  console.log(
+    '[AuthService] Auto initialization started'
+  );
+
+  console.log(
+    '[AuthService] Refresh token exists:',
+    Boolean(refreshToken)
+  );
+
+  if (refreshToken) {
+
+    console.log(
+      '[AuthService] Calling refresh API'
+    );
+
+    this.refreshToken().subscribe({
+      next: response => {
+        console.log(
+          '[AuthService] Refresh successful:',
+          response
+        );
+      },
+
+      error: error => {
+        console.error(
+          '[AuthService] Refresh failed:',
+          error
+        );
+
+        /*
+         * Temporarily do not call logout,
+         * so we can inspect the error.
+         */
+      }
+    });
   }
+}
+
+  getCurrentRoles(): string[] {
+
+  /*
+   * First, check whether the current user
+   * is already available in memory.
+   */
+  const existingUser =
+    this.currentUser();
+
+  if (existingUser) {
+    return existingUser.roles;
+  }
+
+
+  /*
+   * This situation can happen after
+   * refreshing the browser.
+   *
+   * The token may still exist, but the
+   * currentUser signal may be empty.
+   */
+  const accessToken =
+    this.tokenStorage.getAccessToken();
+
+  if (!accessToken) {
+    return [];
+  }
+
+
+  /*
+   * Read the logged-in user from the
+   * stored JWT access token.
+   */
+  const decodedUser =
+    this.tokenStorage.decodeUserFromToken(
+      accessToken
+    );
+
+  if (!decodedUser) {
+    return [];
+  }
+
+
+  /*
+   * Restore the current user signal.
+   */
+  this.currentUser.set(decodedUser);
+
+  return decodedUser.roles;
+}
 }
