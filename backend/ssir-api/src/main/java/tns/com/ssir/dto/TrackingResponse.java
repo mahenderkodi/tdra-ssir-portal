@@ -10,6 +10,7 @@ public class TrackingResponse {
     private String trackingId;
     private String companyName;
     private String currentStatus;
+    private String proposedSenderId;
     private LocalDateTime submittedAt;
    // private String feedbackComments; 
     

@@ -23,8 +23,8 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "company_id", unique = true, length = 30)
-    private String companyId; 
+    @Column(name = "proposed_sender_id", nullable = false, length = 11)
+    private String proposedSenderId; 
 
     @Column(name = "company_name", nullable = false)
     private String companyName;

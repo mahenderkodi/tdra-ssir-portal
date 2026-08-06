@@ -62,6 +62,7 @@ public class RegistrationController {
                 .message("Your onboarding application has been successfully submitted.")
                 .username(generatedUsername) // Updated to use the correctly resolved username [1]
                 .tempPassword(tempPassword)
+                .proposedSenderId(savedRequest.getCompany().getProposedSenderId())
                 .submittedAt(savedRequest.getCreatedAt())
                 .build();
 
@@ -105,6 +106,7 @@ public class RegistrationController {
         		.trackingId(request.getTrackingId())
                 .companyName(request.getCompany().getCompanyName())
                 .currentStatus(request.getCurrentStatus())
+                .proposedSenderId(request.getCompany().getProposedSenderId())
                 .submittedAt(request.getCreatedAt())
                 .build();
         return ResponseEntity.ok(trackingResponse);

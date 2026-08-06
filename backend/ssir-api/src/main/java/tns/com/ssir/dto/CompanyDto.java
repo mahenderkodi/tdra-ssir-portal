@@ -3,6 +3,7 @@ package tns.com.ssir.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
@@ -10,6 +11,11 @@ public class CompanyDto {
 
     @NotBlank(message = "Company name is required")
     private String companyName;
+    
+    @NotBlank(message = "Proposed Sender ID is required")
+    @Size(min = 2, max = 11, message = "Proposed Sender ID must be between 2 and 11 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9._-]+$", message = "Proposed Sender ID must contain only alphanumeric characters, dots, hyphens, or underscores")
+    private String proposedSenderId; // Added [3]
 
     @NotBlank(message = "Legal entity name is required")
     private String legalEntityName;

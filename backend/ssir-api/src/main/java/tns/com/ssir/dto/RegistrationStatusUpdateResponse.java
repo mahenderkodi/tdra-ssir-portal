@@ -8,8 +8,8 @@ import lombok.Data;
 public class RegistrationStatusUpdateResponse {
     private String trackingId;
     private String currentStatus;
-    private String companyId; // populated only on APPROVED
-    private String userId;    // populated only on APPROVED
+    private String userId;    
+    private String proposedSenderId;
     private boolean emailSent;
     private MockEmailDetails mockEmailDetails;
 }
