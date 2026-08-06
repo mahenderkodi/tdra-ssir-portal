@@ -12,6 +12,7 @@ export interface CompanyDto {
   emirateState: string;
   city: string;
   postalCode: string;
+  proposedSenderId: string;
   website?: string;
   companyEmail: string;
   companyPhone: string;
