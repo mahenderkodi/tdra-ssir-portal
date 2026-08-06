@@ -21,7 +21,7 @@ import { AdminRegistrationDetailComponent } from './pages/admin/registration-det
 import { AdminUsersComponent } from './pages/admin/users/users';
 
 // Portal pages
-
+import { PortalDashboard as PortalDashboard } from './pages/portal/dashboard/dashboard';
 import { Profile } from './pages/portal/profile/profile';
 import { SenderIds } from './pages/portal/sender-ids/sender-ids';
 import { SenderIdNew } from './pages/portal/sender-id-new/sender-id-new';
@@ -38,7 +38,7 @@ export const routes: Routes = [
     redirectTo: 'auth/login'
   },
 
-  // 2. PUBLIC AUTHENTICATION ROUTING (Unified Namespace) [1]
+  // 2. PUBLIC AUTHENTICATION ROUTING (Unified Namespace under AuthLayoutComponent) [1, 3]
   {
     path: 'auth',
     component: AuthLayoutComponent,
@@ -81,88 +81,67 @@ export const routes: Routes = [
       ]
     },
     children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'registrations'
-      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
-        component: AdminDashboardComponent
+        component: AdminDashboardComponent,
+        title: 'TDRA Admin Dashboard'
       },
       {
         path: 'registrations',
-        component: AdminRegistrationsComponent
+        component: AdminRegistrationsComponent,
+        title: 'Onboarding Queue'
       },
       {
         path: 'registrations/:id',
-        component: AdminRegistrationDetailComponent
+        component: AdminRegistrationDetailComponent,
+        title: 'Inspect Request'
       },
       {
         path: 'users',
-        component: AdminUsersComponent
+        component: AdminUsersComponent,
+        canActivate: [roleGuard],
+        data: { expectedRoles: ['ROLE_TDRA_SUPER_ADMIN'] },
+        title: 'Manage Staff'
       }
     ]
   },
 
-  // 4. SECURE COMPANY PORTAL PAGES (Separated status tracking and dashboards) [1, 3]
+  // 4. SECURE COMPANY PORTAL PAGES [1, 3]
   {
     path: 'portal',
     component: PortalLayout,
-    canActivate: [authGuard, roleGuard],
-    data: {
-      roles: [
-        'ROLE_COMPANY_PENDING', // Allows pending users to enter the portal layout [1]
-        'ROLE_COMPANY_ADMIN',
-        'ROLE_COMPANY_USER',
-        'ROLE_COMPANY_VIEWER'
-      ]
-    },
+    canActivate: [authGuard/*, roleGuard*/],
+    // data: {
+    //   roles: [
+    //     'ROLE_COMPANY_ADMIN',
+    //     'ROLE_COMPANY_USER',
+    //     'ROLE_COMPANY_VIEWER'
+    //   ]
+    // },
     children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'dashboard'
-      },
-      // ROUTE A: Secure Status Tracking Page (Restricted only to Pending Applicants) [1]
-      {
-        path: 'track-status',
-       // loadComponent: () => import('./pages/portal/track-status/track-status.component').then(m => m.TrackStatusComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['ROLE_COMPANY_PENDING'] },
-        title: 'Track Status'
-      },
-      // ROUTE B: Standard Corporate Dashboard (Restricted to Approved Companies) [1]
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
-       // component: PortalDashboard,
-        canActivate: [roleGuard],
-        data: { roles: ['ROLE_COMPANY_ADMIN', 'ROLE_COMPANY_USER', 'ROLE_COMPANY_VIEWER'] },
-        title: 'Company Dashboard'
+        component: PortalDashboard
       },
       {
         path: 'profile',
-        component: Profile,
-        canActivate: [roleGuard],
-        data: { roles: ['ROLE_COMPANY_ADMIN', 'ROLE_COMPANY_USER', 'ROLE_COMPANY_VIEWER'] }
+        component: Profile
       },
       {
         path: 'sender-ids',
-        component: SenderIds,
-        canActivate: [roleGuard],
-        data: { roles: ['ROLE_COMPANY_ADMIN', 'ROLE_COMPANY_USER', 'ROLE_COMPANY_VIEWER'] }
+        component: SenderIds
       },
       {
         path: 'sender-ids/new',
-        component: SenderIdNew,
-        canActivate: [roleGuard],
-        data: { roles: ['ROLE_COMPANY_ADMIN', 'ROLE_COMPANY_USER'] }
+        component: SenderIdNew
       },
       {
         path: 'users',
         component: PortalUsers,
         canActivate: [roleGuard],
-        data: { roles: ['ROLE_COMPANY_ADMIN'] } // Restricted to Company Admin only [1]
+        data: { expectedRoles: ['ROLE_COMPANY_ADMIN'] } // Restricted to Company Admin [1]
       }
     ]
   },
