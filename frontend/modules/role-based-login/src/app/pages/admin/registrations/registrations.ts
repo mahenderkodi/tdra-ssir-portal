@@ -48,7 +48,7 @@ export class AdminRegistrationsComponent implements OnInit, OnDestroy {
   // Calculates metrics dynamically based on active dataset
   calculateMetrics(data: any[]): void {
     this.totalCount.set(data.length);
-    this.pendingCount.set(data.filter(r => r.currentStatus === 'SUBMITTED' || r.currentStatus === 'UNDER_REVIEW').length);
+    this.pendingCount.set(data.filter(r => r.currentStatus === 'SUBMITTED' || r.currentStatus === 'UNDER_REVIEW' || r.currentStatus === 'INFO_REQUESTED').length);
     this.approvedCount.set(data.filter(r => r.currentStatus === 'APPROVED').length);
     this.rejectedCount.set(data.filter(r => r.currentStatus === 'REJECTED').length);
   }

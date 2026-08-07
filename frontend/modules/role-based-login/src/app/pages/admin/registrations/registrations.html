@@ -72,7 +72,8 @@
           <thead class="bg-light border-bottom">
             <tr>
               <th scope="col" class="py-3 px-4 text-uppercase small text-muted fw-bold">Company details</th>
-              <th scope="col" class="py-3 text-uppercase small text-muted fw-bold">Tracking ID</th>
+              <!-- <th scope="col" class="py-3 text-uppercase small text-muted fw-bold">Tracking ID</th> -->
+              <th scope="col" class="py-3 text-uppercase small text-muted fw-bold">Proposed Sender ID</th>
               <th scope="col" class="py-3 text-uppercase small text-muted fw-bold">Authorized Representative</th>
               <th scope="col" class="py-3 text-uppercase small text-muted fw-bold">Documents</th>
               <th scope="col" class="py-3 text-uppercase small text-muted fw-bold">Status</th>
@@ -90,11 +91,18 @@
               </td>
 
               <!-- Tracking ID -->
-              <td class="py-3">
+              <!-- <td class="py-3">
                 <div class="d-flex flex-column">
                   <span class="fw-semibold text-primary mb-1"><code>{{ reg.trackingId }}</code></span>
                   <span class="text-muted small">{{ reg.createdAt | date:'mediumDate' }}</span>
                 </div>
+              </td> -->
+
+              <!-- NEW FIELD: Proposed Sender ID [3] -->
+              <td class="py-3">
+                <span class="fw-bold text-dark">
+                  <code>{{ reg.company.proposedSenderId || 'N/A' }}</code>
+                </span>
               </td>
 
               <!-- Representative contact details -->
@@ -116,38 +124,40 @@
                 </span>
               </td>
 
-              <!-- Dynamic status badge -->
-              <td class="py-3">
-                <span class="badge rounded-pill px-3 py-1 fw-bold text-uppercase fs-7" 
-                      [ngClass]="{
-                        'status-submitted': reg.currentStatus === 'SUBMITTED' || reg.currentStatus === 'UNDER_REVIEW',
-                        'status-approved': reg.currentStatus === 'APPROVED',
-                        'status-rejected': reg.currentStatus === 'REJECTED'
-                      }">
-                  {{ reg.currentStatus }}
-                </span>
-              </td>
+              
+              <!-- Dynamic status badge (Updated with explicit info_requested class mapping) [3] -->
+                  <td class="py-3">
+                    <span class="badge rounded-pill px-3 py-1 fw-bold text-uppercase fs-7" 
+                          [ngClass]="{
+                            'status-submitted': reg.currentStatus === 'SUBMITTED' || reg.currentStatus === 'UNDER_REVIEW',
+                            'status-approved': reg.currentStatus === 'APPROVED',
+                            'status-rejected': reg.currentStatus === 'REJECTED',
+                            'status-info-requested': reg.currentStatus === 'INFO_REQUESTED'
+                          }">
+                      {{ reg.currentStatus }}
+                    </span>
+                  </td>
 
-              <!-- Action buttons -->
-              <td class="py-3 text-center px-4">
-                <div class="d-flex justify-content-center gap-2">
-                  <a [routerLink]="['/admin/registrations', reg.id]" 
-                     class="btn btn-outline-primary btn-sm px-3 fw-semibold">
-                    Inspect
-                  </a>
+                  <!-- Action buttons (Updated to allow quick-approvals for info-requested rows) [3] -->
+                  <td class="py-3 text-center px-4">
+                    <div class="d-flex justify-content-center gap-2">
+                      <a [routerLink]="['/admin/registrations', reg.id]" 
+                         class="btn btn-outline-primary btn-sm px-3 fw-semibold">
+                        Inspect
+                      </a>
 
-                  <!-- Quick Approve Button (Visible only on pending rows) [3] -->
-                  <button *ngIf="reg.currentStatus === 'SUBMITTED' || reg.currentStatus === 'UNDER_REVIEW'"
-                          type="button" 
-                          class="btn btn-success btn-sm px-3 fw-semibold d-flex align-items-center justify-content-center"
-                          [disabled]="actionInProgressId() !== null"
-                          (click)="approveCompany(reg.id)">
-                    <span class="spinner-border spinner-border-sm me-1" *ngIf="actionInProgressId() === reg.id"></span>
-                    Approve
-                  </button>
-                </div>
-              </td>
-            </tr>
+                      <!-- Quick Approve Button [3] -->
+                      <button *ngIf="reg.currentStatus === 'SUBMITTED' || reg.currentStatus === 'UNDER_REVIEW' || reg.currentStatus === 'INFO_REQUESTED'"
+                              type="button" 
+                              class="btn btn-success btn-sm px-3 fw-semibold d-flex align-items-center justify-content-center"
+                              [disabled]="actionInProgressId() !== null"
+                              (click)="approveCompany(reg.id)">
+                        <span class="spinner-border spinner-border-sm me-1" *ngIf="actionInProgressId() === reg.id"></span>
+                        Approve
+                      </button>
+                    </div>
+                </td>
+             </tr>
           </tbody>
         </table>
       </div>
