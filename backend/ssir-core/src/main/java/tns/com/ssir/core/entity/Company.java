@@ -12,7 +12,8 @@ import java.util.List;
     @Index(name = "idx_co_license", columnList = "trade_license_number")
 })
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@Data
+@Getter 
+@Setter 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -23,47 +24,50 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "proposed_sender_id", nullable = false, length = 11)
-    private String proposedSenderId; 
+    @Column(name = "company_id", unique = true, length = 30)
+    private String companyId; 
 
-    @Column(name = "company_name", nullable = false)
+    @Column(name = "company_name", nullable = true) // Set to nullable for drafts
     private String companyName;
 
-    @Column(name = "legal_entity_name", nullable = false)
+    @Column(name = "legal_entity_name", nullable = true)
     private String legalEntityName;
 
-    @Column(name = "trade_license_number", unique = true, nullable = false, length = 50)
+    @Column(name = "trade_license_number", unique = true, nullable = true, length = 50)
     private String tradeLicenseNumber;
 
-    @Column(name = "registration_number", nullable = false, length = 50)
+    @Column(name = "registration_number", nullable = true, length = 50)
     private String registrationNumber;
 
     @Column(name = "tax_vat_number", length = 50)
     private String taxVatNumber;
 
-    @Column(name = "company_type", nullable = false, length = 50)
+    @Column(name = "company_type", length = 50)
     private String companyType; 
 
     @Column(name = "industry_type", length = 100)
     private String industryType;
 
-    @Column(name = "date_of_incorporation", nullable = false, length = 50)
+    @Column(name = "date_of_incorporation", length = 50)
     private String dateOfIncorporation; 
 
-    @Column(name = "email", nullable = false, length = 100)
+    @Column(name = "email", length = 100)
     private String email;
 
-    @Column(name = "company_phone", nullable = false, length = 50)
-    private String companyPhone;
+    @Column(name = "company_phone", length = 50)
+    private String companyPhone; 
+
+    @Column(name = "proposed_sender_id", length = 11)
+    private String proposedSenderId;
 
     @Column(name = "website")
     private String website;
 
     @Column(name = "status", nullable = false, length = 30)
-    private String status;
-    
-    @JsonIgnoreProperties("company")
+    private String status; // Starts as DRAFT, becomes ACTIVE post-approval [3]
+
     @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @JsonIgnoreProperties("company")
     private CompanyAddress address;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -81,6 +85,9 @@ public class Company {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        if (this.status == null) {
+            this.status = "DRAFT"; // Initial state is DRAFT [3]
+        }
     }
 
     @PreUpdate

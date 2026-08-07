@@ -94,6 +94,14 @@ public class SecurityConfig {
 						.permitAll() // Onboarding & Tracking submissions whitelisted [3]
 						.requestMatchers("/error").permitAll()
 						
+						.requestMatchers(HttpMethod.PUT, "/api/v1/registrations/draft").hasRole("COMPANY_PENDING")
+		                .requestMatchers(HttpMethod.POST, "/api/v1/registrations/submit").hasRole("COMPANY_PENDING")
+		                
+						.requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/register-init").permitAll() // Whitelisted [1]
+		                .requestMatchers("/api/v1/auth/forgot-password", "/api/v1/auth/reset-password").permitAll()
+		                .requestMatchers("/error").permitAll()
+						
+						
 						// --- ADDED SWAGGER UI WHITELISTS [1] ---
 		                .requestMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll()
 		                .requestMatchers("/swagger-ui", "/swagger-ui/**", "/swagger-ui.html").permitAll()

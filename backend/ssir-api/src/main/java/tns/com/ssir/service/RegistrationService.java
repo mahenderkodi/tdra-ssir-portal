@@ -1,38 +1,38 @@
 package tns.com.ssir.service;
 
-import tns.com.ssir.core.entity.RegistrationRequest;
-import tns.com.ssir.core.entity.User;
-import tns.com.ssir.dto.CreateCredentialsRequest;
 import tns.com.ssir.dto.ForgotPasswordRequest;
+import tns.com.ssir.dto.RegisterInitRequest;
 import tns.com.ssir.dto.RegistrationRequestDto;
 import tns.com.ssir.dto.RegistrationStatusUpdateResponse;
 import tns.com.ssir.dto.ResetPasswordRequest;
-
+import tns.com.ssir.core.entity.RegistrationRequest;
+import tns.com.ssir.core.entity.User;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface RegistrationService {
     
-    RegistrationRequest submitRegistrationWithFiles(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap);
-    
-    List<RegistrationRequest> getAllRegistrations();
-    
-    RegistrationStatusUpdateResponse updateRegistrationStatus(Long id, String status, String comments);
-    
-    RegistrationRequest getRegistrationWithPresignedUrls(Long id);
-    
-    RegistrationRequest trackApplication(String trackingId);
-    
-    User createCredentials(CreateCredentialsRequest request);
-    
+    // 1. Initial Account Registration (Publicly Whitelisted) [1]
+    User registerAndInit(RegisterInitRequest request);
+
+    // 2. Updates existing authenticated draft [1, 3]
+    RegistrationRequest updateDraft(RegistrationRequestDto dto, Long companyId);
+
+    // 3. Performs strict validation, uploads files, and finalizes submission [1, 2, 3]
+    RegistrationRequest submitFinalOnboarding(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap, Long companyId);
+
     RegistrationRequest getRegistrationByCompanyId(Long companyId);
-    
- // Creates a secure 15-minute token and logs/emails the reset link [1]
+
+    RegistrationRequest getRegistrationWithPresignedUrls(Long id);
+
+    RegistrationStatusUpdateResponse updateRegistrationStatus(Long id, String status, String comments);
+
+    List<RegistrationRequest> getAllRegistrations();
+
+    RegistrationRequest trackApplication(String trackingId);
+
     void processForgotPassword(ForgotPasswordRequest request);
 
-    // Validates the token and updates the user's password using BCrypt [1]
     void resetPassword(ResetPasswordRequest request);
-    
-    
 }

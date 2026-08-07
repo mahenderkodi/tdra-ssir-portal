@@ -2,11 +2,12 @@ package tns.com.ssir.core.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import com.fasterxml.jackson.annotation.JsonIgnore; // Import Jackson Annotation
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "company_addresses")
-@Data
+@Getter 
+@Setter 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -22,19 +23,19 @@ public class CompanyAddress {
     @JsonIgnore 
     private Company company;
 
-    @Column(name = "address_line_1", nullable = false)
+    @Column(name = "address_line_1", nullable = true) // Set to nullable for drafts
     private String addressLine1;
 
-   // @Column(name = "address_line_2")
-   // private String addressLine2;
+    @Column(name = "address_line_2")
+    private String addressLine2;
 
-    @Column(name = "country", nullable = false, length = 100)
+    @Column(name = "country", length = 100)
     private String country; 
 
-    @Column(name = "emirate", nullable = false, length = 50)
+    @Column(name = "emirate", length = 50)
     private String emirate; 
 
-    @Column(name = "city", nullable = false, length = 50)
+    @Column(name = "city", length = 50)
     private String city;
 
     @Column(name = "postal_code", length = 20)
