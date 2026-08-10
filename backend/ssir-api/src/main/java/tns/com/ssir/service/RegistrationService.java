@@ -13,14 +13,13 @@ import java.util.List;
 
 public interface RegistrationService {
     
-    // 1. Initial Account Registration (Publicly Whitelisted) [1]
     User registerAndInit(RegisterInitRequest request);
 
-    // 2. Updates existing authenticated draft [1, 3]
-    RegistrationRequest updateDraft(RegistrationRequestDto dto, Long companyId);
+    // Updated: Accepts both userId and companyId to support dynamic linking on first draft save [1, 3]
+    RegistrationRequest updateDraft(RegistrationRequestDto dto, Long userId, Long companyId);
 
-    // 3. Performs strict validation, uploads files, and finalizes submission [1, 2, 3]
-    RegistrationRequest submitFinalOnboarding(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap, Long companyId);
+    // Updated: Accepts both userId and companyId to support dynamic linking on first submit [1, 2, 3]
+    RegistrationRequest submitFinalOnboarding(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap, Long userId, Long companyId);
 
     RegistrationRequest getRegistrationByCompanyId(Long companyId);
 
@@ -33,6 +32,8 @@ public interface RegistrationService {
     RegistrationRequest trackApplication(String trackingId);
 
     void processForgotPassword(ForgotPasswordRequest request);
+    
+    RegistrationRequest uploadDraftDocument(MultipartFile file, String documentType, Long companyId);
 
     void resetPassword(ResetPasswordRequest request);
 }

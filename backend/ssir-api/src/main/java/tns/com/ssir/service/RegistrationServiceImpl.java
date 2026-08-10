@@ -51,13 +51,11 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Autowired
     private PasswordResetTokenRepository tokenRepository;
 
- // 1. Initial Account Registration (Registers User with company_id = NULL) [1, 3]
     @Override
     @Transactional
     public User registerAndInit(RegisterInitRequest request) {
         log.info("Registering initial user account: {}", request.getUsername());
 
-        // A. Validate duplicate credentials
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username '" + request.getUsername() + "' is already taken.");
         }
@@ -65,14 +63,12 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new IllegalArgumentException("Email '" + request.getEmail() + "' is already registered.");
         }
 
-        // B. Fetch the restricted PENDING role [1]
         Role pendingRole = roleRepository.findByRoleName("ROLE_COMPANY_PENDING")
                 .orElseThrow(() -> new IllegalStateException("Required system role ROLE_COMPANY_PENDING was not found."));
 
         Set<Role> roles = new HashSet<>();
         roles.add(pendingRole);
 
-        // C. Create User in PENDING_ACTIVATION status with company = null [1, 3]
         User user = User.builder()
                 .company(null) // No company exists yet [3]
                 .username(request.getUsername())
@@ -86,20 +82,59 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         return userRepository.save(user);
     }
-    
-    
-    // 2. Updates existing authenticated draft (No validations executed) [1, 3]
+
+    // Private helper: automatically initializes the company and links it to your user on the fly [1, 3]
+    private Company getOrCreateCompany(Long userId, Long companyId, String initialProposedId, String email) {
+        if (companyId != null) {
+            return companyRepository.findById(companyId)
+                    .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
+        }
+
+        log.info("First-time action detected. Instantiating company and linking to User ID: {}", userId);
+
+        // 1. Create a blank Company in DRAFT
+        Company company = Company.builder()
+                .proposedSenderId(initialProposedId != null ? initialProposedId.toUpperCase() : null)
+                .email(email)
+                .status("DRAFT")
+                .build();
+
+        CompanyAddress address = CompanyAddress.builder()
+                .company(company)
+                .country("United Arab Emirates")
+                .build();
+        company.setAddress(address);
+
+        Company savedCompany = companyRepository.save(company);
+
+        // 2. Link the active User to this Company permanently [1, 3]
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Authenticated user session not found"));
+        user.setCompany(savedCompany);
+        userRepository.save(user);
+
+        // 3. Create the RegistrationRequest in DRAFT status
+        String trackingId = "REG-" + LocalDateTime.now().getYear() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        RegistrationRequest regRequest = RegistrationRequest.builder()
+                .trackingId(trackingId)
+                .company(savedCompany)
+                .currentStatus("DRAFT")
+                .build();
+        registrationRepository.save(regRequest);
+
+        return savedCompany;
+    }
+
     @Override
     @Transactional
-    public RegistrationRequest updateDraft(RegistrationRequestDto dto, Long companyId) {
-        log.info("Updating existing draft for Company ID: {}", companyId);
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
-
+    public RegistrationRequest updateDraft(RegistrationRequestDto dto, Long userId, Long companyId) {
         CompanyDto companyDto = dto.getCompany();
         RepresentativeDto repDto = dto.getRepresentative();
 
-        // Update company fields
+        // 1. Load or dynamically instantiate the company in MySQL [1, 3]
+        Company company = getOrCreateCompany(userId, companyId, companyDto.getProposedSenderId(), companyDto.getCompanyEmail());
+
+        // 2. Map all incoming draft values safely (allowing nulls) [3]
         company.setCompanyName(companyDto.getCompanyName());
         company.setLegalEntityName(companyDto.getLegalEntityName());
         company.setTradeLicenseNumber(companyDto.getTradeLicenseNumber());
@@ -110,10 +145,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         company.setDateOfIncorporation(companyDto.getDateOfIncorporation());
         company.setEmail(companyDto.getCompanyEmail());
         company.setCompanyPhone(companyDto.getCompanyPhone());
-        company.setProposedSenderId(companyDto.getProposedSenderId() != null ? companyDto.getProposedSenderId().toUpperCase() : null);
+        company.setProposedSenderId(companyDto.getProposedSenderId() != null ? companyDto.getProposedSenderId().toUpperCase() : company.getProposedSenderId());
         company.setWebsite(companyDto.getWebsite());
 
-        // Update Address fields
+        // Map Address
         CompanyAddress address = company.getAddress();
         address.setAddressLine1(companyDto.getRegisteredAddress());
         address.setCountry(companyDto.getCountry());
@@ -121,8 +156,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         address.setCity(companyDto.getCity());
         address.setPostalCode(companyDto.getPostalCode());
 
-        // Update Representative fields
-        if (repDto != null && repDto.getFirstName() != null && !repDto.getFirstName().trim().isEmpty()) {
+        // Map Representative (Allow partial saving of representative draft details)
+        if (repDto != null) {
             company.getContacts().clear();
             CompanyContact contact = CompanyContact.builder()
                     .company(company)
@@ -140,37 +175,53 @@ public class RegistrationServiceImpl implements RegistrationService {
             company.getContacts().add(contact);
         }
 
+        // Map Account/User Setup (Saves Step 4 preferences during drafts)
+        User user = userRepository.findByCompany(company)
+                .orElseThrow(() -> new IllegalArgumentException("Associated user account not found"));
+
+        AccountDto accountDto = dto.getAccount();
+        if (accountDto != null) {
+            if (accountDto.getUsername() != null && !accountDto.getUsername().trim().isEmpty()) {
+                user.setUsername(accountDto.getUsername());
+            }
+            if (accountDto.getPreferredLanguage() != null) {
+                user.setPreferredLanguage(accountDto.getPreferredLanguage());
+            }
+            if (accountDto.getTimeZone() != null) {
+                user.setTimeZone(accountDto.getTimeZone());
+            }
+            if (accountDto.getMfaPreference() != null) {
+                user.setMfaPreference(accountDto.getMfaPreference());
+            }
+            if (accountDto.getNotificationPreference() != null) {
+                user.setNotificationPreference(accountDto.getNotificationPreference());
+            }
+            userRepository.save(user);
+        }
+
         RegistrationRequest request = registrationRepository.findByCompany(company)
                 .orElseThrow(() -> new IllegalArgumentException("No onboarding request found associated with this company."));
 
         return registrationRepository.save(request);
     }
 
-    // 3. Performs strict validation, uploads files, and finalizes submission [1, 2, 3]
     @Override
     @Transactional
-    public RegistrationRequest submitFinalOnboarding(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap, Long companyId) {
-        log.info("Executing final onboarding submission for Company ID: {}", companyId);
+    public RegistrationRequest submitFinalOnboarding(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap, Long userId, Long companyId) {
+        log.info("Executing final onboarding submission...");
 
-        // Fetch existing request to capture previous status before update [3]
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
-        RegistrationRequest request = registrationRepository.findByCompany(company)
-                .orElseThrow(() -> new IllegalArgumentException("No onboarding request found associated with this company."));
+        // 1. Process draft save first to update any final text fields [1, 3]
+        RegistrationRequest request = updateDraft(dto, userId, companyId);
+        Company company = request.getCompany();
 
-        String oldStatus = request.getCurrentStatus(); // Captures "DRAFT" or "INFO_REQUESTED" dynamically [3]
+        String oldStatus = request.getCurrentStatus(); // Holds "DRAFT" or "INFO_REQUESTED" [3]
 
-        // Update the draft first with any final form modifications [1, 3]
-        updateDraft(dto, companyId);
-
-        // Transition active status back to SUBMITTED for reviewer re-audit [3]
+        // 2. Transition status back to SUBMITTED for TDRA Audit [3]
         request.setCurrentStatus("SUBMITTED");
-        
-        // Clear out old reviewer feedback comments since they are now resubmitting fresh corrected details [3]
         request.setInfoRequestComments(null);
         request.setRejectionReason(null);
         
-        // Loop over and stream all uploaded files directly to MinIO and log in legal_documents [2]
+        // 3. Stream all uploaded files directly to MinIO and log in legal_documents [2]
         if (fileMap != null && !fileMap.isEmpty()) {
             for (String formKey : fileMap.keySet()) {
                 List<MultipartFile> files = fileMap.get(formKey);
@@ -185,14 +236,28 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
         }
 
-        // Save transactional status history log [3]
+        // 4. Save Status History Log [3]
         RegistrationStatusHistory history = RegistrationStatusHistory.builder()
                 .registrationRequest(request)
-                .fromStatus(oldStatus) // Logged dynamically (e.g., INFO_REQUESTED -> SUBMITTED) [3]
+                .fromStatus(oldStatus) // e.g., DRAFT -> SUBMITTED or INFO_REQUESTED -> SUBMITTED [3]
                 .toStatus("SUBMITTED")
-                .comments("Onboarding Application Resubmitted with Corrected Details")
+                .comments("Onboarding Application Successfully Submitted for Review")
                 .build();
         historyRepository.save(history);
+
+        // 5. Update user account setup preferences [1, 3]
+        User user = userRepository.findByCompany(company)
+                .orElseThrow(() -> new IllegalArgumentException("Associated user account not found"));
+        
+        AccountDto accountDto = dto.getAccount();
+        if (accountDto != null) {
+            user.setUsername(accountDto.getUsername() != null && !accountDto.getUsername().trim().isEmpty() ? accountDto.getUsername() : user.getUsername());
+            user.setPreferredLanguage(accountDto.getPreferredLanguage() != null ? accountDto.getPreferredLanguage() : "EN");
+            user.setTimeZone(accountDto.getTimeZone() != null ? accountDto.getTimeZone() : "Asia/Dubai");
+            user.setMfaPreference(accountDto.getMfaPreference() != null ? accountDto.getMfaPreference() : "EMAIL");
+            user.setNotificationPreference(accountDto.getNotificationPreference() != null ? accountDto.getNotificationPreference() : "BOTH");
+            userRepository.save(user);
+        }
 
         return registrationRepository.save(request);
     }
@@ -216,6 +281,22 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public RegistrationRequest getRegistrationWithPresignedUrls(Long id) {
+        RegistrationRequest request = registrationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Registration Request not found with ID: " + id));
+
+        if (request.getDocuments() != null) {
+            for (LegalDocument doc : request.getDocuments()) {
+                String secureUrl = storageService.generatePresignedUrl(doc.getFileStoragePath());
+                doc.setPresignedUrl(secureUrl); 
+            }
+        }
+
+        return request;
+    }
+
+    @Override
     @Transactional
     public RegistrationStatusUpdateResponse updateRegistrationStatus(Long id, String status, String comments) {
         RegistrationRequest request = registrationRepository.findById(id)
@@ -224,7 +305,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         String oldStatus = request.getCurrentStatus();
         request.setCurrentStatus(status);
 
-        String generatedCompanyId = null;
         String generatedUserId = null;
         MockEmailDetails emailDetails = null;
         boolean emailSent = false;
@@ -301,22 +381,22 @@ public class RegistrationServiceImpl implements RegistrationService {
                     "\"%s\"\n\n" +
                     "Regards,\nTDRA Onboarding Team",
                     request.getTrackingId(), status.toLowerCase(), comments
-            );
+                );
 
-            emailDetails = MockEmailDetails.builder()
-                    .to(company.getEmail())
-                    .subject("TDRA Onboarding " + status + " - Tracking ID: " + request.getTrackingId())
-                    .body(emailBody)
-                    .build();
-            emailSent = true;
+                emailDetails = MockEmailDetails.builder()
+                        .to(company.getEmail())
+                        .subject("TDRA Onboarding " + status + " - Tracking ID: " + request.getTrackingId())
+                        .body(emailBody)
+                        .build();
+                emailSent = true;
 
-            log.info("\n=================================================================================" +
-                     "\n>>> MOCK EMAIL NOTIFICATION SYSTEM [TDRA ONBOARDING {}] <<<" +
-                     "\nTo: {}" +
-                     "\nSubject: {}" +
-                     "\n{}" +
-                     "\n=================================================================================\n",
-                     status.toUpperCase(), emailDetails.getTo(), emailDetails.getSubject(), emailDetails.getBody());
+                log.info("\n=================================================================================" +
+                         "\n>>> MOCK EMAIL NOTIFICATION SYSTEM [TDRA ONBOARDING {}] <<<" +
+                         "\nTo: {}" +
+                         "\nSubject: {}" +
+                         "\n{}" +
+                         "\n=================================================================================\n",
+                         status.toUpperCase(), emailDetails.getTo(), emailDetails.getSubject(), emailDetails.getBody());
         }
 
         RegistrationRequest updatedRequest = registrationRepository.save(request);
@@ -352,26 +432,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .emailSent(emailSent)
                 .mockEmailDetails(emailDetails)
                 .build();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public RegistrationRequest getRegistrationWithPresignedUrls(Long id) {
-        RegistrationRequest request = registrationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Registration Request not found with ID: " + id));
-
-        if (request.getDocuments() != null) {
-            for (LegalDocument doc : request.getDocuments()) {
-                String secureUrl = storageService.generatePresignedUrl(doc.getFileStoragePath());
-                doc.setPresignedUrl(secureUrl); 
-            }
-        }
-
-        return request;
-    }
-
-    private String convertCamelCaseToUnderscore(String camelCase) {
-        return camelCase.replaceAll("(?<!_)(?=[A-Z])", "_");
     }
 
     @Override
@@ -446,10 +506,31 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         User user = resetToken.getUser();
+        
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
 
         tokenRepository.delete(resetToken);
         log.info(">>> PASSWORD RESET SUCCESS: Successfully updated password for user: {}", user.getUsername());
+    }
+
+    @Override
+    @Transactional
+    public RegistrationRequest uploadDraftDocument(MultipartFile file, String documentType, Long companyId) {
+        log.info("Uploading draft document of type {} for Company ID: {}", documentType, companyId);
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
+
+        RegistrationRequest request = registrationRepository.findByCompany(company)
+                .orElseThrow(() -> new IllegalArgumentException("No onboarding request found associated with this company."));
+
+        String dbDocType = documentType.toUpperCase();
+        storageService.uploadAndLinkDocument(file, dbDocType, request);
+
+        return request;
+    }
+
+    private String convertCamelCaseToUnderscore(String camelCase) {
+        return camelCase.replaceAll("(?<!_)(?=[A-Z])", "_");
     }
 }

@@ -33,7 +33,7 @@ public class SenderIdController {
 
     // 1. Get Corporate Dashboard Metrics [3]
     @GetMapping("/stats")
-    @PreAuthorize("hasAnyRole('COMPANY_ADMIN', 'COMPANY_USER', 'COMPANY_VIEWER')") // Enforce RBAC [1]
+    @PreAuthorize("hasAnyRole('ROLE_COMPANY_ADMIN', 'ROLE_COMPANY_USER', 'ROLE_COMPANY_VIEWER')") // Aligned with ROLE_ prefix
     public ResponseEntity<CompanyDashboardStats> getDashboardStats(@AuthenticationPrincipal UserPrincipal principal) {
         if (principal.getCompanyId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No company associated with this user.");
@@ -44,7 +44,7 @@ public class SenderIdController {
 
     // 2. Get All Sender IDs belonging to the Company [3]
     @GetMapping
-    @PreAuthorize("hasAnyRole('COMPANY_ADMIN', 'COMPANY_USER', 'COMPANY_VIEWER')")
+    @PreAuthorize("hasAnyRole('ROLE_COMPANY_ADMIN', 'ROLE_COMPANY_USER', 'ROLE_COMPANY_VIEWER')") // Aligned with ROLE_ prefix
     public ResponseEntity<List<SenderIdResponseDto>> getCompanySenderIds(@AuthenticationPrincipal UserPrincipal principal) {
         if (principal.getCompanyId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No company associated with this user.");
@@ -55,7 +55,7 @@ public class SenderIdController {
 
     // 3. Request New Sender ID (Consumes Multipart Form-Data) [3]
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('COMPANY_ADMIN', 'COMPANY_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_COMPANY_ADMIN', 'ROLE_COMPANY_USER')") // Aligned with ROLE_ prefix
     public ResponseEntity<SenderIdResponseDto> requestSenderId(
             @RequestPart("senderIdData") String senderIdDataJson,
             @RequestPart("file") MultipartFile file,
@@ -76,5 +76,17 @@ public class SenderIdController {
 
         SenderIdResponseDto response = senderIdService.requestSenderId(dto, file, principal.getCompanyId());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    
+    // 4. Secure Admin Action: Approve/Reject additional Sender IDs [3]
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ROLE_TDRA_SUPER_ADMIN')") // Aligned with ROLE_ prefix
+    public ResponseEntity<SenderIdResponseDto> updateSenderIdStatus(
+            @PathVariable("id") Long id,
+            @RequestParam("status") String status,
+            @RequestParam(value = "comments", required = false) String comments) {
+
+        SenderIdResponseDto response = senderIdService.updateSenderIdStatus(id, status, comments);
+        return ResponseEntity.ok(response);
     }
 }

@@ -3,8 +3,10 @@ package tns.com.ssir.service;
 import tns.com.ssir.dto.CompanyDashboardStats;
 import tns.com.ssir.dto.SenderIdRequestDto;
 import tns.com.ssir.dto.SenderIdResponseDto;
+import tns.com.ssir.core.entity.AuditLog;
 import tns.com.ssir.core.entity.Company;
 import tns.com.ssir.core.entity.SenderId;
+import tns.com.ssir.core.repository.AuditLogRepository;
 import tns.com.ssir.core.repository.CompanyRepository;
 import tns.com.ssir.core.repository.SenderIdRepository;
 import tns.com.ssir.core.repository.UserRepository;
@@ -31,6 +33,9 @@ public class SenderIdServiceImpl implements SenderIdService {
 
     @Autowired
     private DocumentStorageService storageService;
+    
+    @Autowired
+    private AuditLogRepository auditLogRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -73,6 +78,46 @@ public class SenderIdServiceImpl implements SenderIdService {
                         .build())
                 .collect(Collectors.toList());
     }
+    
+    @Override
+    @Transactional
+    public SenderIdResponseDto updateSenderIdStatus(Long id, String status, String comments) {
+        log.info("Executing Admin status update for Sender ID: {}. Action: {}", id, status);
+
+        // 1. Fetch the Sender ID
+        SenderId senderId = senderIdRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Sender ID not found with ID: " + id));
+
+        // 2. Transition status (e.g. PENDING -> ACTIVE, SUSPENDED, or REVOKED) [3]
+        senderId.setStatus(status.toUpperCase());
+        SenderId savedSenderId = senderIdRepository.save(senderId);
+
+        // 3. System Audit Logger [1]
+        String adminUsername = "SYSTEM";
+        org.springframework.security.core.Authentication auth = 
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            adminUsername = auth.getName();
+        }
+
+        AuditLog auditLog = AuditLog.builder()
+                .actorUsername(adminUsername)
+                .actionTaken("SENDER_ID_" + status.toUpperCase())
+                .ipAddress("127.0.0.1")
+                .payloadDetails(String.format("Sender ID: %s, Comments: %s", 
+                        savedSenderId.getSenderIdName(), comments))
+                .build();
+        auditLogRepository.save(auditLog);
+
+        return SenderIdResponseDto.builder()
+                .id(savedSenderId.getId())
+                .senderIdName(savedSenderId.getSenderIdName())
+                .status(savedSenderId.getStatus())
+                .expirationDate(savedSenderId.getExpirationDate())
+                .createdAt(savedSenderId.getCreatedAt())
+                .build();
+    }
+    
 
     @Override
     @Transactional
