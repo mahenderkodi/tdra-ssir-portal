@@ -83,7 +83,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         return userRepository.save(user);
     }
 
-    // Private helper: automatically initializes the company and links it to your user on the fly [1, 3]
  // 1. Change the signature to accept companyName
     private Company getOrCreateCompany(Long userId, Long companyId, String initialProposedId, String email, String companyName) {
         if (companyId != null) {
@@ -131,6 +130,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         return savedCompany;
     }
+    
 
     @Override
     @Transactional
@@ -138,8 +138,14 @@ public class RegistrationServiceImpl implements RegistrationService {
         CompanyDto companyDto = dto.getCompany();
         RepresentativeDto repDto = dto.getRepresentative();
 
-        // 1. Load or dynamically instantiate the company in MySQL [1, 3]
-        Company company = getOrCreateCompany(userId, companyId, companyDto.getProposedSenderId(), companyDto.getCompanyEmail());
+        // Pass the company name from the DTO down to the builder [3]
+        Company company = getOrCreateCompany(
+            userId, 
+            companyId, 
+            companyDto.getProposedSenderId(), 
+            companyDto.getCompanyEmail(),
+            companyDto.getCompanyName() // Added parameter [3]
+        );
 
         // 2. Map all incoming draft values safely (allowing nulls) [3]
         company.setCompanyName(companyDto.getCompanyName());
