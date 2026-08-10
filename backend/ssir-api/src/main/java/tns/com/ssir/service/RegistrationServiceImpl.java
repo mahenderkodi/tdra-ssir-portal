@@ -84,7 +84,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     // Private helper: automatically initializes the company and links it to your user on the fly [1, 3]
-    private Company getOrCreateCompany(Long userId, Long companyId, String initialProposedId, String email) {
+ // 1. Change the signature to accept companyName
+    private Company getOrCreateCompany(Long userId, Long companyId, String initialProposedId, String email, String companyName) {
         if (companyId != null) {
             return companyRepository.findById(companyId)
                     .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
@@ -92,8 +93,14 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         log.info("First-time action detected. Instantiating company and linking to User ID: {}", userId);
 
-        // 1. Create a blank Company in DRAFT
+        // Fallback default name to protect against early draft saves with blank fields
+        String finalCompanyName = (companyName != null && !companyName.trim().isEmpty()) 
+                ? companyName 
+                : "Draft Company " + UUID.randomUUID().toString().substring(0, 5);
+
+        // 2. Add .companyName() to the builder [3]
         Company company = Company.builder()
+                .companyName(finalCompanyName)
                 .proposedSenderId(initialProposedId != null ? initialProposedId.toUpperCase() : null)
                 .email(email)
                 .status("DRAFT")
@@ -107,13 +114,13 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         Company savedCompany = companyRepository.save(company);
 
-        // 2. Link the active User to this Company permanently [1, 3]
+        // Link the active User to this Company permanently [1, 3]
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Authenticated user session not found"));
         user.setCompany(savedCompany);
         userRepository.save(user);
 
-        // 3. Create the RegistrationRequest in DRAFT status
+        // Create the RegistrationRequest in DRAFT status
         String trackingId = "REG-" + LocalDateTime.now().getYear() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         RegistrationRequest regRequest = RegistrationRequest.builder()
                 .trackingId(trackingId)
