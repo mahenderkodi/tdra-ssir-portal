@@ -11,11 +11,15 @@ import tns.com.ssir.core.repository.CompanyRepository;
 import tns.com.ssir.core.repository.SenderIdRepository;
 import tns.com.ssir.core.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import lombok.extern.log4j.Log4j2;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,21 +46,18 @@ public class SenderIdServiceImpl implements SenderIdService {
     public CompanyDashboardStats getDashboardStats(Long companyId) {
         log.info("Calculating secure compliance metrics for Company ID: {}", companyId);
 
-        // 1. Count active registered headers
         long activeSenderIds = senderIdRepository.countByCompanyIdAndStatus(companyId, "ACTIVE");
         
-        // 2. Count critical compliance warnings (status is either EXPIRING_SOON or EXPIRED) [3]
         long criticalWarnings = senderIdRepository.countByCompanyIdAndStatusIn(
                 companyId, 
                 List.of("EXPIRING_SOON", "EXPIRED")
         );
         
-        // 3. Count total delegated team members [1, 3]
         long totalUsers = userRepository.countByCompanyId(companyId);
 
         return CompanyDashboardStats.builder()
                 .activeSenderIds(activeSenderIds)
-                .criticalExpiryWarnings(criticalWarnings) // Mapped [3]
+                .criticalExpiryWarnings(criticalWarnings)
                 .totalUsers(totalUsers)
                 .build();
     }
@@ -72,27 +73,103 @@ public class SenderIdServiceImpl implements SenderIdService {
                 .map(senderId -> SenderIdResponseDto.builder()
                         .id(senderId.getId())
                         .senderIdName(senderId.getSenderIdName())
+                        .trackingId(senderId.getTrackingId()) // Mapped tracking-id [3]
                         .status(senderId.getStatus())
+                        .createdAt(senderId.getCreatedAt())     // Mapped submitted on [3]
                         .expirationDate(senderId.getExpirationDate())
-                        .createdAt(senderId.getCreatedAt())
+                        .remarks(senderId.getRemarks())         // Mapped remarks [3]
                         .build())
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public SenderIdResponseDto getSenderIdById(Long id, Long companyId) {
+        log.info("Fetching detailed view of Sender ID: {} for Company ID: {}", id, companyId);
+
+        SenderId senderId = senderIdRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Sender ID record not found with ID: " + id));
+
+        // Security boundary check
+        if (!senderId.getCompany().getId().equals(companyId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized access to this Sender ID record.");
+        }
+
+        // Generate short-lived presigned URL for MinIO file download [2]
+        String secureDocUrl = null;
+        if (senderId.getAuthLetterPath() != null) {
+            secureDocUrl = storageService.generatePresignedUrl(senderId.getAuthLetterPath());
+        }
+
+        return SenderIdResponseDto.builder()
+                .id(senderId.getId())
+                .senderIdName(senderId.getSenderIdName())
+                .trackingId(senderId.getTrackingId())
+                .status(senderId.getStatus())
+                .createdAt(senderId.getCreatedAt())
+                .expirationDate(senderId.getExpirationDate())
+                .remarks(senderId.getRemarks())
+                .justification(senderId.getJustification())
+                .companyName(senderId.getCompany().getCompanyName())
+                .authLetterUrl(secureDocUrl) // Mapped presigned file [2]
+                .build();
+    }
     
+    @Override
+    @Transactional
+    public SenderIdResponseDto requestSenderId(SenderIdRequestDto dto, MultipartFile authLetter, Long companyId) {
+        log.info("Processing new Sender ID request: '{}' for Company ID: {}", dto.getSenderIdName(), companyId);
+
+        if (senderIdRepository.findBySenderIdName(dto.getSenderIdName()).isPresent()) {
+            throw new IllegalArgumentException("This Sender ID header is already registered on the platform.");
+        }
+
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
+
+        // Generate a standard Tracking ID
+        String trackingId = "SND-" + LocalDateTime.now().getYear() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+
+        // Persist Metadata [3]
+        SenderId senderId = SenderId.builder()
+                .senderIdName(dto.getSenderIdName())
+                .trackingId(trackingId)
+                .justification(dto.getJustification())
+                .company(company)
+                .status("PENDING")
+                .build();
+
+        // Stream binary file directly to MinIO and save path [2]
+        if (authLetter != null && !authLetter.isEmpty()) {
+            String fileStoragePath = "companies/" + companyId + "/sender_ids/" + trackingId.toLowerCase() + "_auth_letter.pdf";
+            storageService.uploadDocument(authLetter, fileStoragePath);
+            senderId.setAuthLetterPath(fileStoragePath); // Save file reference [2]
+        }
+
+        SenderId savedSenderId = senderIdRepository.save(senderId);
+
+        return SenderIdResponseDto.builder()
+                .id(savedSenderId.getId())
+                .senderIdName(savedSenderId.getSenderIdName())
+                .trackingId(savedSenderId.getTrackingId())
+                .status(savedSenderId.getStatus())
+                .expirationDate(savedSenderId.getExpirationDate())
+                .createdAt(savedSenderId.getCreatedAt())
+                .build();
+    }
+
     @Override
     @Transactional
     public SenderIdResponseDto updateSenderIdStatus(Long id, String status, String comments) {
         log.info("Executing Admin status update for Sender ID: {}. Action: {}", id, status);
 
-        // 1. Fetch the Sender ID
         SenderId senderId = senderIdRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Sender ID not found with ID: " + id));
 
-        // 2. Transition status (e.g. PENDING -> ACTIVE, SUSPENDED, or REVOKED) [3]
         senderId.setStatus(status.toUpperCase());
+        senderId.setRemarks(comments); // Save the feedback remarks
         SenderId savedSenderId = senderIdRepository.save(senderId);
 
-        // 3. System Audit Logger [1]
         String adminUsername = "SYSTEM";
         org.springframework.security.core.Authentication auth = 
                 org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
@@ -112,48 +189,11 @@ public class SenderIdServiceImpl implements SenderIdService {
         return SenderIdResponseDto.builder()
                 .id(savedSenderId.getId())
                 .senderIdName(savedSenderId.getSenderIdName())
+                .trackingId(savedSenderId.getTrackingId())
                 .status(savedSenderId.getStatus())
                 .expirationDate(savedSenderId.getExpirationDate())
                 .createdAt(savedSenderId.getCreatedAt())
-                .build();
-    }
-    
-
-    @Override
-    @Transactional
-    public SenderIdResponseDto requestSenderId(SenderIdRequestDto dto, MultipartFile authLetter, Long companyId) {
-        log.info("Processing new Sender ID request: '{}' for Company ID: {}", dto.getSenderIdName(), companyId);
-
-        // 1. Prevent duplicate registrations globally
-        if (senderIdRepository.findBySenderIdName(dto.getSenderIdName()).isPresent()) {
-            throw new IllegalArgumentException("This Sender ID header is already registered on the platform.");
-        }
-
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
-
-        // 2. Persist the Sender ID metadata
-        SenderId senderId = SenderId.builder()
-                .senderIdName(dto.getSenderIdName())
-                .company(company)
-                .status("PENDING")
-                .build();
-
-        SenderId savedSenderId = senderIdRepository.save(senderId);
-
-        // 3. Stream the mandatory authorization/signatory letter directly to MinIO
-        if (authLetter != null && !authLetter.isEmpty()) {
-            // Saves securely inside registrations/reg_{id}/sender_ids/ folder
-            String docType = "SENDER_ID_AUTH_LETTER_" + savedSenderId.getSenderIdName().toUpperCase();
-            storageService.uploadDocument(authLetter, docType);
-        }
-
-        return SenderIdResponseDto.builder()
-                .id(savedSenderId.getId())
-                .senderIdName(savedSenderId.getSenderIdName())
-                .status(savedSenderId.getStatus())
-                .expirationDate(savedSenderId.getExpirationDate())
-                .createdAt(savedSenderId.getCreatedAt())
+                .remarks(savedSenderId.getRemarks())
                 .build();
     }
 }
