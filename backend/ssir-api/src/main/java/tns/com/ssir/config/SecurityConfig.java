@@ -81,6 +81,8 @@ public class SecurityConfig {
 				// --- ADDED SWAGGER UI WHITELISTS [1] ---
 				.requestMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll()
 				.requestMatchers("/swagger-ui", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+				// Permit single-shot onboarding requests for pending and approved roles [3]
+				.requestMatchers("/api/v1/onboarding-single/**").hasAnyRole("COMPANY_PENDING", "COMPANY_ADMIN")
 				// ---------------------------------------
 
 				// 3. SECURE ENDPOINTS
