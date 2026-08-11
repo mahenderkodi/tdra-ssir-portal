@@ -3,6 +3,8 @@ package tns.com.ssir.core.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +50,8 @@ public class Company {
     @Column(name = "industry_type", length = 100)
     private String industryType;
 
-    @Column(name = "date_of_incorporation", length = 50)
-    private String dateOfIncorporation; 
+    @Column(name = "date_of_incorporation")
+    private LocalDate dateOfIncorporation; 
 
     @Column(name = "email", length = 100)
     private String email;
