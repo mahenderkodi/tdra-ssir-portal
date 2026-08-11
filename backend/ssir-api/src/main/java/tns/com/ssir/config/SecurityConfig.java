@@ -83,6 +83,10 @@ public class SecurityConfig {
 				.requestMatchers("/swagger-ui", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 				// Permit single-shot onboarding requests for pending and approved roles [3]
 				.requestMatchers("/api/v1/onboarding-single/**").hasAnyRole("COMPANY_PENDING", "COMPANY_ADMIN")
+				
+				.requestMatchers(HttpMethod.PUT, "/api/v1/onboarding-single/**")
+				.hasAnyRole("COMPANY_ADMIN", "COMPANY_USER")
+				
 				// ---------------------------------------
 
 				// 3. SECURE ENDPOINTS

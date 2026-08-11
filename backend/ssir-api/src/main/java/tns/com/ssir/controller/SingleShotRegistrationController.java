@@ -28,27 +28,26 @@ public class SingleShotRegistrationController {
 
     @Autowired
     private Validator validator;
-    
+
+    // INJECTED: Spring-managed ObjectMapper containing JSR-310 (LocalDate) deserializers [3]
     @Autowired
     private ObjectMapper objectMapper;
 
-    
     @PostMapping(value = "/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('ROLE_COMPANY_PENDING', 'ROLE_COMPANY_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_COMPANY_ADMIN')")
     public ResponseEntity<RegistrationSuccessResponse> submitOnboardingSingle(
             @RequestPart("registrationData") String registrationDataJson,
             MultipartHttpServletRequest request,
             @AuthenticationPrincipal UserPrincipal principal) throws Exception {
 
-       
+        // FIX: Replaced manual initialization with injected mapper
         RegistrationRequestDto dto = objectMapper.readValue(registrationDataJson, RegistrationRequestDto.class);
-        // Run validation on the payload [1, 3]
+
         Set<ConstraintViolation<RegistrationRequestDto>> violations = validator.validate(dto);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
         }
 
-        // Execute single-shot creation and file uploads [3]
         RegistrationRequest savedRequest = singleShotService.submitSingleShot(
                 dto, 
                 request.getMultiFileMap(), 
@@ -64,5 +63,39 @@ public class SingleShotRegistrationController {
                 .build();
 
         return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
+    }
+
+    // I. SECURE AUTHENTICATED SINGLE-SHOT RESUBMISSION (PUT)
+    @PutMapping(value = "/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ROLE_COMPANY_ADMIN')")
+    public ResponseEntity<RegistrationSuccessResponse> resubmitOnboardingSingle(
+            @RequestPart("registrationData") String registrationDataJson,
+            MultipartHttpServletRequest request,
+            @AuthenticationPrincipal UserPrincipal principal) throws Exception {
+
+        // FIX: Replaced manual initialization with injected mapper [3]
+        RegistrationRequestDto dto = objectMapper.readValue(registrationDataJson, RegistrationRequestDto.class);
+
+        Set<ConstraintViolation<RegistrationRequestDto>> violations = validator.validate(dto);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
+        RegistrationRequest savedRequest = singleShotService.resubmitSingleShot(
+                dto, 
+                request.getMultiFileMap(), 
+                principal.getId(),
+                principal.getCompanyId()
+        );
+
+        RegistrationSuccessResponse successResponse = RegistrationSuccessResponse.builder()
+                .trackingId(savedRequest.getTrackingId())
+                .status(savedRequest.getCurrentStatus())
+                .message("Your onboarding application has been successfully resubmitted.")
+                .proposedSenderId(savedRequest.getCompany().getProposedSenderId())
+                .submittedAt(savedRequest.getCreatedAt())
+                .build();
+
+        return ResponseEntity.ok(successResponse);
     }
 }

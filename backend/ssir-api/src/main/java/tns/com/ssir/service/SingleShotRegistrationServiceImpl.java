@@ -165,4 +165,114 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
     private String convertCamelCaseToUnderscore(String camelCase) {
         return camelCase.replaceAll("(?<!_)(?=[A-Z])", "_");
     }
+    
+    @Override
+    @Transactional
+    public RegistrationRequest resubmitSingleShot(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap, Long userId, Long companyId) {
+        log.info("Processing single-shot onboarding resubmission for Company ID: {}", companyId);
+
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
+
+        CompanyDto companyDto = dto.getCompany();
+        RepresentativeDto repDto = dto.getRepresentative();
+        AccountDto accountDto = dto.getAccount();
+
+        // 1. Update existing Company metadata safely
+        company.setCompanyName(companyDto.getCompanyName());
+        company.setLegalEntityName(companyDto.getLegalEntityName());
+        company.setTradeLicenseNumber(companyDto.getTradeLicenseNumber());
+        company.setRegistrationNumber(companyDto.getRegistrationNumber());
+        company.setTaxVatNumber(companyDto.getTaxId());
+        company.setCompanyType(companyDto.getCompanyType());
+        company.setIndustryType(companyDto.getIndustry());
+        company.setDateOfIncorporation(companyDto.getDateOfIncorporation());
+        company.setEmail(companyDto.getCompanyEmail());
+        company.setCompanyPhone(companyDto.getCompanyPhone());
+        company.setProposedSenderId(companyDto.getProposedSenderId() != null ? companyDto.getProposedSenderId().toUpperCase() : company.getProposedSenderId());
+        company.setWebsite(companyDto.getWebsite());
+
+        // 2. Update address relation
+        CompanyAddress address = company.getAddress();
+        if (address == null) {
+            address = new CompanyAddress();
+            address.setCompany(company);
+        }
+        address.setAddressLine1(companyDto.getRegisteredAddress());
+        address.setCountry(companyDto.getCountry() != null ? companyDto.getCountry() : "United Arab Emirates");
+        address.setEmirate(companyDto.getEmirateState());
+        address.setCity(companyDto.getCity());
+        address.setPostalCode(companyDto.getPostalCode());
+        company.setAddress(address);
+
+        Company savedCompany = companyRepository.save(company);
+
+        // 3. Update Representative Contacts
+        if (repDto != null) {
+            savedCompany.getContacts().clear();
+            CompanyContact contact = CompanyContact.builder()
+                    .company(savedCompany)
+                    .firstName(repDto.getFirstName())
+                    .lastName(repDto.getLastName())
+                    .designation(repDto.getDesignation())
+                    .department(repDto.getDepartment())
+                    .officialEmail(repDto.getOfficialEmail())
+                    .mobileNumber(repDto.getMobileNumber())
+                    .officeNumber(repDto.getOfficeNumber())
+                    .address(repDto.getAddress())
+                    .uaePassId(repDto.getUaePassId())
+                    .passportEmiratesId(repDto.getPassportOrEmiratesId())
+                    .build();
+            savedCompany.getContacts().add(contact);
+            companyRepository.save(savedCompany);
+        }
+
+        // 4. Update User configurations
+        User user = userRepository.findByCompany(savedCompany)
+                .orElseThrow(() -> new IllegalArgumentException("Associated user session not found."));
+        if (accountDto != null) {
+            user.setUsername(accountDto.getUsername() != null && !accountDto.getUsername().trim().isEmpty() ? accountDto.getUsername() : user.getUsername());
+            user.setPreferredLanguage(accountDto.getPreferredLanguage() != null ? accountDto.getPreferredLanguage() : "EN");
+            user.setTimeZone(accountDto.getTimeZone() != null ? accountDto.getTimeZone() : "Asia/Dubai");
+            user.setMfaPreference(accountDto.getMfaPreference() != null ? accountDto.getMfaPreference() : "EMAIL");
+            user.setNotificationPreference(accountDto.getNotificationPreference() != null ? accountDto.getNotificationPreference() : "BOTH");
+            userRepository.save(user);
+        }
+
+        // 5. Fetch Onboarding Request and Transition back to SUBMITTED status [3]
+        RegistrationRequest request = registrationRepository.findByCompany(savedCompany)
+                .orElseThrow(() -> new IllegalArgumentException("No onboarding request found associated with this company."));
+
+        String oldStatus = request.getCurrentStatus();
+        request.setCurrentStatus("SUBMITTED");
+        request.setInfoRequestComments(null); // Clears the previous TDRA remarks [3]
+        request.setRejectionReason(null);
+        RegistrationRequest savedRequest = registrationRepository.save(request);
+
+        // 6. Stream replacement files directly to MinIO [2]
+        if (fileMap != null && !fileMap.isEmpty()) {
+            for (String formKey : fileMap.keySet()) {
+                List<MultipartFile> files = fileMap.get(formKey);
+                if (files != null) {
+                    for (MultipartFile file : files) {
+                        if (file != null && !file.isEmpty()) {
+                            String documentType = convertCamelCaseToUnderscore(formKey).toUpperCase();
+                            storageService.uploadAndLinkDocument(file, documentType, savedRequest);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 7. Save Status History Log [3]
+        RegistrationStatusHistory history = RegistrationStatusHistory.builder()
+                .registrationRequest(savedRequest)
+                .fromStatus(oldStatus) // e.g., INFO_REQUESTED -> SUBMITTED [3]
+                .toStatus("SUBMITTED")
+                .comments("Onboarding Application Successfully Resubmitted in Single Shot")
+                .build();
+        historyRepository.save(history);
+
+        return savedRequest;
+    }
 }

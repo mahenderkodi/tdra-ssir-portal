@@ -21,8 +21,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import tns.com.ssir.security.UserPrincipal;
 import java.util.List;
 import java.util.Set;
 
@@ -35,17 +33,18 @@ public class RegistrationController {
 
     @Autowired
     private Validator validator;
+
+    // INJECTED: Spring-managed ObjectMapper [3]
     @Autowired
     private ObjectMapper objectMapper;
 
-    // A. SECURE AUTHENTICATED DRAFT UPDATE (Saves or updates draft in MySQL) [1, 3]
+    // A. SECURE AUTHENTICATED DRAFT UPDATE
     @PutMapping("/draft")
-    @PreAuthorize("hasRole('ROLE_COMPANY_PENDING')")
+    @PreAuthorize("hasRole('ROLE_COMPANY_ADMIN')")
     public ResponseEntity<RegistrationSuccessResponse> updateDraft(
             @RequestBody RegistrationRequestDto dto,
             @AuthenticationPrincipal UserPrincipal principal) {
 
-        // Passes both principal.getId() (userId) and principal.getCompanyId() (companyId) [1, 3]
         RegistrationRequest updatedRequest = registrationService.updateDraft(dto, principal.getId(), principal.getCompanyId());
 
         RegistrationSuccessResponse successResponse = RegistrationSuccessResponse.builder()
@@ -58,24 +57,22 @@ public class RegistrationController {
         return ResponseEntity.ok(successResponse);
     }
 
-    // B. SECURE AUTHENTICATED SUBMISSION (Runs strict validations, streams files) [1, 2, 3]
+    // B. SECURE AUTHENTICATED SUBMISSION (POST)
     @PostMapping(value = "/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('ROLE_COMPANY_PENDING', 'ROLE_COMPANY_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_COMPANY_ADMIN')")
     public ResponseEntity<RegistrationSuccessResponse> submitFinalOnboarding(
             @RequestPart("registrationData") String registrationDataJson,
             MultipartHttpServletRequest request,
             @AuthenticationPrincipal UserPrincipal principal) throws Exception {
 
-      
+        // FIX: Replaced manual initialization with injected mapper
         RegistrationRequestDto dto = objectMapper.readValue(registrationDataJson, RegistrationRequestDto.class);
 
-        // STRICT VALIDATIONS TRIGGERED ONLY AT THE FINAL SUBMISSION GATEWAY [1, 3]
         Set<ConstraintViolation<RegistrationRequestDto>> violations = validator.validate(dto);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations); 
         }
 
-        // Passes both principal.getId() (userId) and principal.getCompanyId() (companyId) [1, 3]
         RegistrationRequest savedRequest = registrationService.submitFinalOnboarding(dto, request.getMultiFileMap(), principal.getId(), principal.getCompanyId());
 
         RegistrationSuccessResponse successResponse = RegistrationSuccessResponse.builder()
@@ -89,9 +86,38 @@ public class RegistrationController {
         return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
     }
 
-    // C. SECURE STATUS TRACKING API [1, 3]
+    // I. SECURE AUTHENTICATED RESUBMISSION (PUT)
+    @PutMapping(value = "/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ROLE_COMPANY_ADMIN')")
+    public ResponseEntity<RegistrationSuccessResponse> resubmitOnboarding(
+            @RequestPart("registrationData") String registrationDataJson,
+            MultipartHttpServletRequest request,
+            @AuthenticationPrincipal UserPrincipal principal) throws Exception {
+
+        // FIX: Replaced manual initialization with injected mapper [3]
+        RegistrationRequestDto dto = objectMapper.readValue(registrationDataJson, RegistrationRequestDto.class);
+
+        Set<ConstraintViolation<RegistrationRequestDto>> violations = validator.validate(dto);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations); 
+        }
+
+        RegistrationRequest savedRequest = registrationService.submitFinalOnboarding(dto, request.getMultiFileMap(), principal.getId(), principal.getCompanyId());
+
+        RegistrationSuccessResponse successResponse = RegistrationSuccessResponse.builder()
+                .trackingId(savedRequest.getTrackingId())
+                .status(savedRequest.getCurrentStatus())
+                .message("Your onboarding application has been successfully resubmitted to TDRA.")
+                .proposedSenderId(savedRequest.getCompany().getProposedSenderId())
+                .submittedAt(savedRequest.getCreatedAt())
+                .build();
+
+        return ResponseEntity.ok(successResponse);
+    }
+
+    // C. SECURE STATUS TRACKING API
     @GetMapping("/my-status")
-    @PreAuthorize("hasAnyRole('ROLE_COMPANY_PENDING', 'ROLE_COMPANY_ADMIN', 'ROLE_COMPANY_USER')")
+    @PreAuthorize("hasRole('ROLE_COMPANY_ADMIN')")
     public ResponseEntity<TrackingResponse> getMyStatus(@AuthenticationPrincipal UserPrincipal principal) {
         if (principal.getCompanyId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No company associated with this user account.");
@@ -129,7 +155,7 @@ public class RegistrationController {
         return ResponseEntity.ok(trackingResponse);
     }
 
-    // D. GET ALL REGISTRATIONS (Admin View Queue) [3]
+    // D. GET ALL REGISTRATIONS (Admin View Queue)
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_TDRA_SUPER_ADMIN', 'ROLE_TDRA_REVIEWER')")
     public ResponseEntity<List<RegistrationRequest>> getAllRegistrations() {
@@ -137,17 +163,15 @@ public class RegistrationController {
         return ResponseEntity.ok(list);
     }
 
-    // E. GET SINGLE REGISTRATION BY ID (Admin Inspection View) [3]
+    // E. GET SINGLE REGISTRATION BY ID (Admin Inspection View)
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_TDRA_SUPER_ADMIN', 'ROLE_TDRA_REVIEWER')")
     public ResponseEntity<RegistrationRequest> getRegistrationById(@PathVariable("id") Long id) {
         RegistrationRequest request = registrationService.getRegistrationWithPresignedUrls(id);
         return ResponseEntity.ok(request);
     }
-    
-    
 
-    // F. UPDATE STATUS (Admin approvals / rejections) [1, 3]
+    // F. UPDATE STATUS
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('ROLE_TDRA_SUPER_ADMIN') or hasRole('ROLE_TDRA_APPROVER')")
     public ResponseEntity<RegistrationStatusUpdateResponse> updateStatus(
@@ -159,9 +183,9 @@ public class RegistrationController {
         return ResponseEntity.ok(response);
     }
     
- // G. SECURE DRAFT DOCUMENT UPLOAD (Saves files to MinIO during draft phase)
+    // G. SECURE DRAFT DOCUMENT UPLOAD
     @PostMapping(value = "/draft/documents", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('ROLE_COMPANY_PENDING', 'ROLE_COMPANY_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_COMPANY_ADMIN')")
     public ResponseEntity<RegistrationSuccessResponse> uploadDraftDocument(
             @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
             @RequestParam("documentType") String documentType,
@@ -182,16 +206,13 @@ public class RegistrationController {
         return ResponseEntity.ok(successResponse);
     }
     
- // H. SECURE DRAFT RETRIEVAL ENDPOINT (For pre-populating client stepper on load) [1, 3]
+    // H. SECURE DRAFT RETRIEVAL ENDPOINT
     @GetMapping("/my-draft")
-    @PreAuthorize("hasAnyRole('ROLE_COMPANY_PENDING', 'ROLE_COMPANY_ADMIN')") // Only accessible to pending applicants [1]
+    @PreAuthorize("hasRole('ROLE_COMPANY_ADMIN')")
     public ResponseEntity<RegistrationRequest> getMyDraft(@AuthenticationPrincipal UserPrincipal principal) {
-        
         if (principal.getCompanyId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No company associated with this user.");
         }
-
-        // Fetches the complete, un-flattened company, address, representative, and document relationship graph [3]
         RegistrationRequest request = registrationService.getRegistrationByCompanyId(principal.getCompanyId());
         return ResponseEntity.ok(request);
     }

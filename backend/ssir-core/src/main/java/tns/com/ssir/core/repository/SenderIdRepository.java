@@ -20,4 +20,6 @@ public interface SenderIdRepository extends JpaRepository<SenderId, Long> {
     long countByCompanyIdAndStatusIn(Long companyId, List<String> statuses);
     
     long countByCompanyId(Long companyId);
+    
+    Optional<SenderId> findByTrackingId(String trackingId);
 }

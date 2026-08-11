@@ -83,7 +83,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         return userRepository.save(user);
     }
 
- // 1. Change the signature to accept companyName
+    // Change the signature to accept companyName
     private Company getOrCreateCompany(Long userId, Long companyId, String initialProposedId, String email, String companyName) {
         if (companyId != null) {
             return companyRepository.findById(companyId)
@@ -97,7 +97,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 ? companyName 
                 : "Draft Company " + UUID.randomUUID().toString().substring(0, 5);
 
-        // 2. Add .companyName() to the builder [3]
+        // Add .companyName() to the builder [3]
         Company company = Company.builder()
                 .companyName(finalCompanyName)
                 .proposedSenderId(initialProposedId != null ? initialProposedId.toUpperCase() : null)
@@ -147,7 +147,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             companyDto.getCompanyName() // Added parameter [3]
         );
 
-        // 2. Map all incoming draft values safely (allowing nulls) [3]
+        // Map all incoming draft values safely (allowing nulls) [3]
         company.setCompanyName(companyDto.getCompanyName());
         company.setLegalEntityName(companyDto.getLegalEntityName());
         company.setTradeLicenseNumber(companyDto.getTradeLicenseNumber());
@@ -223,18 +223,18 @@ public class RegistrationServiceImpl implements RegistrationService {
     public RegistrationRequest submitFinalOnboarding(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap, Long userId, Long companyId) {
         log.info("Executing final onboarding submission...");
 
-        // 1. Process draft save first to update any final text fields [1, 3]
+        // Process draft save first to update any final text fields [1, 3]
         RegistrationRequest request = updateDraft(dto, userId, companyId);
         Company company = request.getCompany();
 
         String oldStatus = request.getCurrentStatus(); // Holds "DRAFT" or "INFO_REQUESTED" [3]
 
-        // 2. Transition status back to SUBMITTED for TDRA Audit [3]
+        // Transition status back to SUBMITTED for TDRA Audit [3]
         request.setCurrentStatus("SUBMITTED");
         request.setInfoRequestComments(null);
         request.setRejectionReason(null);
         
-        // 3. Stream all uploaded files directly to MinIO and log in legal_documents [2]
+        // Stream all uploaded files directly to MinIO and log in legal_documents [2]
         if (fileMap != null && !fileMap.isEmpty()) {
             for (String formKey : fileMap.keySet()) {
                 List<MultipartFile> files = fileMap.get(formKey);
@@ -249,7 +249,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
         }
 
-        // 4. Save Status History Log [3]
+        // Save Status History Log [3]
         RegistrationStatusHistory history = RegistrationStatusHistory.builder()
                 .registrationRequest(request)
                 .fromStatus(oldStatus) // e.g., DRAFT -> SUBMITTED or INFO_REQUESTED -> SUBMITTED [3]
@@ -258,7 +258,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .build();
         historyRepository.save(history);
 
-        // 5. Update user account setup preferences [1, 3]
+        // Update user account setup preferences [1, 3]
         User user = userRepository.findByCompany(company)
                 .orElseThrow(() -> new IllegalArgumentException("Associated user account not found"));
         
@@ -322,31 +322,33 @@ public class RegistrationServiceImpl implements RegistrationService {
         MockEmailDetails emailDetails = null;
         boolean emailSent = false;
 
-        if ("APPROVED".equalsIgnoreCase(status)) {
-            Company company = request.getCompany();
-            company.setStatus("ACTIVE");
+        Company company = request.getCompany();
 
-            // Auto-activate the proposed Sender ID upon onboarding approval [3]
-            if (company.getProposedSenderId() != null) {
-                SenderId activeSenderId = SenderId.builder()
-                        .senderIdName(company.getProposedSenderId())
-                        .company(company)
-                        .status("ACTIVE")
-                        .build();
-                senderIdRepository.save(activeSenderId);
+        // 1. Synchronize the associated PENDING SenderId record in your database [3]
+        java.util.Optional<SenderId> senderIdOpt = senderIdRepository.findByTrackingId(request.getTrackingId());
+        if (senderIdOpt.isPresent()) {
+            SenderId senderId = senderIdOpt.get();
+            if ("APPROVED".equalsIgnoreCase(status)) {
+                senderId.setStatus("ACTIVE");
+                senderId.setRemarks(comments);
+                // Automatically assign a standard 1-year expiration date upon approval [3]
+                senderId.setExpirationDate(java.time.LocalDate.now().plusYears(1));
+            } else {
+                senderId.setStatus(status.toUpperCase()); // e.g., INFO_REQUESTED, REJECTED [3]
+                senderId.setRemarks(comments);            // Maps the feedback remarks to the sender_ids record [3]
             }
+            senderIdRepository.save(senderId);
+        }
+
+        // 2. Perform company/user account state transitions based on the status [3]
+        if ("APPROVED".equalsIgnoreCase(status)) {
+            company.setStatus("ACTIVE");
 
             User user = userRepository.findByCompany(company)
                     .orElseThrow(() -> new IllegalArgumentException("No pending user account found associated with this company"));
 
-            // Change status to ACTIVE and swap role to COMPANY_ADMIN [1]
+            // Simply activate user (no longer execute role swaps - user remains ROLE_COMPANY_ADMIN) [1]
             user.setStatus("ACTIVE");
-            
-            Role adminRole = roleRepository.findByRoleName("ROLE_COMPANY_ADMIN")
-                    .orElseThrow(() -> new IllegalStateException("Core role ROLE_COMPANY_ADMIN not found"));
-            
-            user.getRoles().clear();
-            user.getRoles().add(adminRole);
             userRepository.save(user);
 
             generatedUserId = user.getUserIdString();
@@ -359,7 +361,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                     "Your proposed Sender ID '%s' has been successfully activated on the registry [3].\n" +
                     "You can now log in to the portal using your permanent credentials.\n\n" +
                     "Regards,\nTDRA Onboarding Team",
-                    user.getUsername(), company.getId(), generatedUserId, company.getProposedSenderId()
+                    user.getUsername(), company.getId(), user.getUserIdString(), company.getProposedSenderId()
             );
 
             emailDetails = MockEmailDetails.builder()
@@ -378,7 +380,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                      emailDetails.getTo(), emailDetails.getSubject(), emailDetails.getBody());
 
         } else if ("REJECTED".equalsIgnoreCase(status) || "INFO_REQUESTED".equalsIgnoreCase(status)) {
-            Company company = request.getCompany();
             company.setStatus("DEACTIVATED");
             
             if ("REJECTED".equalsIgnoreCase(status)) {
@@ -438,12 +439,11 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .build();
         historyRepository.save(history);
 
+        // Map and return the clean, compact REST payload [3]
         return RegistrationStatusUpdateResponse.builder()
                 .trackingId(updatedRequest.getTrackingId())
                 .currentStatus(updatedRequest.getCurrentStatus())
-                .userId(generatedUserId)
-                .emailSent(emailSent)
-                .mockEmailDetails(emailDetails)
+                .remarks(comments)
                 .build();
     }
 

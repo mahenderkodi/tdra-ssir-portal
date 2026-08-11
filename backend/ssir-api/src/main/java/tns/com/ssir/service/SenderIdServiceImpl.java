@@ -73,11 +73,11 @@ public class SenderIdServiceImpl implements SenderIdService {
                 .map(senderId -> SenderIdResponseDto.builder()
                         .id(senderId.getId())
                         .senderIdName(senderId.getSenderIdName())
-                        .trackingId(senderId.getTrackingId()) // Mapped tracking-id [3]
+                        .trackingId(senderId.getTrackingId()) 
                         .status(senderId.getStatus())
-                        .createdAt(senderId.getCreatedAt())     // Mapped submitted on [3]
+                        .createdAt(senderId.getCreatedAt())     
                         .expirationDate(senderId.getExpirationDate())
-                        .remarks(senderId.getRemarks())         // Mapped remarks [3]
+                        .remarks(senderId.getRemarks())     
                         .build())
                 .collect(Collectors.toList());
     }
