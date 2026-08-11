@@ -32,6 +32,10 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
     @Autowired
     private DocumentStorageService storageService;
 
+    // 1. Injected SenderIdRepository to handle the instant save of the pending header [3]
+    @Autowired
+    private SenderIdRepository senderIdRepository;
+
     @Override
     @Transactional
     public RegistrationRequest submitSingleShot(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap, Long userId) {
@@ -44,8 +48,12 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
         RepresentativeDto repDto = dto.getRepresentative();
         AccountDto accountDto = dto.getAccount();
 
-        // 1. Build and populate the Company entity completely before executing the first save() [3]
+        // 2. Generate a unique Company ID String (e.g., CO-A3F1B5E8) [3]
+        String generatedCompanyId = "CO-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+
+        // 3. Build and populate the Company entity completely, including the newly generated companyId [3]
         Company company = Company.builder()
+                .companyId(generatedCompanyId) // Assigned [3]
                 .companyName(companyDto.getCompanyName())
                 .legalEntityName(companyDto.getLegalEntityName())
                 .tradeLicenseNumber(companyDto.getTradeLicenseNumber())
@@ -61,7 +69,7 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
                 .status("DRAFT") 
                 .build();
 
-        // 2. Build and link the Address entity [3]
+        // 4. Build and link the Address entity [3]
         CompanyAddress address = CompanyAddress.builder()
                 .company(company)
                 .addressLine1(companyDto.getRegisteredAddress())
@@ -72,10 +80,10 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
                 .build();
         company.setAddress(address);
 
-        // 3. Save the Company first to capture the generated ID [3]
+        // 5. Save the Company first to capture the generated ID [3]
         Company savedCompany = companyRepository.save(company);
 
-        // 4. Build and link Representative Contacts if available [3]
+        // 6. Build and link Representative Contacts if available [3]
         if (repDto != null) {
             CompanyContact contact = CompanyContact.builder()
                     .company(savedCompany)
@@ -94,10 +102,10 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
             companyRepository.save(savedCompany); 
         }
 
-        // 5. Link the User to the saved Company [1, 3]
+        // 7. Link the User to the saved Company [1, 3]
         user.setCompany(savedCompany);
         
-        // 6. Map and update User account preferences (Step 4) [1, 3]
+        // 8. Map and update User account preferences (Step 4) [1, 3]
         if (accountDto != null) {
             user.setUsername(accountDto.getUsername() != null && !accountDto.getUsername().trim().isEmpty() ? accountDto.getUsername() : user.getUsername());
             user.setPreferredLanguage(accountDto.getPreferredLanguage() != null ? accountDto.getPreferredLanguage() : "EN");
@@ -107,7 +115,7 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
         }
         userRepository.save(user);
 
-        // 7. Create the RegistrationRequest in the SUBMITTED status [3]
+        // 9. Create the RegistrationRequest in the SUBMITTED status [3]
         String trackingId = "REG-" + LocalDateTime.now().getYear() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         RegistrationRequest regRequest = RegistrationRequest.builder()
                 .trackingId(trackingId)
@@ -116,7 +124,18 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
                 .build();
         RegistrationRequest savedRequest = registrationRepository.save(regRequest);
 
-        // 8. Stream the uploaded files directly to MinIO and write them to legal_documents [2]
+        // 10. Automatically create a PENDING record in sender_ids table for your first proposed Sender ID [3]
+        if (savedCompany.getProposedSenderId() != null && !savedCompany.getProposedSenderId().trim().isEmpty()) {
+            SenderId initialSenderId = SenderId.builder()
+                    .senderIdName(savedCompany.getProposedSenderId())
+                    .trackingId(trackingId) // Links it to the registration tracking-id [3]
+                    .company(savedCompany)   // Maps to the company [3]
+                    .status("PENDING")       // Initial status is PENDING [3]
+                    .build();
+            senderIdRepository.save(initialSenderId);
+        }
+
+        // 11. Stream the uploaded files directly to MinIO and write them to legal_documents [2]
         if (fileMap != null && !fileMap.isEmpty()) {
             for (String formKey : fileMap.keySet()) {
                 List<MultipartFile> files = fileMap.get(formKey);
@@ -131,7 +150,7 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
             }
         }
 
-        // 9. Save Status History Log [3]
+        // 12. Save Status History Log [3]
         RegistrationStatusHistory history = RegistrationStatusHistory.builder()
                 .registrationRequest(savedRequest)
                 .fromStatus("DRAFT")
