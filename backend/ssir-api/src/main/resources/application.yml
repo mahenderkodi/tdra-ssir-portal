@@ -1,15 +1,22 @@
 spring:
   application:
     name: tdra-ssir-backend
+
   profiles:
     active: local
+
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+
   jackson:
     serialization:
       fail-on-empty-beans: false
+
+  messages:
+    basename: messages
+    encoding: UTF-8
 
 server:
   port: 8080

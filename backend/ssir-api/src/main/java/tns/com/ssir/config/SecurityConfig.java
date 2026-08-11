@@ -101,10 +101,10 @@ public class SecurityConfig {
 
 				// Rule B: Broader administrative GET endpoints evaluated SECOND [1]
 				.requestMatchers(HttpMethod.GET, "/api/v1/registrations", "/api/v1/registrations/**")
-				.hasAnyRole("TDRA_SUPER_ADMIN", "REVIEWER")
+				.hasAnyRole("TDRA_SUPER_ADMIN", "REVIEWER","COMPANY_ADMIN")
 
 				// Only TDRA Admins can execute approvals/rejections (PUT status transitions)
-				.requestMatchers(HttpMethod.PUT, "/api/v1/registrations/**").hasRole("TDRA_SUPER_ADMIN")
+				.requestMatchers(HttpMethod.PUT, "/api/v1/registrations/**").hasAnyRole("TDRA_SUPER_ADMIN","COMPANY_ADMIN")
 
 				// Secure Password Setup (Requires user to be logged in with their temporary credentials) [1]
 				.requestMatchers(HttpMethod.POST, "/api/v1/auth/setup-password").hasRole("COMPANY_PENDING")

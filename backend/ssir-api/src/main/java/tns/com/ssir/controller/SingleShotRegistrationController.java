@@ -28,7 +28,11 @@ public class SingleShotRegistrationController {
 
     @Autowired
     private Validator validator;
+    
+    @Autowired
+    private ObjectMapper objectMapper;
 
+    
     @PostMapping(value = "/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ROLE_COMPANY_PENDING', 'ROLE_COMPANY_ADMIN')")
     public ResponseEntity<RegistrationSuccessResponse> submitOnboardingSingle(
@@ -36,9 +40,8 @@ public class SingleShotRegistrationController {
             MultipartHttpServletRequest request,
             @AuthenticationPrincipal UserPrincipal principal) throws Exception {
 
-        ObjectMapper objectMapper = new ObjectMapper();
+       
         RegistrationRequestDto dto = objectMapper.readValue(registrationDataJson, RegistrationRequestDto.class);
-
         // Run validation on the payload [1, 3]
         Set<ConstraintViolation<RegistrationRequestDto>> violations = validator.validate(dto);
         if (!violations.isEmpty()) {

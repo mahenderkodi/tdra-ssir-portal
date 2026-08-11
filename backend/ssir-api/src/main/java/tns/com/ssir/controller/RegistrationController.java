@@ -35,6 +35,8 @@ public class RegistrationController {
 
     @Autowired
     private Validator validator;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     // A. SECURE AUTHENTICATED DRAFT UPDATE (Saves or updates draft in MySQL) [1, 3]
     @PutMapping("/draft")
@@ -64,7 +66,7 @@ public class RegistrationController {
             MultipartHttpServletRequest request,
             @AuthenticationPrincipal UserPrincipal principal) throws Exception {
 
-        ObjectMapper objectMapper = new ObjectMapper();
+      
         RegistrationRequestDto dto = objectMapper.readValue(registrationDataJson, RegistrationRequestDto.class);
 
         // STRICT VALIDATIONS TRIGGERED ONLY AT THE FINAL SUBMISSION GATEWAY [1, 3]

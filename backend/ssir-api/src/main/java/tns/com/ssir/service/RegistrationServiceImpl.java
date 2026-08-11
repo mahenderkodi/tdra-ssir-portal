@@ -63,11 +63,11 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new IllegalArgumentException("Email '" + request.getEmail() + "' is already registered.");
         }
 
-        Role pendingRole = roleRepository.findByRoleName("ROLE_COMPANY_PENDING")
+        Role adminRole = roleRepository.findByRoleName("ROLE_COMPANY_ADMIN")
                 .orElseThrow(() -> new IllegalStateException("Required system role ROLE_COMPANY_PENDING was not found."));
 
         Set<Role> roles = new HashSet<>();
-        roles.add(pendingRole);
+        roles.add(adminRole);
 
         User user = User.builder()
                 .company(null) // No company exists yet [3]

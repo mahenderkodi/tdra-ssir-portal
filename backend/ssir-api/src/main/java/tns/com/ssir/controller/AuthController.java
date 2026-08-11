@@ -71,7 +71,7 @@ public class AuthController {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .username(pendingUser.getUsername())
-                .roles(List.of("ROLE_COMPANY_PENDING"))
+                .roles(List.of("ROLE_COMPANY_ADMIN"))
                 .companyId(null) // Explicitly null to trigger onboarding stepper redirection [3]
                 .firstTimeLogin(false)
                 .build();
