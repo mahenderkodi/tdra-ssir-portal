@@ -23,34 +23,23 @@ const TDRA_ROLES: string[] = [
 ];
 
 
-export const guestGuard:
-  CanActivateFn = () => {
+export const guestGuard: CanActivateFn = () => {
 
-  const authService =
-    inject(AuthService);
-
-  const tokenStorage =
-    inject(TokenStorageService);
-
-  const router =
-    inject(Router);
+  const authService = inject(AuthService);
+  const tokenStorage = inject(TokenStorageService);
+  const router = inject(Router);
 
 
-  /*
-   * This function redirects an
-   * authenticated user by role.
-   */
+  // Redirects an already logged-in user to the correct portal based on role.
   const redirectByRole = () => {
 
-    const roles =
-      authService.getCurrentRoles();
-
+    const roles = authService.getCurrentRoles();
+    const user = authService.currentUser();
 
     const isTdraUser =
       roles.some(role =>
         TDRA_ROLES.includes(role)
       );
-
 
     if (isTdraUser) {
       return router.createUrlTree([
@@ -59,27 +48,23 @@ export const guestGuard:
     }
 
 
-    if (
-      roles.includes(
-        'ROLE_COMPANY_PENDING'
-      )
-    ) {
-      return router.createUrlTree([
-        '/portal/track-status'
-      ]);
-    }
+    const isCompanyUser =
+      roles.includes('ROLE_COMPANY_PENDING') ||
+      roles.includes('ROLE_COMPANY_ADMIN');
 
+    if (isCompanyUser) {
 
-    if (
-      roles.includes(
-        'ROLE_COMPANY_ADMIN'
-      )
-    ) {
+      // Current logic uses companyId to decide between initial form and dashboard.
+      if (user?.companyId == null) {
+        return router.createUrlTree([
+          '/portal/sender-id/new'
+        ]);
+      }
+
       return router.createUrlTree([
         '/portal/dashboard'
       ]);
     }
-
 
     return router.createUrlTree([
       '/unauthorized'
@@ -87,37 +72,30 @@ export const guestGuard:
   };
 
 
-  /*
-   * Access token already exists.
-   */
+  // If access token already exists, do not allow login/signup page.
   if (authService.isAuthenticated()) {
     return redirectByRole();
   }
 
 
-  /*
-   * No access token and no refresh token:
-   * allow the login page.
-   */
+  // No active session exists, so guest can access login/signup.
   if (!tokenStorage.hasRefreshToken()) {
     return true;
   }
 
 
-  /*
-   * Refresh token exists.
-   *
-   * Wait for the refresh API before
-   * deciding whether login can open.
-   */
+  // Restore the session from refresh token before deciding where to redirect.
   return authService
     .refreshToken()
     .pipe(
+
       map(() =>
         redirectByRole()
       ),
 
+      // Invalid/expired refresh token means treat the user as logged out.
       catchError(error => {
+
         console.error(
           'Unable to restore session:',
           error

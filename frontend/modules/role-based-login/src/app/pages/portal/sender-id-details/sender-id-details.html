@@ -1,0 +1,280 @@
+<!-- Back to dashboard -->
+<div class="mb-3">
+
+  <a
+    routerLink="/portal/dashboard"
+    class="btn btn-sm btn-outline-secondary"
+  >
+    ← Back to Dashboard
+  </a>
+
+</div>
+
+
+<!-- Loading -->
+@if (loading()) {
+
+  <div
+    class="
+      d-flex
+      justify-content-center
+      py-5
+    "
+  >
+
+    <div
+      class="spinner-border text-primary"
+      role="status"
+    >
+      <span class="visually-hidden">
+        Loading registration
+      </span>
+    </div>
+
+  </div>
+}
+
+
+<!-- Error -->
+@if (errorMessage()) {
+
+  <div
+    class="alert alert-danger"
+    role="alert"
+  >
+    {{ errorMessage() }}
+  </div>
+}
+
+
+<!-- Registration -->
+@if (registration(); as record) {
+
+  <!-- Header -->
+  <div
+    class="
+      d-flex
+      justify-content-between
+      align-items-start
+      mb-4
+    "
+  >
+
+    <div>
+
+      <h1 class="h3 fw-bold mb-1">
+        {{
+          record.company.proposedSenderId
+        }}
+      </h1>
+
+      <div class="text-secondary">
+        Tracking ID:
+        {{ record.trackingId }}
+      </div>
+
+    </div>
+
+
+    <span
+      class="
+        badge
+        text-bg-warning
+        fs-6
+      "
+    >
+      {{ record.currentStatus }}
+    </span>
+
+  </div>
+
+
+  <!-- Company Details -->
+  <div
+    class="
+      card
+      border-0
+      shadow-sm
+      mb-4
+    "
+  >
+
+    <div class="card-body p-4">
+
+      <h2 class="h5 fw-bold mb-4">
+        Company Details
+      </h2>
+
+
+      <div class="row g-4">
+
+        <div class="col-md-6">
+          <div class="text-secondary small">
+            Company Name
+          </div>
+
+          <div class="fw-semibold">
+            {{ record.company.companyName }}
+          </div>
+        </div>
+
+
+        <div class="col-md-6">
+          <div class="text-secondary small">
+            Legal Entity Name
+          </div>
+
+          <div class="fw-semibold">
+            {{ record.company.legalEntityName }}
+          </div>
+        </div>
+
+
+        <div class="col-md-6">
+          <div class="text-secondary small">
+            Proposed Sender ID
+          </div>
+
+          <div class="fw-semibold">
+            {{ record.company.proposedSenderId }}
+          </div>
+        </div>
+
+
+        <div class="col-md-6">
+          <div class="text-secondary small">
+            Trade License Number
+          </div>
+
+          <div class="fw-semibold">
+            {{
+              record.company.tradeLicenseNumber
+            }}
+          </div>
+        </div>
+
+
+        <div class="col-md-6">
+          <div class="text-secondary small">
+            Registration Number
+          </div>
+
+          <div class="fw-semibold">
+            {{
+              record.company.registrationNumber
+            }}
+          </div>
+        </div>
+
+
+        <div class="col-md-6">
+          <div class="text-secondary small">
+            Company Email
+          </div>
+
+          <div class="fw-semibold">
+            {{ record.company.companyEmail }}
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Representative -->
+  <div
+    class="
+      card
+      border-0
+      shadow-sm
+      mb-4
+    "
+  >
+
+    <div class="card-body p-4">
+
+      <h2 class="h5 fw-bold mb-4">
+        Authorized Representative
+      </h2>
+
+
+      <div class="row g-4">
+
+        <div class="col-md-6">
+
+          <div class="text-secondary small">
+            Name
+          </div>
+
+          <div class="fw-semibold">
+            {{ record.representative.firstName }}
+            {{ record.representative.lastName }}
+          </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+          <div class="text-secondary small">
+            Designation
+          </div>
+
+          <div class="fw-semibold">
+            {{ record.representative.designation }}
+          </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+          <div class="text-secondary small">
+            Email
+          </div>
+
+          <div class="fw-semibold">
+            {{ record.representative.officialEmail }}
+          </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+          <div class="text-secondary small">
+            Mobile Number
+          </div>
+
+          <div class="fw-semibold">
+            {{ record.representative.mobileNumber }}
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- TDRA comments -->
+  @if (record.feedbackComments) {
+
+    <div class="alert alert-warning">
+
+      <div class="fw-bold mb-1">
+        TDRA Comments
+      </div>
+
+      {{ record.feedbackComments }}
+
+    </div>
+
+  }
+
+}

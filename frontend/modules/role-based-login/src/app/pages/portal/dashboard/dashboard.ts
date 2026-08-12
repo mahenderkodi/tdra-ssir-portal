@@ -6,15 +6,19 @@ import {
 } from '@angular/core';
 
 import { SenderId } from '../../../core/services/sender-id';
+import {SenderIdResponse} from '../../../core/auth/models/sender-id-response-model';
 
 import { DashboardStatsResponse } from '../../../core/services/dashboard-stats-response';
+import { RegistrationService }
+  from '../../../core/services/registration-service';
 
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-portal-dashboard',
   standalone: true,
 
-  imports: [],
+  imports: [RouterLink],
 
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
@@ -46,6 +50,8 @@ export class PortalDashboard
   readonly loading =
     signal(true);
 
+  readonly registrations =
+  signal<SenderIdResponse[]>([]);
 
   /*
    * Stores a user-friendly API error.
@@ -54,18 +60,57 @@ export class PortalDashboard
     signal('');
 
 
-  /*
-   * Runs automatically when the dashboard
-   * component is initialized.
-   */
-  ngOnInit(): void {
-  console.log(
-    '[PortalDashboard] ngOnInit called'
-  );
+    private readonly registrationService =
+  inject(RegistrationService);
 
-  this.loadDashboardStats();
+
+ 
+
+ngOnInit(): void {
+ 
+  this.loadRegistrations();
 }
 
+
+private loadRegistrations(): void {
+
+  this.loading.set(true);
+  this.errorMessage.set('');
+
+  this.registrationService
+    .getRegistrations()
+    .subscribe({
+
+      next: response => {
+
+        console.log(
+          'REGISTRATIONS RESPONSE:',
+          response
+        );
+
+        this.registrations.set(
+          response as any[]
+        );
+
+        this.loading.set(false);
+      },
+
+      error: error => {
+
+        console.error(
+          'REGISTRATIONS ERROR:',
+          error
+        );
+
+        this.loading.set(false);
+
+        this.errorMessage.set(
+          'Unable to load Sender ID registrations.'
+        );
+      }
+
+    });
+}
 
   /*
    * Fetches the approved company's
@@ -103,7 +148,12 @@ export class PortalDashboard
   /*
    * Allows the user to retry when the API fails.
    */
+  // retry(): void {
+  //   this.loadDashboardStats();
+  // }
+
   retry(): void {
-    this.loadDashboardStats();
-  }
+
+  this.loadRegistrations();
+}
 }

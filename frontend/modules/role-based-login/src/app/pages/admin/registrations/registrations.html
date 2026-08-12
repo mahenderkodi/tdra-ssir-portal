@@ -147,14 +147,15 @@
                       </a>
 
                       <!-- Quick Approve Button [3] -->
-                      <button *ngIf="reg.currentStatus === 'SUBMITTED' || reg.currentStatus === 'UNDER_REVIEW' || reg.currentStatus === 'INFO_REQUESTED'"
+                      <!-- <button *ngIf="reg.currentStatus === 'SUBMITTED' || reg.currentStatus === 'UNDER_REVIEW' || reg.currentStatus === 'INFO_REQUESTED'"
                               type="button" 
                               class="btn btn-success btn-sm px-3 fw-semibold d-flex align-items-center justify-content-center"
                               [disabled]="actionInProgressId() !== null"
                               (click)="approveCompany(reg.id)">
                         <span class="spinner-border spinner-border-sm me-1" *ngIf="actionInProgressId() === reg.id"></span>
                         Approve
-                      </button>
+                      </button> -->
+  
                     </div>
                 </td>
              </tr>

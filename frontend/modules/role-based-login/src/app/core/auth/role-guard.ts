@@ -7,22 +7,23 @@ import {
 import { AuthService } from './auth-service';
 
 /**
- * Checks the allowed roles configured in app.routes.ts.
+ * Restricts routes based on the roles configured in app.routes.ts.
  */
+
+//route = information/configuration about the route you are trying to enter.
+//state = information about the complete navigation currently happening. state.url
 export const roleGuard: CanActivateFn = (
   route,
   state
 ) => {
+
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  /*
-   * This makes the guard safe even when it is
-   * accidentally used without authGuard.
-   */
+  // Prevent unauthenticated users from accessing role-protected routes.
   if (!authService.isAuthenticated()) {
     return router.createUrlTree(
-      ['/login'],
+      ['/auth/login'],
       {
         queryParams: {
           returnUrl: state.url
@@ -35,20 +36,17 @@ export const roleGuard: CanActivateFn = (
     (route.data['roles'] as string[] | undefined)
     ?? [];
 
-  /*
-   * No roles configured means that any authenticated
-   * user can open the route.
-   */
+  // If no roles are specified, any authenticated user is allowed.
   if (allowedRoles.length === 0) {
     return true;
   }
 
-  if (
-    authService.hasAnyRole(allowedRoles)
-  ) {
+  // Allow access when the user has at least one required role.
+  if (authService.hasAnyRole(allowedRoles)) {
     return true;
   }
 
+  // Logged-in user does not have permission for this route.
   return router.createUrlTree([
     '/unauthorized'
   ]);

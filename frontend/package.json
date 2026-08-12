@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start:login": "ng serve role-login",
+    "start:login": "ng serve role-based-login",
     "start:registry": "ng serve sender-registry",
-    "build": "ng build common && ng build role-login --configuration production && ng build sender-registry --configuration production",
+    "build": "ng build common && ng build role-based-login --configuration production && ng build sender-registry --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

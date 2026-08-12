@@ -83,22 +83,82 @@
             </button>
           </div>
 
-          <!-- Section E: Administrator Action Footer -->
-          <div class="border-top pt-4 mt-4 d-flex justify-content-around gap-2">
-            <button class="btn btn-danger px-4 fw-semibold" [disabled]="isProcessing()"
-                    (click)="executeAction('REJECTED', 'Trade License signature or formatting invalid.')">
-              Reject
-            </button>
-            <button class="btn btn-warning px-4 fw-semibold" [disabled]="isProcessing()"
-                    (click)="executeAction('INFO_REQUESTED', 'Emirates ID is expired. Please upload a valid card.')">
-              Request Info
-            </button>
-            <button class="btn btn-success px-5 fw-semibold" [disabled]="isProcessing()"
-                    (click)="executeAction('APPROVED', 'All documents successfully audited and verified.')">
-              Approve Onboarding
-            </button>
-          </div>
+          <!-- TDRA Review Comments -->
+<div class="mb-4">
 
+  <label
+    for="reviewComments"
+    class="form-label fw-bold"
+  >
+    TDRA Review Comments
+    <span class="text-danger">*</span>
+  </label>
+
+  <textarea
+    id="reviewComments"
+    class="form-control"
+    rows="4"
+    placeholder="
+Enter the reason for approval,
+rejection or additional information request
+    "
+    [value]="actionComment()"
+    (input)="
+      actionComment.set(
+        $any($event.target).value
+      )
+    "
+  ></textarea>
+
+  <div class="form-text">
+    These comments will be shared with
+    the applicant where applicable.
+  </div>
+
+</div>
+
+          <!-- Section E: Administrator Action Footer -->
+          <div
+  class="
+    border-top
+    pt-4
+    mt-4
+    d-flex
+    justify-content-around
+    gap-2
+  "
+>
+
+  <button
+    type="button"
+    class="btn btn-danger px-4 fw-semibold"
+    [disabled]="isProcessing()"
+    (click)="executeAction('REJECTED')"
+  >
+    Reject
+  </button>
+
+
+  <button
+    type="button"
+    class="btn btn-warning px-4 fw-semibold"
+    [disabled]="isProcessing()"
+    (click)="executeAction('INFO_REQUESTED')"
+  >
+    Request Info
+  </button>
+
+
+  <button
+    type="button"
+    class="btn btn-success px-5 fw-semibold"
+    [disabled]="isProcessing()"
+    (click)="executeAction('APPROVED')"
+  >
+    Approve Onboarding
+  </button>
+
+</div>
         </div>
       </div>
     </div>

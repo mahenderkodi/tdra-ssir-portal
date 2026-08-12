@@ -1,51 +1,30 @@
-import {
-  HttpInterceptorFn
-} from '@angular/common/http';
+import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { TokenStorageService } from './token-storage';
 
-import {
-  inject
-} from '@angular/core';
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
-import {
-  TokenStorageService
-} from './token-storage';
+  const tokenStorage = inject(TokenStorageService);
+  const accessToken = tokenStorage.getAccessToken();
 
-export const authInterceptor:
-  HttpInterceptorFn = (req, next) => {
+  // Auth endpoints that must work without an existing access token.
+  const isPublicAuthRequest =
+    req.url.includes('/api/v1/auth/login') ||
+    req.url.includes('/api/v1/auth/register-init') ||
+    req.url.includes('/api/v1/auth/refresh') ||
+    req.url.includes('/api/v1/auth/forgot-password');
 
-    const tokenStorage =
-      inject(TokenStorageService);
+  // Automatically attaches the JWT to protected API requests.
+  if (accessToken && !isPublicAuthRequest) {
 
-    const accessToken =
-      tokenStorage.getAccessToken();
+    const authenticatedRequest = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
 
-    /*
-     * These endpoints do not require
-     * an existing access token.
-     */
-    const isPublicAuthRequest =
-      req.url.includes('/api/v1/auth/login') ||
-      req.url.includes('/api/v1/auth/refresh') ||
-      req.url.includes('/api/v1/auth/forgot-password');
+    return next(authenticatedRequest);
+  }
 
-    /*
-     * setup-password is not excluded,
-     * so it receives the Bearer token.
-     */
-    if (
-      accessToken &&
-      !isPublicAuthRequest
-    ) {
-      const authenticatedRequest =
-        req.clone({
-          setHeaders: {
-            Authorization:
-              `Bearer ${accessToken}`
-          }
-        });
-
-      return next(authenticatedRequest);
-    }
-
-    return next(req);
-  };
+  return next(req);
+};

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient,HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
  
@@ -34,11 +34,22 @@ export class AdminRegistrationService {
  
   // 3. Update Status (Execute APPROVE / REJECT / INFO_REQUESTED actions) [3]
 
-  updateRegistrationStatus(id: number, status: string, comments: string): Observable<any> {
+updateRegistrationStatus(
+  id: number,
+  status: string,
+  comments: string
+): Observable<any> {
 
-    return this.http.put<any>(`${this.API_URL}/${id}/status?status=${status}&comments=${comments}`, {});
+  const params = new HttpParams()
+    .set('status', status)
+    .set('comments', comments);
 
-  }
+  return this.http.put<any>(
+    `${this.API_URL}/${id}/status`,
+    {},
+    { params }
+  );
+}
 
 }
  

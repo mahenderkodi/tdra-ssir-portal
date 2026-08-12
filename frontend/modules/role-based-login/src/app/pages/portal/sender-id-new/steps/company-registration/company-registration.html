@@ -1,0 +1,524 @@
+<section [formGroup]="group">
+
+  <!-- Section heading -->
+  <div class="mb-4">
+    <h2 class="h5 fw-bold text-primary mb-1">
+      Company Registration
+    </h2>
+
+    <p class="text-secondary small mb-0">
+      Enter the organization’s legal and registration information.
+    </p>
+  </div>
+
+  <!-- Responsive form grid -->
+  <div class="row g-4">
+
+    <!-- Company Name -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="companyName" class="form-label fw-semibold">
+        Company Name
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="companyName"
+        type="text"
+        class="form-control"
+        formControlName="companyName"
+        placeholder="Enter company name"
+        [class.is-invalid]="
+          group.get('companyName')?.touched &&
+          group.get('companyName')?.invalid
+        "
+      />
+
+      @if (
+        group.get('companyName')?.touched &&
+        group.get('companyName')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Company name is required.
+        </div>
+      }
+    </div>
+
+    <!-- Legal Entity Name -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="legalEntityName" class="form-label fw-semibold">
+        Legal Entity Name
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="legalEntityName"
+        type="text"
+        class="form-control"
+        formControlName="legalEntityName"
+        placeholder="Enter legal entity name"
+        [class.is-invalid]="
+          group.get('legalEntityName')?.touched &&
+          group.get('legalEntityName')?.invalid
+        "
+      />
+
+      @if (
+        group.get('legalEntityName')?.touched &&
+        group.get('legalEntityName')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Legal entity name is required.
+        </div>
+      }
+    </div>
+
+    <!-- Trade License Number -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="tradeLicenseNumber" class="form-label fw-semibold">
+        Trade License Number
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="tradeLicenseNumber"
+        type="text"
+        class="form-control"
+        formControlName="tradeLicenseNumber"
+        placeholder="Enter trade license number"
+        [class.is-invalid]="
+          group.get('tradeLicenseNumber')?.touched &&
+          group.get('tradeLicenseNumber')?.invalid
+        "
+      />
+
+      @if (
+        group.get('tradeLicenseNumber')?.touched &&
+        group.get('tradeLicenseNumber')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Trade license number is required.
+        </div>
+      }
+    </div>
+
+    <!-- Registration Number -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="registrationNumber" class="form-label fw-semibold">
+        Registration Number
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="registrationNumber"
+        type="text"
+        class="form-control"
+        formControlName="registrationNumber"
+        placeholder="Enter registration number"
+        [class.is-invalid]="
+          group.get('registrationNumber')?.touched &&
+          group.get('registrationNumber')?.invalid
+        "
+      />
+
+      @if (
+        group.get('registrationNumber')?.touched &&
+        group.get('registrationNumber')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Registration number is required.
+        </div>
+      }
+    </div>
+
+    <!-- Tax ID -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="taxId" class="form-label fw-semibold">
+        Tax ID / VAT Number
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="taxId"
+        type="text"
+        class="form-control"
+        formControlName="taxId"
+        placeholder="Enter Tax ID or VAT number"
+        [class.is-invalid]="
+          group.get('taxId')?.touched &&
+          group.get('taxId')?.invalid
+        "
+      />
+
+      @if (
+        group.get('taxId')?.touched &&
+        group.get('taxId')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Tax ID or VAT number is required.
+        </div>
+      }
+    </div>
+
+    <!-- Company Type -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="companyType" class="form-label fw-semibold">
+        Company Type
+        <span class="text-danger">*</span>
+      </label>
+
+      <select
+        id="companyType"
+        class="form-select"
+        formControlName="companyType"
+        [class.is-invalid]="
+          group.get('companyType')?.touched &&
+          group.get('companyType')?.invalid
+        "
+      >
+        <option value="" disabled>
+          Select company type
+        </option>
+
+        @for (type of companyTypes; track type) {
+          <option [value]="type">
+            {{ type }}
+          </option>
+        }
+      </select>
+
+      @if (
+        group.get('companyType')?.touched &&
+        group.get('companyType')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Company type is required.
+        </div>
+      }
+    </div>
+
+    <!-- Industry -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="industry" class="form-label fw-semibold">
+        Industry
+        <span class="text-danger">*</span>
+      </label>
+
+      <select
+        id="industry"
+        class="form-select"
+        formControlName="industry"
+        [class.is-invalid]="
+          group.get('industry')?.touched &&
+          group.get('industry')?.invalid
+        "
+      >
+        <option value="" disabled>
+          Select industry
+        </option>
+
+        @for (industry of industries; track industry) {
+          <option [value]="industry">
+            {{ industry }}
+          </option>
+        }
+      </select>
+
+      @if (
+        group.get('industry')?.touched &&
+        group.get('industry')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Industry is required.
+        </div>
+      }
+    </div>
+
+    <!-- Date of Incorporation -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="dateOfIncorporation" class="form-label fw-semibold">
+        Date of Incorporation
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="dateOfIncorporation"
+        type="date"
+        class="form-control"
+        formControlName="dateOfIncorporation"
+        [class.is-invalid]="
+          group.get('dateOfIncorporation')?.touched &&
+          group.get('dateOfIncorporation')?.invalid
+        "
+      />
+
+      @if (
+        group.get('dateOfIncorporation')?.touched &&
+        group.get('dateOfIncorporation')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Date of incorporation is required.
+        </div>
+      }
+    </div>
+
+    <!-- Country -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="country" class="form-label fw-semibold">
+        Country
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="country"
+        type="text"
+        class="form-control bg-body-secondary"
+        formControlName="country"
+        readonly
+      />
+    </div>
+
+    <!-- Registered Address -->
+    <div class="col-12">
+      <label for="registeredAddress" class="form-label fw-semibold">
+        Registered Address
+        <span class="text-danger">*</span>
+      </label>
+
+      <textarea
+        id="registeredAddress"
+        class="form-control"
+        formControlName="registeredAddress"
+        placeholder="Enter complete registered address"
+        rows="3"
+        [class.is-invalid]="
+          group.get('registeredAddress')?.touched &&
+          group.get('registeredAddress')?.invalid
+        "
+      ></textarea>
+
+      @if (
+        group.get('registeredAddress')?.touched &&
+        group.get('registeredAddress')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Registered address is required.
+        </div>
+      }
+    </div>
+
+    <!-- Emirate -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="emirateState" class="form-label fw-semibold">
+        Emirate / State
+        <span class="text-danger">*</span>
+      </label>
+
+      <select
+        id="emirateState"
+        class="form-select"
+        formControlName="emirateState"
+        [class.is-invalid]="
+          group.get('emirateState')?.touched &&
+          group.get('emirateState')?.invalid
+        "
+      >
+        <option value="" disabled>
+          Select emirate
+        </option>
+
+        @for (emirate of emirates; track emirate) {
+          <option [value]="emirate">
+            {{ emirate }}
+          </option>
+        }
+      </select>
+
+      @if (
+        group.get('emirateState')?.touched &&
+        group.get('emirateState')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Emirate is required.
+        </div>
+      }
+    </div>
+
+    <!-- City -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="city" class="form-label fw-semibold">
+        City
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="city"
+        type="text"
+        class="form-control"
+        formControlName="city"
+        placeholder="Enter city"
+        [class.is-invalid]="
+          group.get('city')?.touched &&
+          group.get('city')?.invalid
+        "
+      />
+
+      @if (
+        group.get('city')?.touched &&
+        group.get('city')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          City is required.
+        </div>
+      }
+    </div>
+
+    <!-- Postal Code -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="postalCode" class="form-label fw-semibold">
+        Postal Code
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="postalCode"
+        type="text"
+        class="form-control"
+        formControlName="postalCode"
+        placeholder="Enter postal code"
+        [class.is-invalid]="
+          group.get('postalCode')?.touched &&
+          group.get('postalCode')?.invalid
+        "
+      />
+
+      @if (
+        group.get('postalCode')?.touched &&
+        group.get('postalCode')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Postal code is required.
+        </div>
+      }
+    </div>
+
+    <!-- Website -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="website" class="form-label fw-semibold">
+        Website
+      </label>
+
+      <input
+        id="website"
+        type="url"
+        class="form-control"
+        formControlName="website"
+        placeholder="https://www.company.com"
+      />
+
+      <div class="form-text">
+        Optional
+      </div>
+    </div>
+
+    <!-- Company Email -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="companyEmail" class="form-label fw-semibold">
+        Company Email
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="companyEmail"
+        type="email"
+        class="form-control"
+        formControlName="companyEmail"
+        placeholder="name@company.com"
+        [class.is-invalid]="
+          group.get('companyEmail')?.touched &&
+          group.get('companyEmail')?.invalid
+        "
+      />
+
+      @if (
+        group.get('companyEmail')?.touched &&
+        group.get('companyEmail')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Company email is required.
+        </div>
+      }
+
+      @if (
+        group.get('companyEmail')?.touched &&
+        group.get('companyEmail')?.hasError('email')
+      ) {
+        <div class="invalid-feedback">
+          Enter a valid email address.
+        </div>
+      }
+    </div>
+
+    <!-- Company Phone -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="companyPhone" class="form-label fw-semibold">
+        Company Phone
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="companyPhone"
+        type="tel"
+        class="form-control"
+        formControlName="companyPhone"
+        placeholder="+971 50 123 4567"
+        [class.is-invalid]="
+          group.get('companyPhone')?.touched &&
+          group.get('companyPhone')?.invalid
+        "
+      />
+
+      @if (
+        group.get('companyPhone')?.touched &&
+        group.get('companyPhone')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Company phone is required.
+        </div>
+      }
+
+      @if (
+        group.get('companyPhone')?.touched &&
+        group.get('companyPhone')?.hasError('pattern')
+      ) {
+        <div class="invalid-feedback">
+          Enter a valid phone number.
+        </div>
+      }
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-4">
+      <label for="proposedSenderId" class="form-label fw-semibold">
+        Proposed Sender ID
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="proposedSenderId"
+        type="text"
+        class="form-control"
+        formControlName="proposedSenderId"
+        placeholder="Enter proposed sender ID"
+      />
+
+      @if (
+        group.get('proposedSenderId')?.touched &&
+        group.get('proposedSenderId')?.invalid
+      ) {
+        <div class="invalid-feedback">
+          Proposed sender ID is required.
+        </div>
+      }
+    </div>
+
+  </div>
+</section>
