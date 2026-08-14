@@ -26,6 +26,7 @@ export class AdminRegistrationDetailComponent implements OnInit {
   isLoading = signal(true);
   isProcessing = signal(false);
   errorMessage = signal('');
+  actionComment = signal('');
 
   ngOnInit(): void {
     // SAFE FALLBACK: If Router Component Input binding is not enabled in app.config.ts,
@@ -49,25 +50,105 @@ export class AdminRegistrationDetailComponent implements OnInit {
   }
 
   // Executes state-machine triggers (APPROVE / REJECT / INFO_REQUESTED)
-  executeAction(status: string, comments: string): void {
-    const resolvedId = this.id || this.route.snapshot.paramMap.get('id');
-    const regId = Number(resolvedId);
-    if (!regId) return;
+executeAction(
+  status: string
+): void {
 
-    this.isProcessing.set(true);
-    this.errorMessage.set('');
+  const resolvedId =
+    this.id ||
+    this.route.snapshot.paramMap.get('id');
 
-    this.adminService.updateRegistrationStatus(regId, status, comments).subscribe({
-      next: () => {
-        this.isProcessing.set(false);
-        this.router.navigate(['/admin/registrations']); // Redirect back to queue
-      },
-      error: (err) => {
-        this.isProcessing.set(false);
-        this.errorMessage.set(err.error?.message || 'Failed to process request.');
-      }
-    });
+  const regId =
+    Number(resolvedId);
+
+  if (!regId) {
+    return;
   }
+
+
+  let comments =
+    this.actionComment().trim();
+
+
+  /*
+   * Comments are compulsory when
+   * TDRA Rejects or Requests Information.
+   */
+  if (
+    (
+      status === 'INFO_REQUESTED' ||
+      status === 'REJECTED'
+    ) &&
+    !comments
+  ) {
+
+    this.errorMessage.set(
+      status === 'INFO_REQUESTED'
+        ? 'Please enter what additional information is required.'
+        : 'Please enter the reason for rejection.'
+    );
+
+    return;
+  }
+
+
+  /*
+   * Approval does not require the admin
+   * to type a comment.
+   */
+  if (
+    status === 'APPROVED' &&
+    !comments
+  ) {
+
+    comments =
+      'Application approved by TDRA.';
+  }
+
+
+  this.isProcessing.set(true);
+  this.errorMessage.set('');
+
+
+  this.adminService
+    .updateRegistrationStatus(
+      regId,
+      status,
+      comments
+    )
+    .subscribe({
+
+      next: response => {
+
+        console.log(
+          'STATUS UPDATE RESPONSE:',
+          response
+        );
+
+        this.isProcessing.set(false);
+
+        void this.router.navigate(
+          ['/admin/registrations']
+        );
+      },
+
+      error: err => {
+
+        console.error(
+          'STATUS UPDATE ERROR:',
+          err
+        );
+
+        this.isProcessing.set(false);
+
+        this.errorMessage.set(
+          err.error?.message ||
+          'Failed to process request.'
+        );
+      }
+
+    });
+}
 
   private loadRegistrationDetails(id: number): void {
     this.adminService.getRegistrationById(id).subscribe({

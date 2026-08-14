@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import {guestGuard} from './core/auth/guest-guard';
+import { guestGuard } from './core/auth/guest-guard';
 import { authGuard } from './core/auth/auth-guard';
 import { roleGuard } from './core/auth/role-guard';
 
@@ -13,63 +13,73 @@ import { Login } from './pages/auth/login/login';
 import { CreatePassword } from './pages/auth/create-password/create-password';
 import { ForgotPassword } from './pages/auth/forgot-password/forgot-password';
 import { ResetPassword } from './pages/auth/reset-password/reset-password';
+import { Signup } from './pages/auth/signup/signup';
 
 // Admin pages
-import { AdminDashboardComponent } from './pages/admin/dashboard/dashboard'; 
+import { AdminDashboardComponent } from './pages/admin/dashboard/dashboard';
 import { AdminRegistrationsComponent } from './pages/admin/registrations/registrations';
 import { AdminRegistrationDetailComponent } from './pages/admin/registration-detail/registration-detail';
 import { AdminUsersComponent } from './pages/admin/users/users';
 
-// Portal pages
-import { PortalDashboard as PortalDashboard } from './pages/portal/dashboard/dashboard';
-import { Profile } from './pages/portal/profile/profile';
-import { SenderIds } from './pages/portal/sender-ids/sender-ids';
+// Company portal pages
+import { PortalDashboard } from './pages/portal/dashboard/dashboard';
 import { SenderIdNew } from './pages/portal/sender-id-new/sender-id-new';
-import { Users as PortalUsers } from './pages/portal/users/users';
-import { TrackStatus } from './pages/portal/track-status/track-status';
+import { SenderIdDetails } from './pages/portal/sender-id-details/sender-id-details';
 
-// Other pages
 import { Unauthorized } from './pages/unauthorized/unauthorized';
 
+
 export const routes: Routes = [
-  // 1. BASE REDIRECT TO SIGN-IN [1]
+
+  // Default application entry point
   {
     path: '',
     pathMatch: 'full',
     redirectTo: 'auth/login'
   },
 
-  // 2. PUBLIC AUTHENTICATION ROUTING (Unified Namespace under AuthLayoutComponent) [1, 3]
+  // Authentication pages share the AuthLayout
   {
     path: 'auth',
     component: AuthLayoutComponent,
     children: [
       { path: '', redirectTo: 'login', pathMatch: 'full' },
+
       {
         path: 'login',
         component: Login,
-        title: 'Sign In',
-        canActivate: [guestGuard]
+        canActivate: [guestGuard],
+        title: 'Sign In'
       },
+
       {
         path: 'create-password',
         component: CreatePassword,
         title: 'Setup Password'
       },
+
       {
         path: 'forgot-password',
         component: ForgotPassword,
         title: 'Forgot Password'
       },
+
       {
         path: 'reset-password',
         component: ResetPassword,
         title: 'Reset Password'
+      },
+
+      {
+        path: 'signup',
+        component: Signup,
+        canActivate: [guestGuard],
+        title: 'Sign Up'
       }
     ]
   },
 
-  // 3. SECURE TDRA ADMINISTRATOR PORTAL [1, 3]
+  // TDRA routes require login + an allowed TDRA role
   {
     path: 'admin',
     component: AdminLayoutComponent,
@@ -82,77 +92,100 @@ export const routes: Routes = [
         'ROLE_TDRA_AUDITOR'
       ]
     },
+
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+
       {
         path: 'dashboard',
         component: AdminDashboardComponent,
         title: 'TDRA Admin Dashboard'
       },
+
       {
         path: 'registrations',
         component: AdminRegistrationsComponent,
         title: 'Onboarding Queue'
       },
+
       {
         path: 'registrations/:id',
         component: AdminRegistrationDetailComponent,
         title: 'Inspect Request'
       },
+
       {
         path: 'users',
         component: AdminUsersComponent,
         canActivate: [roleGuard],
-        data: { expectedRoles: ['ROLE_TDRA_SUPER_ADMIN'] },
+
+        // Only Super Admin should access staff management
+        data: {
+          roles: ['ROLE_TDRA_SUPER_ADMIN']
+        },
+
         title: 'Manage Staff'
       }
     ]
   },
 
-  // 4. SECURE COMPANY PORTAL PAGES [1, 3]
+  // Company portal requires authentication; individual pages restrict company roles
   {
-  path: 'portal',
-  component: PortalLayout,
-  canActivate: [authGuard],
+    path: 'portal',
+    component: PortalLayout,
+    canActivate: [authGuard],
 
-  children: [
-    {
-      path: 'track-status',
-      component: TrackStatus,
-      canActivate: [roleGuard],
-
-      data: {
-        roles: [
-          'ROLE_COMPANY_PENDING'
-        ]
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
       },
 
-      title: 'Application Status'
-    },
-    {
-      path: 'dashboard',
-      component: PortalDashboard,
-      canActivate: [roleGuard],
-
-      data: {
-        roles: [
-          'ROLE_COMPANY_ADMIN'
-        ]
+      {
+        path: 'dashboard',
+        component: PortalDashboard,
+        canActivate: [roleGuard],
+        data: {
+          roles: [
+            'ROLE_COMPANY_PENDING',
+            'ROLE_COMPANY_ADMIN'
+          ]
+        },
+        title: 'Company Dashboard'
       },
 
-      title: 'Corporate Dashboard'
-    }
-  ]
-},
+      {
+        path: 'sender-id/new',
+        component: SenderIdNew,
+        canActivate: [roleGuard],
+        data: {
+          roles: [
+            'ROLE_COMPANY_PENDING',
+            'ROLE_COMPANY_ADMIN'
+          ]
+        },
+        title: 'Create Sender ID'
+      },
 
-  // 5. UN-AUTHORIZED ACCESS VIEW
+      {
+        path: 'sender-id/:id',
+        component: SenderIdDetails
+      }
+    ]
+  },
+
   {
     path: 'unauthorized',
     component: Unauthorized,
     title: 'Access Denied'
   },
 
-  // 6. DEFAULT FALLBACK
+  // Unknown URLs return to login
   {
     path: '**',
     redirectTo: 'auth/login'

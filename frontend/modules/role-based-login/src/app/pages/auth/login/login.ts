@@ -24,6 +24,21 @@ export class Login {
     password: ['', [Validators.required, Validators.minLength(8)]]
   });
 
+
+  ngOnInit(): void {
+  console.log(
+    'CURRENT USER:',
+    this.authService.currentUser()
+  );
+
+  console.log(
+    'CURRENT ROLES:',
+    this.authService.currentUser()?.roles
+  );
+
+  
+}
+
   onSubmit(): void {
 
   if (
@@ -32,7 +47,10 @@ export class Login {
     const roles =
       this.authService.getCurrentRoles();
 
-    this.redirectUserByRole(roles);
+    const user =
+  this.authService.currentUser();
+
+    this.redirectUserByRole(roles, user?.companyId ?? null);
 
     return;
   }
@@ -83,7 +101,8 @@ export class Login {
     response.firstTimeLogin === false
   ) {
     this.redirectUserByRole(
-      response.roles
+      response.roles,
+      response.companyId
     );
 
     return;
@@ -112,12 +131,10 @@ export class Login {
 }
 
  private redirectUserByRole(
-  roles: string[]
+  roles: string[],
+  companyId: number | null
 ): void {
 
-  /*
-   * TDRA administrator roles
-   */
   const isTdraUser =
     roles.some(role =>
       [
@@ -132,35 +149,24 @@ export class Login {
     void this.router.navigate([
       '/admin/dashboard'
     ]);
-
     return;
   }
 
+  const isCompanyUser =
+    roles.includes('ROLE_COMPANY_PENDING') ||
+    roles.includes('ROLE_COMPANY_ADMIN');
 
-  /*
-   * Company registration is still pending.
-   */
-  if (
-    roles.includes(
-      'ROLE_COMPANY_PENDING'
-    )
-  ) {
-    void this.router.navigate([
-      '/portal/track-status'
-    ]);
+  if (isCompanyUser) {
 
-    return;
-  }
+    if (companyId === null) {
 
+      void this.router.navigate([
+        '/portal/sender-id/new'
+      ]);
 
-  /*
-   * Approved company account.
-   */
-  if (
-    roles.includes(
-      'ROLE_COMPANY_ADMIN'
-    )
-  ) {
+      return;
+    }
+
     void this.router.navigate([
       '/portal/dashboard'
     ]);
@@ -168,10 +174,6 @@ export class Login {
     return;
   }
 
-
-  /*
-   * No recognized role.
-   */
   void this.router.navigate([
     '/unauthorized'
   ]);

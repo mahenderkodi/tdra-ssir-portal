@@ -67,210 +67,198 @@
     }
 
 
-    <!-- Dashboard statistics -->
-    @if (stats(); as dashboardStats) {
+    <!-- Sender ID registrations -->
+@if (!loading() && !errorMessage()) {
 
-      <div class="row g-3">
+  <div
+    class="
+      d-flex
+      justify-content-between
+      align-items-center
+      mb-3
+    "
+  >
 
-        <!-- Active Sender IDs -->
-        <div class="col-12 col-md-4">
+    <div>
+      <h2 class="h5 fw-bold mb-1">
+        Sender ID Registrations
+      </h2>
 
-          <div
-            class="
-              card
-              dashboard-card
-              border-0
-              shadow-sm
-              h-100
-            "
-          >
-            <div class="card-body p-4">
+      <p class="text-secondary mb-0">
+        View and manage your Sender ID
+        registration requests.
+      </p>
+    </div>
 
-              <div
-                class="
-                  d-flex
-                  justify-content-between
-                  align-items-start
-                  gap-3
-                "
-              >
-                <div>
-                  <div
+   <button
+  type="button"
+  class="btn btn-primary"
+  [routerLink]="['/portal/sender-id/new']"
+  [queryParams]="{
+    mode: 'additional'
+  }"
+>
+  Create Sender ID
+</button>
+
+  </div>
+
+
+  @if (registrations().length > 0) {
+
+    <div
+      class="
+        card
+        border-0
+        shadow-sm
+      "
+    >
+
+      <div class="table-responsive">
+
+        <table
+          class="
+            table
+            table-hover
+            align-middle
+            mb-0
+          "
+        >
+
+          <thead>
+
+            <tr>
+              <th>
+                Sender ID
+              </th>
+
+              <th>
+                Tracking ID
+              </th>
+
+              <th>
+                Status
+              </th>
+
+              <th>
+                Submitted On
+              </th>
+
+              <th>
+                Action
+              </th>
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            @for (
+              registration of registrations();
+              track registration.id
+            ) {
+
+              <tr>
+
+                <td class="fw-semibold">
+
+                  {{
+                    registration.senderIdName
+                  }}
+
+                </td>
+
+
+                <td>
+
+                  {{
+                    registration
+                      .trackingId
+                  }}
+
+                </td>
+
+
+                <td>
+
+                  <span
                     class="
-                      text-secondary
-                      small
-                      fw-semibold
-                      mb-2
+                      badge
+                      text-bg-warning
                     "
                   >
-                    Active Sender IDs
-                  </div>
 
-                  <div class="display-6 fw-bold">
                     {{
-                      dashboardStats
-                        .activeSenderIds
+                      registration
+                        .status
                     }}
-                  </div>
 
-                  <div class="small text-secondary">
-                    Currently active headers
-                  </div>
-                </div>
+                  </span>
 
-                <div class="metric-icon">
-                  ✓
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
+                </td>
 
 
-        <!-- Critical expiry warnings -->
-        <div class="col-12 col-md-4">
+                <td>
 
-          <div
-            class="
-              card
-              dashboard-card
-              border-0
-              shadow-sm
-              h-100
-            "
-          >
-            <div class="card-body p-4">
+                  {{
+                    registration
+                      .createdAt
+                  }}
 
-              <div
-                class="
-                  d-flex
-                  justify-content-between
-                  align-items-start
-                  gap-3
-                "
-              >
-                <div>
-                  <div
-                    class="
-                      text-secondary
-                      small
-                      fw-semibold
-                      mb-2
-                    "
-                  >
-                    Critical Expiry Warnings
-                  </div>
-
-                  <div class="display-6 fw-bold">
-                    {{
-                      dashboardStats
-                        .criticalExpiryWarnings
-                    }}
-                  </div>
-
-                  <div class="small text-secondary">
-                    Sender IDs requiring attention
-                  </div>
-                </div>
-
-                <div class="metric-icon">
-                  !
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
+                </td>
 
 
-        <!-- Total users -->
-        <div class="col-12 col-md-4">
+                
 
-          <div
-            class="
-              card
-              dashboard-card
-              border-0
-              shadow-sm
-              h-100
-            "
-          >
-            <div class="card-body p-4">
+                  <td>
 
-              <div
-                class="
-                  d-flex
-                  justify-content-between
-                  align-items-start
-                  gap-3
-                "
-              >
-                <div>
-                  <div
-                    class="
-                      text-secondary
-                      small
-                      fw-semibold
-                      mb-2
-                    "
-                  >
-                    Total Users
-                  </div>
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-primary"
+    [routerLink]="[
+      '/portal/sender-id',
+      registration.id
+    ]"
+  >
+    View
+  </button>
 
-                  <div class="display-6 fw-bold">
-                    {{
-                      dashboardStats
-                        .totalUsers
-                    }}
-                  </div>
+</td>
 
-                  <div class="small text-secondary">
-                    Users linked to this company
-                  </div>
-                </div>
+                
 
-                <div class="metric-icon">
-                  #
-                </div>
-              </div>
+              </tr>
 
-            </div>
-          </div>
+            }
 
-        </div>
+          </tbody>
+
+        </table>
 
       </div>
 
+    </div>
 
-      <!-- Future dashboard features -->
-      <div
-        class="
-          card
-          border-0
-          shadow-sm
-          mt-4
-        "
-      >
-        <div class="card-body p-4">
+  } @else {
 
-          <h2 class="h5 fw-bold mb-2">
-            Sender ID Management
-          </h2>
+    <div
+      class="
+        alert
+        alert-light
+        border
+      "
+    >
 
-          <p class="text-secondary mb-0">
-            Sender ID details, expiration alerts,
-            renewal actions and team-management
-            features will appear here as their APIs
-            become available.
-          </p>
+      No Sender ID registrations found.
 
-        </div>
-      </div>
-    }
+    </div>
 
+  }
+
+}
+
+   
   </div>
 
 </section>

@@ -1,0 +1,377 @@
+<section [formGroup]="group">
+
+  <!-- Section heading -->
+  <div class="mb-4">
+    <h2 class="h5 fw-bold text-primary mb-1">
+      Authorized Representative
+    </h2>
+
+    <p class="text-secondary small mb-0">
+      Enter the details of the person authorized to represent the company.
+    </p>
+  </div>
+
+  <!-- Information message -->
+  <div
+    class="alert alert-info small mb-4"
+    role="alert"
+  >
+    Fields marked with
+    <span class="text-danger fw-bold">*</span>
+    are mandatory.
+  </div>
+
+  <!-- Responsive form grid -->
+  <div class="row g-4">
+
+    <!-- First Name -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label
+        for="FirstName"
+        class="form-label fw-semibold"
+      >
+        First Name
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="FirstName"
+        type="text"
+        class="form-control"
+        formControlName="firstName"
+        placeholder="Enter first name"
+        [class.is-invalid]="
+          group.get('firstName')?.touched &&
+          group.get('firstName')?.invalid
+        "
+      />
+
+      @if (
+        group.get('firstName')?.touched &&
+        group.get('firstName')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          First name is required.
+        </div>
+      }
+    </div>
+
+    <!-- Last Name -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label
+        for="lastName"
+        class="form-label fw-semibold"
+      >
+        Last Name
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="lastName"
+        type="text"
+        class="form-control"
+        formControlName="lastName"
+        placeholder="Enter last name"
+        [class.is-invalid]="
+          group.get('lastName')?.touched &&
+          group.get('lastName')?.invalid
+        "
+      />
+
+      @if (
+        group.get('lastName')?.touched &&
+        group.get('lastName')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Last name is required.
+        </div>
+      }
+    </div>
+
+    <!-- Designation -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label
+        for="designation"
+        class="form-label fw-semibold"
+      >
+        Designation
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="designation"
+        type="text"
+        class="form-control"
+        formControlName="designation"
+        placeholder="Enter designation"
+        [class.is-invalid]="
+          group.get('designation')?.touched &&
+          group.get('designation')?.invalid
+        "
+      />
+
+      @if (
+        group.get('designation')?.touched &&
+        group.get('designation')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Designation is required.
+        </div>
+      }
+    </div>
+
+    <!-- Department -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label
+        for="department"
+        class="form-label fw-semibold"
+      >
+        Department
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="department"
+        type="text"
+        class="form-control"
+        formControlName="department"
+        placeholder="Enter department"
+        [class.is-invalid]="
+          group.get('department')?.touched &&
+          group.get('department')?.invalid
+        "
+      />
+
+      @if (
+        group.get('department')?.touched &&
+        group.get('department')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Department is required.
+        </div>
+      }
+    </div>
+
+    <!-- Official Email -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label
+        for="officialEmail"
+        class="form-label fw-semibold"
+      >
+        Official Email
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="officialEmail"
+        type="email"
+        class="form-control"
+        formControlName="officialEmail"
+        placeholder="name@company.com"
+        autocomplete="email"
+        [class.is-invalid]="
+          group.get('officialEmail')?.touched &&
+          group.get('officialEmail')?.invalid
+        "
+      />
+
+      @if (
+        group.get('officialEmail')?.touched &&
+        group.get('officialEmail')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Official email is required.
+        </div>
+      }
+
+      @if (
+        group.get('officialEmail')?.touched &&
+        group.get('officialEmail')?.hasError('email')
+      ) {
+        <div class="invalid-feedback">
+          Enter a valid official email address.
+        </div>
+      }
+    </div>
+
+    <!-- Mobile Number -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label
+        for="mobileNumber"
+        class="form-label fw-semibold"
+      >
+        Mobile Number
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="mobileNumber"
+        type="tel"
+        class="form-control"
+        formControlName="mobileNumber"
+        placeholder="+971 50 123 4567"
+        autocomplete="tel"
+        [class.is-invalid]="
+          group.get('mobileNumber')?.touched &&
+          group.get('mobileNumber')?.invalid
+        "
+      />
+
+      @if (
+        group.get('mobileNumber')?.touched &&
+        group.get('mobileNumber')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Mobile number is required.
+        </div>
+      }
+
+      @if (
+        group.get('mobileNumber')?.touched &&
+        group.get('mobileNumber')?.hasError('pattern')
+      ) {
+        <div class="invalid-feedback">
+          Enter a valid mobile number.
+        </div>
+      }
+    </div>
+
+    <!-- Office Number -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label
+        for="officeNumber"
+        class="form-label fw-semibold"
+      >
+        Office Number
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="officeNumber"
+        type="tel"
+        class="form-control"
+        formControlName="officeNumber"
+        placeholder="+971 4 123 4567"
+        [class.is-invalid]="
+          group.get('officeNumber')?.touched &&
+          group.get('officeNumber')?.invalid
+        "
+      />
+
+      @if (
+        group.get('officeNumber')?.touched &&
+        group.get('officeNumber')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Office number is required.
+        </div>
+      }
+
+      @if (
+        group.get('officeNumber')?.touched &&
+        group.get('officeNumber')?.hasError('pattern')
+      ) {
+        <div class="invalid-feedback">
+          Enter a valid office number.
+        </div>
+      }
+    </div>
+
+    <!-- UAE PASS ID -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label
+        for="uaePassId"
+        class="form-label fw-semibold"
+      >
+        UAE PASS ID
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="uaePassId"
+        type="text"
+        class="form-control"
+        formControlName="uaePassId"
+        placeholder="Enter UAE PASS ID"
+        [class.is-invalid]="
+          group.get('uaePassId')?.touched &&
+          group.get('uaePassId')?.invalid
+        "
+      />
+
+      @if (
+        group.get('uaePassId')?.touched &&
+        group.get('uaePassId')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          UAE PASS ID is required.
+        </div>
+      }
+    </div>
+
+    <!-- Passport / Emirates ID -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <label
+        for="passportOrEmiratesId"
+        class="form-label fw-semibold"
+      >
+        Passport / Emirates ID
+        <span class="text-danger">*</span>
+      </label>
+
+      <input
+        id="passportOrEmiratesId"
+        type="text"
+        class="form-control"
+        formControlName="passportOrEmiratesId"
+        placeholder="Enter passport or Emirates ID"
+        [class.is-invalid]="
+          group.get('passportOrEmiratesId')?.touched &&
+          group.get('passportOrEmiratesId')?.invalid
+        "
+      />
+
+      @if (
+        group.get('passportOrEmiratesId')?.touched &&
+        group.get('passportOrEmiratesId')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Passport or Emirates ID is required.
+        </div>
+      }
+    </div>
+
+    <!-- Address -->
+    <div class="col-12">
+      <label
+        for="address"
+        class="form-label fw-semibold"
+      >
+        Address
+        <span class="text-danger">*</span>
+      </label>
+
+      <textarea
+        id="address"
+        class="form-control"
+        formControlName="address"
+        placeholder="Enter the complete representative address"
+        rows="3"
+        [class.is-invalid]="
+          group.get('address')?.touched &&
+          group.get('address')?.invalid
+        "
+      ></textarea>
+
+      @if (
+        group.get('address')?.touched &&
+        group.get('address')?.hasError('required')
+      ) {
+        <div class="invalid-feedback">
+          Address is required.
+        </div>
+      }
+    </div>
+
+  </div>
+</section>

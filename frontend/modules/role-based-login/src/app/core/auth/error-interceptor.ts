@@ -3,9 +3,7 @@ import {
   HttpInterceptorFn
 } from '@angular/common/http';
 
-import {
-  inject
-} from '@angular/core';
+import { inject } from '@angular/core';
 
 import {
   catchError,
@@ -13,24 +11,15 @@ import {
   throwError
 } from 'rxjs';
 
-import {
-  AuthService
-} from './auth-service';
+import { AuthService } from './auth-service';
+import { TokenStorageService } from './token-storage';
 
-import {
-  TokenStorageService
-} from './token-storage';
-
-
+//req  = current API request
+//next = send this request to the next step/backend
 export const errorInterceptor:
-  HttpInterceptorFn = (req, next) => {
+HttpInterceptorFn = (req, next) => {
 
-  /*
-   * Authentication requests must not inject
-   * AuthService inside this interceptor.
-   *
-   * This prevents the circular dependency.
-   */
+  // Auth APIs are excluded to avoid circular refresh/interceptor handling.
   const isAuthenticationRequest =
     req.url.includes('/api/v1/auth/');
 
@@ -38,89 +27,61 @@ export const errorInterceptor:
     return next(req);
   }
 
-
-  /*
-   * These services are injected only for
-   * non-authentication requests.
-   */
-  const authService =
-    inject(AuthService);
-
-  const tokenService =
-    inject(TokenStorageService);
+  const authService = inject(AuthService);
+  const tokenService = inject(TokenStorageService);
 
 
   return next(req).pipe(
-    catchError(
-      (error: HttpErrorResponse) => {
 
-        /*
-         * When a protected request receives 401,
-         * request a new access token.
-         */
-        if (error.status === 401) {
+    catchError((error: HttpErrorResponse) => {
 
-          return authService
-            .refreshToken()
-            .pipe(
-              switchMap(() => {
+      // A 401 from a protected API triggers access-token refresh.
+      if (error.status === 401) {
+        //Send the API request, then process what happens - pipe
+        return authService
+          .refreshToken()
+          .pipe(
 
-                const freshToken =
-                  tokenService.getAccessToken();
+            switchMap(() => {
 
-                /*
-                 * The refresh succeeded but no new
-                 * access token was received.
-                 */
-                if (!freshToken) {
-                  authService.logout();
+              const freshToken =
+                tokenService.getAccessToken();
 
-                  return throwError(
-                    () =>
-                      new Error(
-                        'No access token received after refresh.'
-                      )
-                  );
-                }
-
-
-                /*
-                 * Retry the original request using
-                 * the newly received access token.
-                 */
-                const retriedRequest =
-                  req.clone({
-                    setHeaders: {
-                      Authorization:
-                        `Bearer ${freshToken}`
-                    }
-                  });
-
-
-                return next(
-                  retriedRequest
-                );
-              }),
-
-              catchError(refreshError => {
-
-                /*
-                 * Refresh token is invalid or expired.
-                 */
+              if (!freshToken) {
                 authService.logout();
 
                 return throwError(
-                  () => refreshError
+                  () =>
+                    new Error(
+                      'No access token received after refresh.'
+                    )
                 );
-              })
-            );
-        }
+              }
 
+              // Retry the failed API call with the new access token.
+              const retriedRequest =
+                req.clone({
+                  setHeaders: {
+                    Authorization:
+                      `Bearer ${freshToken}`
+                  }
+                });
 
-        return throwError(
-          () => error
-        );
+              return next(retriedRequest);
+            }),
+
+            // If refresh itself fails, end the current session.
+            catchError(refreshError => {
+              authService.logout();
+
+              return throwError(
+                () => refreshError
+              );
+            })
+          );
       }
-    )
+
+      return throwError(() => error);
+    })
   );
 };
