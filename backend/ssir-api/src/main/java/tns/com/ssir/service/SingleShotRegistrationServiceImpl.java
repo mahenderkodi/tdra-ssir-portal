@@ -32,14 +32,13 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
     @Autowired
     private DocumentStorageService storageService;
 
-    // 1. Injected SenderIdRepository to handle the instant save of the pending header [3]
     @Autowired
     private SenderIdRepository senderIdRepository;
 
     @Override
     @Transactional
     public RegistrationRequest submitSingleShot(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap, Long userId) {
-        log.info("Processing single-shot onboarding submission for User ID: {}", userId);
+        log.info("Processing brand-new Sender ID registration for User ID: {}", userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Authenticated user session not found."));
@@ -48,43 +47,52 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
         RepresentativeDto repDto = dto.getRepresentative();
         AccountDto accountDto = dto.getAccount();
 
-        // 2. Generate a unique Company ID String (e.g., CO-A3F1B5E8) [3]
-        String generatedCompanyId = "CO-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        // 1. Get or Create the Parent Company entity [3]
+        Company company = user.getCompany();
+        boolean isNewCompany = (company == null);
 
-        // 3. Build and populate the Company entity completely, including the newly generated companyId [3]
-        Company company = Company.builder()
-                .companyId(generatedCompanyId) // Assigned [3]
-                .companyName(companyDto.getCompanyName())
-                .legalEntityName(companyDto.getLegalEntityName())
-                .tradeLicenseNumber(companyDto.getTradeLicenseNumber())
-                .registrationNumber(companyDto.getRegistrationNumber())
-                .taxVatNumber(companyDto.getTaxId())
-                .companyType(companyDto.getCompanyType())
-                .industryType(companyDto.getIndustry())
-                .dateOfIncorporation(companyDto.getDateOfIncorporation())
-                .email(companyDto.getCompanyEmail())
-                .companyPhone(companyDto.getCompanyPhone())
-                .proposedSenderId(companyDto.getProposedSenderId() != null ? companyDto.getProposedSenderId().toUpperCase() : null)
-                .website(companyDto.getWebsite())
-                .status("DRAFT") 
-                .build();
+        if (isNewCompany) {
+            log.info("No company associated with user. Creating a new Company record...");
+            String generatedCompanyId = "CO-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+            company = Company.builder()
+                    .companyId(generatedCompanyId)
+                    .status("DRAFT")
+                    .build();
+        } else {
+            log.info("Existing company found (ID: {}). Updating company details...", company.getId());
+        }
 
-        // 4. Build and link the Address entity [3]
-        CompanyAddress address = CompanyAddress.builder()
-                .company(company)
-                .addressLine1(companyDto.getRegisteredAddress())
-                .country(companyDto.getCountry() != null ? companyDto.getCountry() : "United Arab Emirates")
-                .emirate(companyDto.getEmirateState())
-                .city(companyDto.getCity())
-                .postalCode(companyDto.getPostalCode())
-                .build();
+        // 2. Populate Company fields (Updates your legal profile without duplicate entries) [3]
+        company.setCompanyName(companyDto.getCompanyName());
+        company.setLegalEntityName(companyDto.getLegalEntityName());
+        company.setTradeLicenseNumber(companyDto.getTradeLicenseNumber());
+        company.setRegistrationNumber(companyDto.getRegistrationNumber());
+        company.setTaxVatNumber(companyDto.getTaxId());
+        company.setCompanyType(companyDto.getCompanyType());
+        company.setIndustryType(companyDto.getIndustry());
+        company.setDateOfIncorporation(companyDto.getDateOfIncorporation());
+        company.setEmail(companyDto.getCompanyEmail());
+        company.setCompanyPhone(companyDto.getCompanyPhone());
+        company.setProposedSenderId(companyDto.getProposedSenderId() != null ? companyDto.getProposedSenderId().toUpperCase() : company.getProposedSenderId());
+        company.setWebsite(companyDto.getWebsite());
+
+        // Map Address
+        CompanyAddress address = company.getAddress();
+        if (address == null) {
+            address = CompanyAddress.builder().company(company).build();
+        }
+        address.setAddressLine1(companyDto.getRegisteredAddress());
+        address.setCountry(companyDto.getCountry() != null ? companyDto.getCountry() : "United Arab Emirates");
+        address.setEmirate(companyDto.getEmirateState());
+        address.setCity(companyDto.getCity());
+        address.setPostalCode(companyDto.getPostalCode());
         company.setAddress(address);
 
-        // 5. Save the Company first to capture the generated ID [3]
         Company savedCompany = companyRepository.save(company);
 
-        // 6. Build and link Representative Contacts if available [3]
+        // 3. Populate/Update Representative Contacts [3]
         if (repDto != null) {
+            savedCompany.getContacts().clear();
             CompanyContact contact = CompanyContact.builder()
                     .company(savedCompany)
                     .firstName(repDto.getFirstName())
@@ -102,10 +110,9 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
             companyRepository.save(savedCompany); 
         }
 
-        // 7. Link the User to the saved Company [1, 3]
+        // 4. Link active User to company [1, 3]
         user.setCompany(savedCompany);
         
-        // 8. Map and update User account preferences (Step 4) [1, 3]
         if (accountDto != null) {
             user.setUsername(accountDto.getUsername() != null && !accountDto.getUsername().trim().isEmpty() ? accountDto.getUsername() : user.getUsername());
             user.setPreferredLanguage(accountDto.getPreferredLanguage() != null ? accountDto.getPreferredLanguage() : "EN");
@@ -115,7 +122,7 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
         }
         userRepository.save(user);
 
-        // 9. Create the RegistrationRequest in the SUBMITTED status [3]
+        // 5. Always generate a brand-new RegistrationRequest for this new Sender ID [3]
         String trackingId = "REG-" + LocalDateTime.now().getYear() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         RegistrationRequest regRequest = RegistrationRequest.builder()
                 .trackingId(trackingId)
@@ -124,18 +131,18 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
                 .build();
         RegistrationRequest savedRequest = registrationRepository.save(regRequest);
 
-        // 10. Automatically create a PENDING record in sender_ids table for your first proposed Sender ID [3]
+        // 6. Always create a brand-new PENDING record inside sender_ids linked to this trackingId [3]
         if (savedCompany.getProposedSenderId() != null && !savedCompany.getProposedSenderId().trim().isEmpty()) {
-            SenderId initialSenderId = SenderId.builder()
+            SenderId pendingSenderId = SenderId.builder()
                     .senderIdName(savedCompany.getProposedSenderId())
-                    .trackingId(trackingId) // Links it to the registration tracking-id [3]
-                    .company(savedCompany)   // Maps to the company [3]
+                    .trackingId(trackingId) // Mapped directly to this specific request's tracking ID [3]
+                    .company(savedCompany)   // Mapped to the parent company [3]
                     .status("PENDING")       // Initial status is PENDING [3]
                     .build();
-            senderIdRepository.save(initialSenderId);
+            senderIdRepository.save(pendingSenderId);
         }
 
-        // 11. Stream the uploaded files directly to MinIO and write them to legal_documents [2]
+        // 7. Stream files directly to MinIO [2]
         if (fileMap != null && !fileMap.isEmpty()) {
             for (String formKey : fileMap.keySet()) {
                 List<MultipartFile> files = fileMap.get(formKey);
@@ -150,22 +157,18 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
             }
         }
 
-        // 12. Save Status History Log [3]
+        // 8. Save Status History Log [3]
         RegistrationStatusHistory history = RegistrationStatusHistory.builder()
                 .registrationRequest(savedRequest)
                 .fromStatus("DRAFT")
                 .toStatus("SUBMITTED")
-                .comments("Onboarding Application Successfully Submitted in Single Shot")
+                .comments("Onboarding Application Successfully Submitted for New Sender ID")
                 .build();
         historyRepository.save(history);
 
         return savedRequest;
     }
 
-    private String convertCamelCaseToUnderscore(String camelCase) {
-        return camelCase.replaceAll("(?<!_)(?=[A-Z])", "_");
-    }
-    
     @Override
     @Transactional
     public RegistrationRequest resubmitSingleShot(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap, Long userId, Long companyId) {
@@ -178,7 +181,7 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
         RepresentativeDto repDto = dto.getRepresentative();
         AccountDto accountDto = dto.getAccount();
 
-        // 1. Update existing Company metadata safely
+        // 1. Update company details
         company.setCompanyName(companyDto.getCompanyName());
         company.setLegalEntityName(companyDto.getLegalEntityName());
         company.setTradeLicenseNumber(companyDto.getTradeLicenseNumber());
@@ -192,11 +195,10 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
         company.setProposedSenderId(companyDto.getProposedSenderId() != null ? companyDto.getProposedSenderId().toUpperCase() : company.getProposedSenderId());
         company.setWebsite(companyDto.getWebsite());
 
-        // 2. Update address relation
+        // Update Address
         CompanyAddress address = company.getAddress();
         if (address == null) {
-            address = new CompanyAddress();
-            address.setCompany(company);
+            address = CompanyAddress.builder().company(company).build();
         }
         address.setAddressLine1(companyDto.getRegisteredAddress());
         address.setCountry(companyDto.getCountry() != null ? companyDto.getCountry() : "United Arab Emirates");
@@ -207,7 +209,7 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
 
         Company savedCompany = companyRepository.save(company);
 
-        // 3. Update Representative Contacts
+        // Update Representative Contacts
         if (repDto != null) {
             savedCompany.getContacts().clear();
             CompanyContact contact = CompanyContact.builder()
@@ -224,10 +226,10 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
                     .passportEmiratesId(repDto.getPassportOrEmiratesId())
                     .build();
             savedCompany.getContacts().add(contact);
-            companyRepository.save(savedCompany);
+            companyRepository.save(savedCompany); 
         }
 
-        // 4. Update User configurations
+        // Update User configurations
         User user = userRepository.findByCompany(savedCompany)
                 .orElseThrow(() -> new IllegalArgumentException("Associated user session not found."));
         if (accountDto != null) {
@@ -239,17 +241,30 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
             userRepository.save(user);
         }
 
-        // 5. Fetch Onboarding Request and Transition back to SUBMITTED status [3]
-        RegistrationRequest request = registrationRepository.findByCompany(savedCompany)
-                .orElseThrow(() -> new IllegalArgumentException("No onboarding request found associated with this company."));
+        // 2. Locate the active registration request currently in INFO_REQUESTED status for this company [3]
+        List<RegistrationRequest> requests = registrationRepository.findByCompany(savedCompany);
+        RegistrationRequest targetRequest = requests.stream()
+                .filter(r -> "INFO_REQUESTED".equalsIgnoreCase(r.getCurrentStatus()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No active 'INFO_REQUESTED' onboarding request found for this company."));
 
-        String oldStatus = request.getCurrentStatus();
-        request.setCurrentStatus("SUBMITTED");
-        request.setInfoRequestComments(null); // Clears the previous TDRA remarks [3]
-        request.setRejectionReason(null);
-        RegistrationRequest savedRequest = registrationRepository.save(request);
+        String oldStatus = targetRequest.getCurrentStatus();
+        targetRequest.setCurrentStatus("SUBMITTED");
+        targetRequest.setInfoRequestComments(null); // Clear previous admin comments [3]
+        targetRequest.setRejectionReason(null);
+        RegistrationRequest savedRequest = registrationRepository.save(targetRequest);
 
-        // 6. Stream replacement files directly to MinIO [2]
+        // 3. Find the corresponding SenderId in PENDING/INFO_REQUESTED status and reset its details [3]
+        java.util.Optional<SenderId> senderIdOpt = senderIdRepository.findByTrackingId(savedRequest.getTrackingId());
+        if (senderIdOpt.isPresent()) {
+            SenderId senderId = senderIdOpt.get();
+            senderId.setSenderIdName(savedCompany.getProposedSenderId());
+            senderId.setStatus("PENDING");
+            senderId.setRemarks(null); // Clear previous remarks [3]
+            senderIdRepository.save(senderId);
+        }
+
+        // 4. Stream files directly to MinIO [2]
         if (fileMap != null && !fileMap.isEmpty()) {
             for (String formKey : fileMap.keySet()) {
                 List<MultipartFile> files = fileMap.get(formKey);
@@ -264,15 +279,19 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
             }
         }
 
-        // 7. Save Status History Log [3]
+        // 5. Save Status History Log [3]
         RegistrationStatusHistory history = RegistrationStatusHistory.builder()
                 .registrationRequest(savedRequest)
-                .fromStatus(oldStatus) // e.g., INFO_REQUESTED -> SUBMITTED [3]
+                .fromStatus(oldStatus)
                 .toStatus("SUBMITTED")
                 .comments("Onboarding Application Successfully Resubmitted in Single Shot")
                 .build();
         historyRepository.save(history);
 
         return savedRequest;
+    }
+
+    private String convertCamelCaseToUnderscore(String camelCase) {
+        return camelCase.replaceAll("(?<!_)(?=[A-Z])", "_");
     }
 }

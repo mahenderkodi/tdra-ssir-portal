@@ -1,12 +1,17 @@
 package tns.com.ssir.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException; 
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import jakarta.validation.Validator;
+import tns.com.ssir.dto.AuthResponse;
 import tns.com.ssir.dto.RegistrationRequestDto;
 import tns.com.ssir.dto.RegistrationSuccessResponse;
 import tns.com.ssir.dto.TrackingResponse;
+import tns.com.ssir.dto.UaePassLoginRequest;
 import tns.com.ssir.dto.TrackedDocumentDto;
 import tns.com.ssir.dto.RegistrationStatusUpdateResponse;
 import tns.com.ssir.core.entity.RegistrationRequest;
@@ -216,4 +221,6 @@ public class RegistrationController {
         RegistrationRequest request = registrationService.getRegistrationByCompanyId(principal.getCompanyId());
         return ResponseEntity.ok(request);
     }
+ 
 }
+

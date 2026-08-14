@@ -1,10 +1,6 @@
 package tns.com.ssir.service;
 
-import tns.com.ssir.dto.ForgotPasswordRequest;
-import tns.com.ssir.dto.RegisterInitRequest;
-import tns.com.ssir.dto.RegistrationRequestDto;
-import tns.com.ssir.dto.RegistrationStatusUpdateResponse;
-import tns.com.ssir.dto.ResetPasswordRequest;
+import tns.com.ssir.dto.*;
 import tns.com.ssir.core.entity.RegistrationRequest;
 import tns.com.ssir.core.entity.User;
 import org.springframework.util.MultiValueMap;
@@ -36,4 +32,7 @@ public interface RegistrationService {
     RegistrationRequest uploadDraftDocument(MultipartFile file, String documentType, Long companyId);
 
     void resetPassword(ResetPasswordRequest request);
+    
+    // NEW: Handle UAE PASS authentication and auto-signup [6, 7]
+    AuthResponse authenticateWithUaePass(String code);
 }

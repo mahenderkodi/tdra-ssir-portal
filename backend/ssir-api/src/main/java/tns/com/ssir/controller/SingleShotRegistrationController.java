@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import tns.com.ssir.dto.RegistrationRequestDto;
 import tns.com.ssir.dto.RegistrationSuccessResponse;
-import tns.com.ssir.core.entity.RegistrationRequest;
 import tns.com.ssir.security.UserPrincipal;
+import tns.com.ssir.core.entity.RegistrationRequest;
 import tns.com.ssir.service.SingleShotRegistrationService;
 import java.util.Set;
 

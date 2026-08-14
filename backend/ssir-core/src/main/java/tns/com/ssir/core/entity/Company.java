@@ -77,7 +77,7 @@ public class Company {
     @JsonIgnoreProperties("company")
     private List<CompanyContact> contacts = new ArrayList<>();
     
- // Optionally insert this block inside Company.java (e.g., around line 76)
+
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @JsonIgnoreProperties("company")

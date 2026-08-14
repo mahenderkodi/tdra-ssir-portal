@@ -3,6 +3,8 @@ package tns.com.ssir.dto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import tns.com.ssir.dto.CompanyDto;
+
 
 @Data
 public class RegistrationRequestDto {

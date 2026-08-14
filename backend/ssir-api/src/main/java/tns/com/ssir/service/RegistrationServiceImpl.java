@@ -10,12 +10,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import tns.com.ssir.security.UserPrincipal;
+import tns.com.ssir.security.JwtTokenProvider;
 import lombok.extern.log4j.Log4j2;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -51,6 +63,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Autowired
     private PasswordResetTokenRepository tokenRepository;
 
+    @Autowired
+    private JwtTokenProvider tokenProvider;
+
     @Override
     @Transactional
     public User registerAndInit(RegisterInitRequest request) {
@@ -64,7 +79,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         Role adminRole = roleRepository.findByRoleName("ROLE_COMPANY_ADMIN")
-                .orElseThrow(() -> new IllegalStateException("Required system role ROLE_COMPANY_PENDING was not found."));
+                .orElseThrow(() -> new IllegalStateException("Required system role ROLE_COMPANY_ADMIN was not found."));
 
         Set<Role> roles = new HashSet<>();
         roles.add(adminRole);
@@ -83,7 +98,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         return userRepository.save(user);
     }
 
-    // Change the signature to accept companyName
     private Company getOrCreateCompany(Long userId, Long companyId, String initialProposedId, String email, String companyName) {
         if (companyId != null) {
             return companyRepository.findById(companyId)
@@ -92,12 +106,10 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         log.info("First-time action detected. Instantiating company and linking to User ID: {}", userId);
 
-        // Fallback default name to protect against early draft saves with blank fields
         String finalCompanyName = (companyName != null && !companyName.trim().isEmpty()) 
                 ? companyName 
                 : "Draft Company " + UUID.randomUUID().toString().substring(0, 5);
 
-        // Add .companyName() to the builder [3]
         Company company = Company.builder()
                 .companyName(finalCompanyName)
                 .proposedSenderId(initialProposedId != null ? initialProposedId.toUpperCase() : null)
@@ -113,13 +125,11 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         Company savedCompany = companyRepository.save(company);
 
-        // Link the active User to this Company permanently [1, 3]
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Authenticated user session not found"));
         user.setCompany(savedCompany);
         userRepository.save(user);
 
-        // Create the RegistrationRequest in DRAFT status
         String trackingId = "REG-" + LocalDateTime.now().getYear() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         RegistrationRequest regRequest = RegistrationRequest.builder()
                 .trackingId(trackingId)
@@ -138,16 +148,14 @@ public class RegistrationServiceImpl implements RegistrationService {
         CompanyDto companyDto = dto.getCompany();
         RepresentativeDto repDto = dto.getRepresentative();
 
-        // Pass the company name from the DTO down to the builder [3]
         Company company = getOrCreateCompany(
             userId, 
             companyId, 
             companyDto.getProposedSenderId(), 
             companyDto.getCompanyEmail(),
-            companyDto.getCompanyName() // Added parameter [3]
+            companyDto.getCompanyName()
         );
 
-        // Map all incoming draft values safely (allowing nulls) [3]
         company.setCompanyName(companyDto.getCompanyName());
         company.setLegalEntityName(companyDto.getLegalEntityName());
         company.setTradeLicenseNumber(companyDto.getTradeLicenseNumber());
@@ -161,7 +169,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         company.setProposedSenderId(companyDto.getProposedSenderId() != null ? companyDto.getProposedSenderId().toUpperCase() : company.getProposedSenderId());
         company.setWebsite(companyDto.getWebsite());
 
-        // Map Address
         CompanyAddress address = company.getAddress();
         address.setAddressLine1(companyDto.getRegisteredAddress());
         address.setCountry(companyDto.getCountry());
@@ -169,7 +176,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         address.setCity(companyDto.getCity());
         address.setPostalCode(companyDto.getPostalCode());
 
-        // Map Representative (Allow partial saving of representative draft details)
         if (repDto != null) {
             company.getContacts().clear();
             CompanyContact contact = CompanyContact.builder()
@@ -188,7 +194,6 @@ public class RegistrationServiceImpl implements RegistrationService {
             company.getContacts().add(contact);
         }
 
-        // Map Account/User Setup (Saves Step 4 preferences during drafts)
         User user = userRepository.findByCompany(company)
                 .orElseThrow(() -> new IllegalArgumentException("Associated user account not found"));
 
@@ -212,7 +217,10 @@ public class RegistrationServiceImpl implements RegistrationService {
             userRepository.save(user);
         }
 
+        // FIX: Extracting first element from the List using Stream mapping to satisfy new return type contract [3]
         RegistrationRequest request = registrationRepository.findByCompany(company)
+                .stream()
+                .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No onboarding request found associated with this company."));
 
         return registrationRepository.save(request);
@@ -223,18 +231,15 @@ public class RegistrationServiceImpl implements RegistrationService {
     public RegistrationRequest submitFinalOnboarding(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap, Long userId, Long companyId) {
         log.info("Executing final onboarding submission...");
 
-        // Process draft save first to update any final text fields [1, 3]
         RegistrationRequest request = updateDraft(dto, userId, companyId);
         Company company = request.getCompany();
 
-        String oldStatus = request.getCurrentStatus(); // Holds "DRAFT" or "INFO_REQUESTED" [3]
+        String oldStatus = request.getCurrentStatus(); 
 
-        // Transition status back to SUBMITTED for TDRA Audit [3]
         request.setCurrentStatus("SUBMITTED");
         request.setInfoRequestComments(null);
         request.setRejectionReason(null);
         
-        // Stream all uploaded files directly to MinIO and log in legal_documents [2]
         if (fileMap != null && !fileMap.isEmpty()) {
             for (String formKey : fileMap.keySet()) {
                 List<MultipartFile> files = fileMap.get(formKey);
@@ -249,16 +254,14 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
         }
 
-        // Save Status History Log [3]
         RegistrationStatusHistory history = RegistrationStatusHistory.builder()
                 .registrationRequest(request)
-                .fromStatus(oldStatus) // e.g., DRAFT -> SUBMITTED or INFO_REQUESTED -> SUBMITTED [3]
+                .fromStatus(oldStatus) 
                 .toStatus("SUBMITTED")
                 .comments("Onboarding Application Successfully Submitted for Review")
                 .build();
         historyRepository.save(history);
 
-        // Update user account setup preferences [1, 3]
         User user = userRepository.findByCompany(company)
                 .orElseThrow(() -> new IllegalArgumentException("Associated user account not found"));
         
@@ -281,7 +284,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
 
+        // FIX: Extracting first element from the List using Stream mapping to satisfy new return type contract [3]
         RegistrationRequest request = registrationRepository.findByCompany(company)
+                .stream()
+                .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No onboarding request found associated with this company."));
 
         if (request.getDocuments() != null) {
@@ -331,11 +337,10 @@ public class RegistrationServiceImpl implements RegistrationService {
             if ("APPROVED".equalsIgnoreCase(status)) {
                 senderId.setStatus("ACTIVE");
                 senderId.setRemarks(comments);
-                // Automatically assign a standard 1-year expiration date upon approval [3]
                 senderId.setExpirationDate(java.time.LocalDate.now().plusYears(1));
             } else {
-                senderId.setStatus(status.toUpperCase()); // e.g., INFO_REQUESTED, REJECTED [3]
-                senderId.setRemarks(comments);            // Maps the feedback remarks to the sender_ids record [3]
+                senderId.setStatus(status.toUpperCase()); 
+                senderId.setRemarks(comments);            
             }
             senderIdRepository.save(senderId);
         }
@@ -534,7 +539,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
 
+        // FIX: Extracting first element from the List using Stream mapping to satisfy new return type contract [3]
         RegistrationRequest request = registrationRepository.findByCompany(company)
+                .stream()
+                .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No onboarding request found associated with this company."));
 
         String dbDocType = documentType.toUpperCase();
@@ -545,5 +553,127 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private String convertCamelCaseToUnderscore(String camelCase) {
         return camelCase.replaceAll("(?<!_)(?=[A-Z])", "_");
+    }
+    
+    @Override
+    @Transactional
+    public AuthResponse authenticateWithUaePass(String code) {
+        log.info("Initiating UAE PASS staging authentication handshake for code...");
+
+        RestTemplate restTemplate = new RestTemplate();
+        
+        // Step A: Exchange the Authorization Code for a UAE PASS Access Token [10]
+        // FIX: Update redirect_uri to point to port 4201 to resolve 'Callback url mismatch' [10]
+        String tokenUrl = "https://stg-id.uaepass.ae/idshub/token"
+                + "?grant_type=authorization_code"
+                + "&redirect_uri=http://localhost:4201/auth/login"
+                + "&code=" + code;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setBasicAuth("sandbox_stage", "sandbox_stage");
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<UaePassTokenResponse> tokenResponse;
+
+        try {
+            tokenResponse = restTemplate.postForEntity(tokenUrl, entity, UaePassTokenResponse.class);
+        } catch (Exception ex) {
+            log.error("Failed to execute token exchange with UAE PASS: {}", ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired UAE PASS authorization code.");
+        }
+
+        UaePassTokenResponse tokenBody = tokenResponse.getBody();
+        if (tokenBody == null || tokenBody.getAccessToken() == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Failed to retrieve Access Token from UAE PASS.");
+        }
+
+        String uaeAccessToken = tokenBody.getAccessToken();
+
+        // Step B: Retrieve the user profile using the access token [7]
+        String userInfoUrl = "https://stg-id.uaepass.ae/idshub/userinfo";
+        HttpHeaders userHeaders = new HttpHeaders();
+        userHeaders.setBearerAuth(uaeAccessToken);
+        HttpEntity<String> userEntity = new HttpEntity<>(userHeaders);
+
+        ResponseEntity<UaePassUserInfo> userResponse;
+        try {
+            userResponse = restTemplate.exchange(userInfoUrl, HttpMethod.GET, userEntity, UaePassUserInfo.class);
+        } catch (Exception ex) {
+            log.error("Failed to fetch userinfo profile from UAE PASS: {}", ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Failed to retrieve user profile from UAE PASS.");
+        }
+
+        UaePassUserInfo userInfo = userResponse.getBody();
+        if (userInfo == null || userInfo.getUuid() == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Empty user profile returned by UAE PASS.");
+        }
+
+        String uaeUuid = userInfo.getUuid();
+        String email = userInfo.getEmail() != null ? userInfo.getEmail().trim() : "";
+        String fullName = userInfo.getFullnameEN() != null ? userInfo.getFullnameEN().trim() : "UAE Pass User";
+
+        // Step C: Check if a user with this UUID already exists in the database
+        java.util.Optional<User> userOpt = userRepository.findByUaePassUuid(uaeUuid);
+        User user;
+
+        if (userOpt.isPresent()) {
+            user = userOpt.get();
+            log.info("Existing UAE PASS user mapped: {}", user.getUsername());
+        } else {
+            log.info("New UAE PASS user detected. Executing on-the-fly registration...");
+
+            String cleanUsername = fullName.toLowerCase()
+                    .replaceAll("[^a-zA-Z0-9._-]", "_")
+                    .replaceAll("_+", "_");
+
+            if (userRepository.findByUsername(cleanUsername).isPresent()) {
+                cleanUsername = cleanUsername + "_" + UUID.randomUUID().toString().substring(0, 4);
+            }
+
+            Role adminRole = roleRepository.findByRoleName("ROLE_COMPANY_ADMIN")
+                    .orElseThrow(() -> new IllegalStateException("Required system role ROLE_COMPANY_ADMIN was not found."));
+
+            Set<Role> roles = new HashSet<>();
+            roles.add(adminRole);
+
+            String secureRandomPassword = UUID.randomUUID().toString() + "-" + UUID.randomUUID().toString();
+
+            user = User.builder()
+                    .uaePassUuid(uaeUuid) 
+                    .username(cleanUsername)
+                    .email(email)
+                    .passwordHash(passwordEncoder.encode(secureRandomPassword))
+                    .userIdString("USR" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
+                    .status("ACTIVE")
+                    .roles(roles)
+                    .firstTimeLogin(false)
+                    .build();
+
+            user = userRepository.save(user);
+        }
+
+        // Step D: Programmatically authenticate the user into Spring Security Context and generate JWTs
+        UserPrincipal principal = UserPrincipal.create(user);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                principal, null, principal.getAuthorities()
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String systemAccessToken = tokenProvider.generateAccessToken(authentication);
+        String systemRefreshToken = tokenProvider.generateRefreshToken(authentication);
+
+        List<String> rolesList = principal.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        return AuthResponse.builder()
+                .accessToken(systemAccessToken)
+                .refreshToken(systemRefreshToken)
+                .username(user.getUsername())
+                .roles(rolesList)
+                .companyId(user.getCompany() != null ? user.getCompany().getId() : null)
+                .firstTimeLogin(false)
+                .build();
     }
 }

@@ -53,26 +53,23 @@ public class AuthController {
     @Operation(summary = "Initial Account Registration", description = "Registers the corporate user's credentials, creating an active session with companyId = NULL.")
     public ResponseEntity<AuthResponse> registerAndInit(@Valid @RequestBody RegisterInitRequest signUpRequest) {
         
-        // 1. Persist the initial, base-level User (Company is NULL) [3]
         User pendingUser = registrationService.registerAndInit(signUpRequest);
 
-        // 2. Programmatically generate the Spring Security Authentication context
+        // FIX: Synchronized programmatic context setup with ROLE_COMPANY_ADMIN authority [1, 3]
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                UserPrincipal.create(pendingUser), null, List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_COMPANY_PENDING"))
+                UserPrincipal.create(pendingUser), null, List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_COMPANY_ADMIN"))
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 3. Generate cryptographic JWT Access & Refresh Tokens statelessly [1]
         String accessToken = tokenProvider.generateAccessToken(authentication);
         String refreshToken = tokenProvider.generateRefreshToken(authentication);
 
-        // 4. Return Auth Response containing companyId = null [1, 3]
         AuthResponse authResponse = AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .username(pendingUser.getUsername())
                 .roles(List.of("ROLE_COMPANY_ADMIN"))
-                .companyId(null) // Explicitly null to trigger onboarding stepper redirection [3]
+                .companyId(null) 
                 .firstTimeLogin(false)
                 .build();
 
@@ -178,5 +175,13 @@ public class AuthController {
         String rawPassword = "Password123!";
         String encodedPassword = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode(rawPassword);
         return ResponseEntity.ok(encodedPassword);
+    }
+    
+    // I. SECURE UAE PASS AUTHENTICATION HUB
+    @PostMapping("/uae-pass/login")
+    @Operation(summary = "UAE PASS Authentication Hub", description = "Exchanges a staging UAE PASS code for a local secure JWT session.")
+    public ResponseEntity<AuthResponse> loginWithUaePass(@Valid @RequestBody UaePassLoginRequest loginRequest) {
+        AuthResponse authResponse = registrationService.authenticateWithUaePass(loginRequest.getCode());
+        return ResponseEntity.ok(authResponse);
     }
 }
