@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/auth")
 @Tag(name = "Authentication Portal", description = "Endpoints for user logins, initial signups, and token refreshes")
 public class AuthController {
-
+ //coments added
     @Autowired
     private AuthenticationManager authenticationManager;
 

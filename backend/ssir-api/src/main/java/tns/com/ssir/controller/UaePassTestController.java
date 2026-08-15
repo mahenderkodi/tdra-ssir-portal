@@ -12,12 +12,13 @@ import java.time.Duration;
 @RestController
 @RequestMapping("/api/v1/auth/test")
 public class UaePassTestController {
-
+ //comment added
     @PostMapping("/capture-code")
     @PreAuthorize("permitAll()") // Keep public for testing
     public ResponseEntity<String> verifyCodeLifespan(@RequestBody UaePassTestRequest request) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime acquiredAt = request.getAcquiredAt();
+        
 
         if (acquiredAt.isAfter(now)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Acquisition timestamp cannot be in the future.");
