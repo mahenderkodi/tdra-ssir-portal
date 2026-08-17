@@ -1,5 +1,6 @@
 package tns.com.ssir.service;
 
+import tns.com.ssir.dto.ChartDataDto;
 import tns.com.ssir.dto.CompanyDashboardStats;
 import tns.com.ssir.dto.SenderIdRequestDto;
 import tns.com.ssir.dto.SenderIdResponseDto;
@@ -19,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import lombok.extern.log4j.Log4j2;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -196,4 +198,24 @@ public class SenderIdServiceImpl implements SenderIdService {
                 .remarks(savedSenderId.getRemarks())
                 .build();
     }
+    
+    @Transactional(readOnly = true)
+    public ChartDataDto getStatusChartData(Long companyId) {
+        List<Map<String, Object>> rawResults = senderIdRepository.getSenderIdStatusDistribution(companyId);
+
+        List<String> labels = new java.util.ArrayList<>();
+        List<Long> data = new java.util.ArrayList<>();
+
+        for (Map<String, Object> row : rawResults) {
+            labels.add(row.get("status").toString());
+            data.add((Long) row.get("count"));
+        }
+
+        return ChartDataDto.builder()
+                .labels(labels)
+                .data(data)
+                .build();
+    }
+    
+    
 }

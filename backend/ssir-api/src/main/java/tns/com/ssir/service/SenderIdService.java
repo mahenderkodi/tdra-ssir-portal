@@ -1,5 +1,6 @@
 package tns.com.ssir.service;
 
+import tns.com.ssir.dto.ChartDataDto;
 import tns.com.ssir.dto.CompanyDashboardStats;
 import tns.com.ssir.dto.SenderIdRequestDto;
 import tns.com.ssir.dto.SenderIdResponseDto;
@@ -14,4 +15,6 @@ public interface SenderIdService {
     
     // NEW: Retrieve detailed sender ID properties and presigned documents [1, 3]
     SenderIdResponseDto getSenderIdById(Long id, Long companyId);
+    
+    ChartDataDto getStatusChartData(Long companyId);
 }

@@ -52,12 +52,22 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
         boolean isNewCompany = (company == null);
 
         if (isNewCompany) {
-            log.info("No company associated with user. Creating a new Company record...");
-            String generatedCompanyId = "CO-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-            company = Company.builder()
-                    .companyId(generatedCompanyId)
-                    .status("DRAFT")
-                    .build();
+            // Check if another user has already registered this physical company via its Trade License [3]
+            String tradeLicense = companyDto.getTradeLicenseNumber();
+            java.util.Optional<Company> existingCompanyOpt = companyRepository.findByTradeLicenseNumber(tradeLicense);
+
+            if (existingCompanyOpt.isPresent()) {
+                log.info("Company already registered. Mapping new user to existing Company ID: {}", existingCompanyOpt.get().getId());
+                company = existingCompanyOpt.get();
+                isNewCompany = false; // Treat as an existing company update
+            } else {
+                log.info("No company associated with user and no matching trade license found. Creating a new Company record...");
+                String generatedCompanyId = "CO-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+                company = Company.builder()
+                        .companyId(generatedCompanyId)
+                        .status("DRAFT")
+                        .build();
+            }
         } else {
             log.info("Existing company found (ID: {}). Updating company details...", company.getId());
         }

@@ -1,5 +1,6 @@
 package tns.com.ssir.controller;
 
+import tns.com.ssir.dto.ChartDataDto;
 import tns.com.ssir.dto.CompanyDashboardStats;
 import tns.com.ssir.dto.SenderIdRequestDto;
 import tns.com.ssir.dto.SenderIdResponseDto;
@@ -101,4 +102,12 @@ public class SenderIdController {
         SenderIdResponseDto response = senderIdService.updateSenderIdStatus(id, status, comments);
         return ResponseEntity.ok(response);
     }
+    
+    @GetMapping("/chart/status")
+    @PreAuthorize("hasRole('ROLE_COMPANY_ADMIN')")
+    public ResponseEntity<ChartDataDto> getStatusChart(@AuthenticationPrincipal UserPrincipal principal) {
+        ChartDataDto chartData = senderIdService.getStatusChartData(principal.getCompanyId());
+        return ResponseEntity.ok(chartData);
+    }
+    
 }
