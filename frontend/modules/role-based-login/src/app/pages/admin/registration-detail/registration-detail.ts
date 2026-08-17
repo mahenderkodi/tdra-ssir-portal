@@ -1,8 +1,27 @@
-import { Component, OnInit, signal, inject, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  signal,
+  inject,
+  Input
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router'; // Imported ActivatedRoute
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { AdminRegistrationService } from '../../../core/services/admin-registration';
+import {
+  ActivatedRoute,
+  Router
+} from '@angular/router';
+
+import {
+  DomSanitizer,
+  SafeResourceUrl
+} from '@angular/platform-browser';
+
+import {
+  AdminRegistrationService
+} from '../../../core/services/admin-registration';
+
+import { HotToastService } from '@ngxpert/hot-toast';
 
 
 @Component({
@@ -10,160 +29,275 @@ import { AdminRegistrationService } from '../../../core/services/admin-registrat
   standalone: true,
   imports: [CommonModule],
   templateUrl: './registration-detail.html',
-  styleUrl: './registration-detail.css' 
+  styleUrl: './registration-detail.css'
 })
-export class AdminRegistrationDetailComponent implements OnInit {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute); // Injected ActivatedRoute [3]
-  private sanitizer = inject(DomSanitizer);
-  private adminService = inject(AdminRegistrationService);
+export class AdminRegistrationDetailComponent
+  implements OnInit {
+
+  private readonly router =
+    inject(Router);
+
+  private readonly route =
+    inject(ActivatedRoute);
+
+  private readonly sanitizer =
+    inject(DomSanitizer);
+
+  private readonly adminService =
+    inject(AdminRegistrationService);
+
+  private readonly toast =
+  inject(HotToastService);
 
   @Input() id!: string;
 
-  registration = signal<any | null>(null);
-  activePreviewUrl = signal<SafeResourceUrl | null>(null);
-  activeDocName = signal<string>('');
-  isLoading = signal(true);
-  isProcessing = signal(false);
-  errorMessage = signal('');
-  actionComment = signal('');
+
+  registration =
+    signal<any | null>(null);
+
+  activeDocument =
+    signal<any | null>(null);
+
+  activePreviewUrl =
+    signal<SafeResourceUrl | null>(null);
+
+  isLoading =
+    signal(true);
+
+  isProcessing =
+    signal(false);
+
+  errorMessage =
+    signal('');
+
+  actionComment =
+    signal('');
+
+  activeAction =
+signal<string | null>(null);
+  
+  
 
   ngOnInit(): void {
-    // SAFE FALLBACK: If Router Component Input binding is not enabled in app.config.ts,
-    // we retrieve the ':id' parameter directly from the active route snapshot [3]!
-    const resolvedId = this.id || this.route.snapshot.paramMap.get('id');
 
-    if (resolvedId) {
-      this.loadRegistrationDetails(Number(resolvedId));
-    } else {
-      this.errorMessage.set('Missing registration identifier.');
+    const resolvedId =
+      this.id ||
+      this.route.snapshot.paramMap.get('id');
+
+    if (!resolvedId) {
+
+      this.errorMessage.set(
+        'Missing registration identifier.'
+      );
+
       this.isLoading.set(false);
+
+      return;
+    }
+
+    this.loadRegistrationDetails(
+      Number(resolvedId)
+    );
+  }
+
+
+  previewDocument(doc: any): void {
+
+    this.activeDocument.set(doc);
+
+    /*
+     * iframe requires a trusted resource URL.
+     * We mainly use this for PDFs.
+     */
+    if (doc?.presignedUrl) {
+
+      this.activePreviewUrl.set(
+        this.sanitizer
+          .bypassSecurityTrustResourceUrl(
+            doc.presignedUrl
+          )
+      );
+
+    } else {
+
+      this.activePreviewUrl.set(null);
     }
   }
 
-  // Prepares the secure pre-signed MinIO URL safely for iframe integration [1.1.2]
-  previewDocument(doc: any): void {
-    this.activeDocName.set(doc.documentType);
-    this.activePreviewUrl.set(
-      this.sanitizer.bypassSecurityTrustResourceUrl(doc.presignedUrl)
+
+  isImage(doc: any): boolean {
+
+    return (
+      doc?.contentType?.startsWith('image/')
     );
   }
 
-  // Executes state-machine triggers (APPROVE / REJECT / INFO_REQUESTED)
-executeAction(
-  status: string
-): void {
 
-  const resolvedId =
-    this.id ||
-    this.route.snapshot.paramMap.get('id');
+  isPdf(doc: any): boolean {
 
-  const regId =
-    Number(resolvedId);
-
-  if (!regId) {
-    return;
-  }
-
-
-  let comments =
-    this.actionComment().trim();
-
-
-  /*
-   * Comments are compulsory when
-   * TDRA Rejects or Requests Information.
-   */
-  if (
-    (
-      status === 'INFO_REQUESTED' ||
-      status === 'REJECTED'
-    ) &&
-    !comments
-  ) {
-
-    this.errorMessage.set(
-      status === 'INFO_REQUESTED'
-        ? 'Please enter what additional information is required.'
-        : 'Please enter the reason for rejection.'
+    return (
+      doc?.contentType === 'application/pdf'
     );
-
-    return;
   }
 
 
-  /*
-   * Approval does not require the admin
-   * to type a comment.
-   */
-  if (
-    status === 'APPROVED' &&
-    !comments
-  ) {
+  executeAction(status: string): void {
 
-    comments =
-      'Application approved by TDRA.';
+    const resolvedId =
+      this.id ||
+      this.route.snapshot.paramMap.get('id');
+
+    const regId =
+      Number(resolvedId);
+
+    if (!regId) {
+      return;
+    }
+
+
+    let comments =
+      this.actionComment().trim();
+
+
+    /*
+     * Reject and Request Info
+     * require explanation.
+     */
+    if (
+  (
+    status === 'REJECTED' ||
+    status === 'INFO_REQUESTED'
+  ) &&
+  !comments
+) {
+
+  if (status === 'REJECTED') {
+    this.toast.error(
+      'Please enter the reason for rejection.'
+    );
   }
 
+  if (status === 'INFO_REQUESTED') {
+    this.toast.error(
+      'Please enter what additional information is required.'
+    );
+  }
 
-  this.isProcessing.set(true);
-  this.errorMessage.set('');
-
-
-  this.adminService
-    .updateRegistrationStatus(
-      regId,
-      status,
-      comments
-    )
-    .subscribe({
-
-      next: response => {
-
-        console.log(
-          'STATUS UPDATE RESPONSE:',
-          response
-        );
-
-        this.isProcessing.set(false);
-
-        void this.router.navigate(
-          ['/admin/registrations']
-        );
-      },
-
-      error: err => {
-
-        console.error(
-          'STATUS UPDATE ERROR:',
-          err
-        );
-
-        this.isProcessing.set(false);
-
-        this.errorMessage.set(
-          err.error?.message ||
-          'Failed to process request.'
-        );
-      }
-
-    });
+  return;
 }
 
-  private loadRegistrationDetails(id: number): void {
-    this.adminService.getRegistrationById(id).subscribe({
-      next: (data) => {
-        this.registration.set(data);
-        this.isLoading.set(false);
-        // Automatically load the first document preview in the iframe
-        if (data.documents && data.documents.length > 0) {
-          this.previewDocument(data.documents[0]);
+
+    /*
+     * Approval comment is optional.
+     */
+    if (
+      status === 'APPROVED' &&
+      !comments
+    ) {
+
+      comments =
+        'Application approved by TDRA.';
+    }
+
+
+    this.isProcessing.set(true);
+    this.errorMessage.set('');
+    this.activeAction.set(status);
+
+    this.adminService
+      .updateRegistrationStatus(
+        regId,
+        status,
+        comments
+      )
+      .subscribe({
+
+        next: () => {
+
+  this.isProcessing.set(false);
+  this.activeAction.set(null);
+
+  if (status === 'APPROVED') {
+
+    this.toast.success(
+      'Registration approved successfully.'
+    );
+
+  } else if (status === 'REJECTED') {
+
+    this.toast.success(
+      'Registration rejected successfully.'
+    );
+
+  } else if (status === 'INFO_REQUESTED') {
+
+    this.toast.success(
+      'Information request sent successfully.'
+    );
+
+  }
+
+  void this.router.navigate(
+    ['/admin/registrations']
+  );
+},
+
+        error: err => {
+
+          this.isProcessing.set(false);
+          this.activeAction.set(null);
+
+          this.errorMessage.set(
+            err.error?.message ||
+            'Failed to process request.'
+          );
         }
-      },
-      error: () => {
-        this.isLoading.set(false);
-        this.errorMessage.set('Failed to load application details.');
-      }
-    });
+
+      });
+  }
+
+
+  goBack(): void {
+
+    void this.router.navigate(
+      ['/admin/registrations']
+    );
+  }
+
+
+  private loadRegistrationDetails(
+    id: number
+  ): void {
+
+    this.adminService
+      .getRegistrationById(id)
+      .subscribe({
+
+        next: data => {
+
+          this.registration.set(data);
+          this.isLoading.set(false);
+
+          if (
+            data.documents &&
+            data.documents.length > 0
+          ) {
+
+            this.previewDocument(
+              data.documents[0]
+            );
+          }
+        },
+
+        error: () => {
+
+          this.isLoading.set(false);
+
+          this.errorMessage.set(
+            'Failed to load application details.'
+          );
+        }
+
+      });
   }
 }

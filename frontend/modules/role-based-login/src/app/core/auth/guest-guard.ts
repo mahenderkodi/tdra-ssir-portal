@@ -23,87 +23,187 @@ const TDRA_ROLES: string[] = [
 ];
 
 
-export const guestGuard: CanActivateFn = () => {
+export const guestGuard: CanActivateFn =
+  (route) => {
 
-  const authService = inject(AuthService);
-  const tokenStorage = inject(TokenStorageService);
-  const router = inject(Router);
+    const authService =
+      inject(AuthService);
+
+    const tokenStorage =
+      inject(TokenStorageService);
+
+    const router =
+      inject(Router);
 
 
-  // Redirects an already logged-in user to the correct portal based on role.
-  const redirectByRole = () => {
-
-    const roles = authService.getCurrentRoles();
-    const user = authService.currentUser();
-
-    const isTdraUser =
-      roles.some(role =>
-        TDRA_ROLES.includes(role)
+    /*
+     * Original page that the user was
+     * trying to access before auth/session
+     * restoration.
+     *
+     * Example:
+     * /portal/sender-id/3
+     */
+    const returnUrl =
+      route.queryParamMap.get(
+        'returnUrl'
       );
 
-    if (isTdraUser) {
-      return router.createUrlTree([
-        '/admin/dashboard'
-      ]);
-    }
+
+    const redirectByRole = () => {
+
+      const roles =
+        authService.getCurrentRoles();
+
+      const user =
+        authService.currentUser();
 
 
-    const isCompanyUser =
-      roles.includes('ROLE_COMPANY_PENDING') ||
-      roles.includes('ROLE_COMPANY_ADMIN');
+      const isTdraUser =
+        roles.some(
+          role =>
+            TDRA_ROLES.includes(role)
+        );
 
-    if (isCompanyUser) {
 
-      // Current logic uses companyId to decide between initial form and dashboard.
-      if (user?.companyId == null) {
+      /*
+       * TDRA user
+       */
+      if (isTdraUser) {
+
+        /*
+         * If TDRA was already on an admin
+         * page before refresh, restore it.
+         */
+        if (
+          returnUrl &&
+          (
+            returnUrl === '/admin' ||
+            returnUrl.startsWith('/admin/')
+          )
+        ) {
+
+          return router.parseUrl(
+            returnUrl
+          );
+        }
+
+
         return router.createUrlTree([
-          '/portal/sender-id/new'
+          '/admin/dashboard'
         ]);
       }
 
-      return router.createUrlTree([
-        '/portal/dashboard'
-      ]);
-    }
 
-    return router.createUrlTree([
-      '/unauthorized'
-    ]);
-  };
-
-
-  // If access token already exists, do not allow login/signup page.
-  if (authService.isAuthenticated()) {
-    return redirectByRole();
-  }
-
-
-  // No active session exists, so guest can access login/signup.
-  if (!tokenStorage.hasRefreshToken()) {
-    return true;
-  }
-
-
-  // Restore the session from refresh token before deciding where to redirect.
-  return authService
-    .refreshToken()
-    .pipe(
-
-      map(() =>
-        redirectByRole()
-      ),
-
-      // Invalid/expired refresh token means treat the user as logged out.
-      catchError(error => {
-
-        console.error(
-          'Unable to restore session:',
-          error
+      const isCompanyUser =
+        roles.includes(
+          'ROLE_COMPANY_PENDING'
+        ) ||
+        roles.includes(
+          'ROLE_COMPANY_ADMIN'
         );
 
-        authService.logout();
 
-        return of(true);
-      })
-    );
-};
+      /*
+       * Company user
+       */
+      if (isCompanyUser) {
+
+        /*
+         * Important:
+         * Restore the exact portal page
+         * that was open before refresh.
+         *
+         * Example:
+         * /portal/sender-id/3
+         */
+        if (
+          returnUrl &&
+          (
+            returnUrl === '/portal' ||
+            returnUrl.startsWith('/portal/')
+          )
+        ) {
+
+          return router.parseUrl(
+            returnUrl
+          );
+        }
+
+
+        /*
+         * New company with no company yet.
+         */
+        if (
+          user?.companyId == null
+        ) {
+
+          return router.createUrlTree([
+            '/portal/sender-id/new'
+          ]);
+        }
+
+
+        /*
+         * Normal login landing page.
+         */
+        return router.createUrlTree([
+          '/portal/dashboard'
+        ]);
+      }
+
+
+      return router.createUrlTree([
+        '/unauthorized'
+      ]);
+    };
+
+
+    /*
+     * Already authenticated.
+     */
+    if (
+      authService.isAuthenticated()
+    ) {
+
+      return redirectByRole();
+    }
+
+
+    /*
+     * Genuine guest.
+     */
+    if (
+      !tokenStorage.hasRefreshToken()
+    ) {
+
+      return true;
+    }
+
+
+    /*
+     * Browser refresh:
+     * restore session first.
+     */
+    return authService
+      .refreshToken()
+      .pipe(
+
+        map(() =>
+          redirectByRole()
+        ),
+
+        catchError(error => {
+
+          console.error(
+            'Unable to restore session:',
+            error
+          );
+
+          authService.logout();
+
+          return of(true);
+        })
+
+      );
+  };

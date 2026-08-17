@@ -896,18 +896,42 @@ private configureAdditionalSenderIdMode(): void {
   nextStep(): void {
 
 
-    if (this.currentStep() === 1) {
+   if (this.currentStep() === 1) {
 
-      const companyGroup =
-        this.registrationForm.controls.company;
+  const companyGroup =
+    this.registrationForm.controls.company;
+
+  companyGroup.markAllAsTouched();
 
 
-      companyGroup.markAllAsTouched();
+  if (this.isAdditionalSenderId) {
 
-      if (companyGroup.invalid) {
-        return;
-      }
+    const senderIdControl =
+      companyGroup.controls.proposedSenderId;
+
+    senderIdControl.markAsTouched();
+
+    if (senderIdControl.invalid) {
+
+      this.toast.error(
+        'Please enter a valid Sender ID.'
+      );
+
+      return;
     }
+
+  } else {
+
+    if (companyGroup.invalid) {
+
+      this.toast.error(
+        'Please complete all required company details.'
+      );
+
+      return;
+    }
+  }
+}
 
 
 

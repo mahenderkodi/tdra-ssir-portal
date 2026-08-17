@@ -1,46 +1,170 @@
-<div class="container-fluid py-4">
+<div class="container-fluid py-4 admin-dashboard">
+
+  <!-- Page heading -->
   <div class="mb-4">
-    <h2 class="fw-bold mb-1">TDRA Admin Control Board</h2>
-    <p class="text-secondary small">Overview of SMS Sender ID Registry Onboarding Operations</p>
+    <p class="small fw-bold text-primary text-uppercase mb-1">
+      TDRA Sender Registry
+    </p>
+
+    <h2 class="fw-bold mb-1">
+      TDRA Admin Control Board
+    </h2>
+
+    <p class="text-secondary small mb-0">
+      Overview of SMS Sender ID Registry Onboarding Operations
+    </p>
   </div>
 
-  <div *ngIf="isLoading()" class="text-center p-5">
-    <div class="spinner-border text-primary" role="status"></div>
+
+  <!-- Loading -->
+  <div
+    *ngIf="isLoading()"
+    class="text-center p-5"
+  >
+    <div
+      class="spinner-border text-primary"
+      role="status"
+    ></div>
+
+    <p class="small text-secondary mt-2 mb-0">
+      Loading dashboard...
+    </p>
   </div>
 
-  <!-- Metric Grid (Updated to 4 responsive columns) [3] -->
-  <div *ngIf="!isLoading()" class="row g-4">
+
+  <!-- Metrics -->
+  <div
+    *ngIf="!isLoading()"
+    class="row g-4"
+  >
+
+    <!-- Pending -->
     <div class="col-xl-3 col-sm-6">
-      <div class="card border-0 shadow-sm bg-warning text-dark p-4 h-100">
-        <h6 class="text-uppercase fw-bold text-muted small mb-2">Pending Reviews</h6>
-        <h1 class="display-5 fw-bold mb-0">{{ pendingCount() }}</h1>
-        <p class="small mb-0 mt-3 text-black-50">Applications awaiting audit</p>
-      </div>
-    </div>
-    
-    <div class="col-xl-3 col-sm-6">
-      <div class="card border-0 shadow-sm bg-success text-white p-4 h-100">
-        <h6 class="text-uppercase fw-bold text-white-50 small mb-2">Approved Entities</h6>
-        <h1 class="display-5 fw-bold mb-0">{{ approvedCount() }}</h1>
-        <p class="small mb-0 mt-3 text-white-50">Active corporate registries</p>
+
+      <div
+        class="
+          card
+          metric-card
+          metric-pending
+          h-100
+        "
+      >
+
+        <div class="card-body p-4">
+
+          <div class="metric-label mb-2">
+            Pending Reviews
+          </div>
+
+          <h2 class="metric-value mb-1">
+            {{ pendingCount() }}
+          </h2>
+
+          <p class="metric-description mb-0">
+            Applications awaiting audit
+          </p>
+
+        </div>
+
       </div>
     </div>
 
-    <!-- NEW CARD: Rejected Applications [3] -->
+
+    <!-- Approved -->
     <div class="col-xl-3 col-sm-6">
-      <div class="card border-0 shadow-sm bg-danger text-white p-4 h-100">
-        <h6 class="text-uppercase fw-bold text-white-50 small mb-2">Rejected Clients</h6>
-        <h1 class="display-5 fw-bold mb-0">{{ rejectedCount() }}</h1>
-        <p class="small mb-0 mt-3 text-white-50">Applications found non-compliant</p>
+
+      <div
+        class="
+          card
+          metric-card
+          metric-approved
+          h-100
+        "
+      >
+
+        <div class="card-body p-4">
+
+          <div class="metric-label mb-2">
+            Approved Entities
+          </div>
+
+          <h2 class="metric-value mb-1">
+            {{ approvedCount() }}
+          </h2>
+
+          <p class="metric-description mb-0">
+            Active corporate registries
+          </p>
+
+        </div>
+
       </div>
     </div>
 
+
+    <!-- Rejected -->
     <div class="col-xl-3 col-sm-6">
-      <div class="card border-0 shadow-sm bg-dark text-white p-4 h-100">
-        <h6 class="text-uppercase fw-bold text-white-50 small mb-2">Total Submissions</h6>
-        <h1 class="display-5 fw-bold mb-0">{{ totalCount() }}</h1>
-        <p class="small mb-0 mt-3 text-white-50">Total requests processed</p>
+
+      <div
+        class="
+          card
+          metric-card
+          metric-rejected
+          h-100
+        "
+      >
+
+        <div class="card-body p-4">
+
+          <div class="metric-label mb-2">
+            Rejected Clients
+          </div>
+
+          <h2 class="metric-value mb-1">
+            {{ rejectedCount() }}
+          </h2>
+
+          <p class="metric-description mb-0">
+            Applications found non-compliant
+          </p>
+
+        </div>
+
       </div>
     </div>
+
+
+    <!-- Total -->
+    <div class="col-xl-3 col-sm-6">
+
+      <div
+        class="
+          card
+          metric-card
+          metric-total
+          h-100
+        "
+      >
+
+        <div class="card-body p-4">
+
+          <div class="metric-label mb-2">
+            Total Submissions
+          </div>
+
+          <h2 class="metric-value mb-1">
+            {{ totalCount() }}
+          </h2>
+
+          <p class="metric-description mb-0">
+            Total requests processed
+          </p>
+
+        </div>
+
+      </div>
+    </div>
+
   </div>
+
 </div>

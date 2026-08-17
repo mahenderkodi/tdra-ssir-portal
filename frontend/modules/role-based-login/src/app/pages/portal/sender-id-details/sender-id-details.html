@@ -1,279 +1,803 @@
-<!-- Back to dashboard -->
-<div class="mb-3">
-
-  <a
-    routerLink="/portal/dashboard"
-    class="btn btn-sm btn-outline-secondary"
-  >
-    ← Back to Dashboard
-  </a>
-
-</div>
-
-
 <!-- Loading -->
 @if (loading()) {
 
-  <div
-    class="
-      d-flex
-      justify-content-center
-      py-5
-    "
-  >
+  <div class="details-loader">
 
     <div
       class="spinner-border text-primary"
       role="status"
-    >
-      <span class="visually-hidden">
-        Loading registration
-      </span>
-    </div>
+    ></div>
+
+    <p class="mt-3 text-secondary">
+      Loading Sender ID details...
+    </p>
 
   </div>
+
 }
 
 
 <!-- Error -->
 @if (errorMessage()) {
 
-  <div
-    class="alert alert-danger"
-    role="alert"
-  >
+  <div class="alert alert-danger">
     {{ errorMessage() }}
   </div>
+
 }
 
 
-<!-- Registration -->
-@if (registration(); as record) {
+@if (
+  senderId();
+  as sender
+) {
 
-  <!-- Header -->
+  @if (
+    registration();
+    as record
+  ) {
+
+    <section
+      class="
+        container-fluid
+        py-4
+        sender-details-page
+      "
+    >
+
+      <!-- ==============================
+           PAGE HEADER
+           ============================== -->
+
+      <div
+        class="
+          d-flex
+          flex-wrap
+          justify-content-between
+          align-items-center
+          gap-3
+          mb-4
+        "
+      >
+
+        <div>
+
+          <a
+            routerLink="/portal/dashboard"
+            class="back-link"
+          >
+            ← Back to Dashboard
+          </a>
+
+
+          <h1 class="page-title mt-2 mb-1">
+
+            {{
+              sender.senderIdName ||
+              record.company.proposedSenderId
+            }}
+
+          </h1>
+
+
+          <div class="text-secondary small">
+
+            Tracking ID:
+
+            <span class="fw-semibold">
+              {{ sender.trackingId }}
+            </span>
+
+          </div>
+
+        </div>
+
+        <p>Current Status: <span
+          class="status-badge"
+          [ngClass]="{
+
+            'status-pending':
+              sender.status === 'PENDING' ||
+              sender.status === 'SUBMITTED' ||
+              sender.status === 'UNDER_REVIEW',
+
+            'status-approved':
+              sender.status === 'APPROVED',
+
+            'status-rejected':
+              sender.status === 'REJECTED',
+
+            'status-info':
+              sender.status === 'INFO_REQUESTED'
+
+          }"
+        >
+         {{ sender.status }}
+        </span> </p>
+        
+
+      </div>
+
+
+      <!-- ==============================
+           TDRA REMARK
+           ============================== -->
+
+      @if (tdraRemark()) {
+
   <div
-    class="
-      d-flex
-      justify-content-between
-      align-items-start
-      mb-4
-    "
+    class="tdra-feedback-card mb-4"
+    [ngClass]="{
+      'feedback-approved':
+        record.currentStatus === 'APPROVED',
+
+      'feedback-info':
+        record.currentStatus === 'INFO_REQUESTED',
+
+      'feedback-rejected':
+        record.currentStatus === 'REJECTED'
+    }"
   >
+
+    <div class="feedback-icon">
+
+      @if (sender.status === 'APPROVED') {
+        ✓
+      } @else if (sender.status === 'REJECTED') {
+        ×
+      } @else {
+        !
+      }
+
+    </div>
+
 
     <div>
 
-      <h1 class="h3 fw-bold mb-1">
-        {{
-          record.company.proposedSenderId
-        }}
-      </h1>
+      <div class="feedback-title">
 
-      <div class="text-secondary">
-        Tracking ID:
-        {{ record.trackingId }}
+        @if (sender.status === 'APPROVED') {
+          TDRA Approval Comment
+        } @else if (sender.status === 'REJECTED') {
+          TDRA Rejection Comment
+        } @else {
+          TDRA Review Comment
+        }
+
+      </div>
+
+      <div class="feedback-text">
+        {{ tdraRemark() }}
       </div>
 
     </div>
 
-
-    <span
-      class="
-        badge
-        text-bg-warning
-        fs-6
-      "
-    >
-      {{ record.currentStatus }}
-    </span>
-
   </div>
 
-
-  <!-- Company Details -->
-  <div
-    class="
-      card
-      border-0
-      shadow-sm
-      mb-4
-    "
-  >
-
-    <div class="card-body p-4">
-
-      <h2 class="h5 fw-bold mb-4">
-        Company Details
-      </h2>
+}
 
 
       <div class="row g-4">
 
-        <div class="col-md-6">
-          <div class="text-secondary small">
-            Company Name
+
+        <!-- ==============================
+             LEFT SIDE
+             ============================== -->
+
+        <div class="col-xl-5 col-lg-6">
+
+
+          <!-- Company -->
+          <div class="details-card mb-4">
+
+            <div class="details-card-header">
+              Company Information
+            </div>
+
+
+            <div class="details-card-body">
+
+              <div class="details-grid">
+
+
+                <div class="detail-item">
+
+                  <span class="detail-label">
+                    Company Name
+                  </span>
+
+                  <span class="detail-value">
+                    {{
+                      record.company.companyName
+                    }}
+                  </span>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <span class="detail-label">
+                    Legal Entity Name
+                  </span>
+
+                  <span class="detail-value">
+                    {{
+                      record.company.legalEntityName
+                    }}
+                  </span>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <span class="detail-label">
+                    Sender ID
+                  </span>
+
+                  <span class="detail-value sender-name">
+                    {{
+                      sender.senderIdName
+                    }}
+                  </span>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <span class="detail-label">
+                    Trade License Number
+                  </span>
+
+                  <span class="detail-value">
+                    {{
+                      record.company.tradeLicenseNumber
+                    }}
+                  </span>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <span class="detail-label">
+                    Registration Number
+                  </span>
+
+                  <span class="detail-value">
+                    {{
+                      record.company.registrationNumber ||
+                      '—'
+                    }}
+                  </span>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <span class="detail-label">
+                    Company Email
+                  </span>
+
+                  <span class="detail-value">
+                    {{
+                      record.company.email ||
+                      '—'
+                    }}
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
           </div>
 
-          <div class="fw-semibold">
-            {{ record.company.companyName }}
+
+          <!-- Address -->
+          <div class="details-card mb-4">
+
+            <div class="details-card-header">
+              Registered Office
+            </div>
+
+
+            <div class="details-card-body">
+
+              <div class="details-grid">
+
+                <div
+                  class="
+                    detail-item
+                    detail-full
+                  "
+                >
+
+                  <span class="detail-label">
+                    Address
+                  </span>
+
+                  <span class="detail-value">
+
+                    {{
+                      record.company.address
+                        ?.addressLine1 ||
+                      '—'
+                    }}
+
+                  </span>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <span class="detail-label">
+                    City
+                  </span>
+
+                  <span class="detail-value">
+                    {{
+                      record.company.address
+                        ?.city ||
+                      '—'
+                    }}
+                  </span>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <span class="detail-label">
+                    Emirate
+                  </span>
+
+                  <span class="detail-value">
+                    {{
+                      record.company.address
+                        ?.emirate ||
+                      '—'
+                    }}
+                  </span>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                  <span class="detail-label">
+                    Country
+                  </span>
+
+                  <span class="detail-value">
+                    {{
+                      record.company.address
+                        ?.country ||
+                      '—'
+                    }}
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
           </div>
+
+
+          <!-- Representative -->
+          <div class="details-card mb-4">
+
+            <div class="details-card-header">
+              Authorized Representative
+            </div>
+
+
+            @if (
+              record.company.contacts &&
+              record.company.contacts.length > 0
+            ) {
+
+              <div class="details-card-body">
+
+                <div class="details-grid">
+
+                  <div class="detail-item">
+
+                    <span class="detail-label">
+                      Name
+                    </span>
+
+                    <span class="detail-value">
+
+                      {{
+                        record.company
+                          .contacts[0]
+                          .firstName
+                      }}
+
+                      {{
+                        record.company
+                          .contacts[0]
+                          .lastName
+                      }}
+
+                    </span>
+
+                  </div>
+
+
+                  <div class="detail-item">
+
+                    <span class="detail-label">
+                      Designation
+                    </span>
+
+                    <span class="detail-value">
+
+                      {{
+                        record.company
+                          .contacts[0]
+                          .designation
+                      }}
+
+                    </span>
+
+                  </div>
+
+
+                  <div
+                    class="
+                      detail-item
+                      detail-full
+                    "
+                  >
+
+                    <span class="detail-label">
+                      Official Email
+                    </span>
+
+                    <span class="detail-value">
+
+                      {{
+                        record.company
+                          .contacts[0]
+                          .officialEmail
+                      }}
+
+                    </span>
+
+                  </div>
+
+
+                  <div class="detail-item">
+
+                    <span class="detail-label">
+                      Mobile
+                    </span>
+
+                    <span class="detail-value">
+
+                      {{
+                        record.company
+                          .contacts[0]
+                          .mobileNumber
+                      }}
+
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            }
+
+          </div>
+
+
+          <!-- Documents -->
+          <div class="details-card">
+
+            <div
+              class="
+                details-card-header
+                d-flex
+                justify-content-between
+                align-items-center
+              "
+            >
+
+              <span>
+                Submitted Documents
+              </span>
+
+              <span class="document-count">
+                {{
+                  record.documents?.length || 0
+                }}
+              </span>
+
+            </div>
+
+
+            <div class="document-list">
+
+              @for (
+                doc of record.documents;
+                track doc.id
+              ) {
+
+                <button
+                  type="button"
+                  class="document-item"
+                  [class.selected]="
+                    activeDocument()?.id ===
+                    doc.id
+                  "
+                  (click)="
+                    previewDocument(doc)
+                  "
+                >
+
+                  <div class="document-icon">
+                    📄
+                  </div>
+
+
+                  <div class="document-info">
+
+                    <div class="document-name">
+
+                      {{
+                        doc.fileName ||
+                        'Document'
+                      }}
+
+                    </div>
+
+
+                    <div class="document-meta">
+
+                      {{
+                        doc.contentType ||
+                        doc.documentType
+                      }}
+
+                      @if (
+                        doc.fileSizeBytes
+                      ) {
+
+                        <span>
+                          •
+                          {{
+                            (doc.fileSizeBytes / 1024)
+                              | number:'1.0-0'
+                          }}
+                          KB
+                        </span>
+
+                      }
+
+                    </div>
+
+                  </div>
+
+
+                  <span class="document-view">
+                    View
+                  </span>
+
+                </button>
+
+              }
+
+            </div>
+
+          </div>
+
         </div>
 
 
-        <div class="col-md-6">
-          <div class="text-secondary small">
-            Legal Entity Name
+        <!-- ==============================
+             RIGHT SIDE - DOCUMENT VIEWER
+             ============================== -->
+
+        <div class="col-xl-7 col-lg-6">
+
+          <div
+            class="
+              details-card
+              document-viewer-card
+            "
+          >
+
+            <div
+              class="
+                details-card-header
+                d-flex
+                justify-content-between
+                align-items-center
+                gap-3
+              "
+            >
+
+              <div class="overflow-hidden">
+
+                <div class="viewer-label">
+                  DOCUMENT PREVIEW
+                </div>
+
+                <div
+                  class="
+                    viewer-title
+                    text-truncate
+                  "
+                >
+
+                  {{
+                    activeDocument()?.fileName ||
+                    'Select a document'
+                  }}
+
+                </div>
+
+              </div>
+
+
+              @if (
+                activeDocument()?.presignedUrl
+              ) {
+
+                <a
+                  [href]="
+                    activeDocument()
+                      .presignedUrl
+                  "
+                  target="_blank"
+                  rel="noopener"
+                  class="
+                    btn
+                    btn-outline-primary
+                    btn-sm
+                  "
+                >
+                  Open in New Tab
+                </a>
+
+              }
+
+            </div>
+
+
+            <div class="document-preview">
+
+
+              <!-- Image -->
+              @if (
+                activeDocument() &&
+                isImage(activeDocument())
+              ) {
+
+                <div
+                  class="
+                    image-preview-container
+                  "
+                >
+
+                  <img
+                    [src]="
+                      activeDocument()
+                        .presignedUrl
+                    "
+                    [alt]="
+                      activeDocument()
+                        .fileName
+                    "
+                    class="document-image"
+                  >
+
+                </div>
+
+              }
+
+
+              <!-- PDF -->
+              @if (
+                activeDocument() &&
+                isPdf(activeDocument()) &&
+                activePreviewUrl()
+              ) {
+
+                <iframe
+                  [src]="activePreviewUrl()"
+                  class="pdf-preview"
+                  title="Document preview"
+                ></iframe>
+
+              }
+
+
+              <!-- Other -->
+              @if (
+                activeDocument() &&
+                !isImage(activeDocument()) &&
+                !isPdf(activeDocument())
+              ) {
+
+                <div
+                  class="
+                    preview-placeholder
+                  "
+                >
+
+                  <div
+                    class="
+                      preview-placeholder-icon
+                    "
+                  >
+                    📄
+                  </div>
+
+                  <h6>
+                    Preview unavailable
+                  </h6>
+
+                  <p>
+                    Open this file in a new tab
+                    to view it.
+                  </p>
+
+                </div>
+
+              }
+
+
+              @if (!activeDocument()) {
+
+                <div
+                  class="
+                    preview-placeholder
+                  "
+                >
+
+                  <div
+                    class="
+                      preview-placeholder-icon
+                    "
+                  >
+                    📁
+                  </div>
+
+                  <h6>
+                    Select a document
+                  </h6>
+
+                  <p>
+                    Select one of your submitted
+                    documents to preview it.
+                  </p>
+
+                </div>
+
+              }
+
+            </div>
+
           </div>
 
-          <div class="fw-semibold">
-            {{ record.company.legalEntityName }}
-          </div>
-        </div>
-
-
-        <div class="col-md-6">
-          <div class="text-secondary small">
-            Proposed Sender ID
-          </div>
-
-          <div class="fw-semibold">
-            {{ record.company.proposedSenderId }}
-          </div>
-        </div>
-
-
-        <div class="col-md-6">
-          <div class="text-secondary small">
-            Trade License Number
-          </div>
-
-          <div class="fw-semibold">
-            {{
-              record.company.tradeLicenseNumber
-            }}
-          </div>
-        </div>
-
-
-        <div class="col-md-6">
-          <div class="text-secondary small">
-            Registration Number
-          </div>
-
-          <div class="fw-semibold">
-            {{
-              record.company.registrationNumber
-            }}
-          </div>
-        </div>
-
-
-        <div class="col-md-6">
-          <div class="text-secondary small">
-            Company Email
-          </div>
-
-          <div class="fw-semibold">
-            {{ record.company.companyEmail }}
-          </div>
         </div>
 
       </div>
 
-    </div>
-
-  </div>
-
-
-  <!-- Representative -->
-  <div
-    class="
-      card
-      border-0
-      shadow-sm
-      mb-4
-    "
-  >
-
-    <div class="card-body p-4">
-
-      <h2 class="h5 fw-bold mb-4">
-        Authorized Representative
-      </h2>
-
-
-      <div class="row g-4">
-
-        <div class="col-md-6">
-
-          <div class="text-secondary small">
-            Name
-          </div>
-
-          <div class="fw-semibold">
-            {{ record.representative.firstName }}
-            {{ record.representative.lastName }}
-          </div>
-
-        </div>
-
-
-        <div class="col-md-6">
-
-          <div class="text-secondary small">
-            Designation
-          </div>
-
-          <div class="fw-semibold">
-            {{ record.representative.designation }}
-          </div>
-
-        </div>
-
-
-        <div class="col-md-6">
-
-          <div class="text-secondary small">
-            Email
-          </div>
-
-          <div class="fw-semibold">
-            {{ record.representative.officialEmail }}
-          </div>
-
-        </div>
-
-
-        <div class="col-md-6">
-
-          <div class="text-secondary small">
-            Mobile Number
-          </div>
-
-          <div class="fw-semibold">
-            {{ record.representative.mobileNumber }}
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- TDRA comments -->
-  @if (record.feedbackComments) {
-
-    <div class="alert alert-warning">
-
-      <div class="fw-bold mb-1">
-        TDRA Comments
-      </div>
-
-      {{ record.feedbackComments }}
-
-    </div>
+    </section>
 
   }
 

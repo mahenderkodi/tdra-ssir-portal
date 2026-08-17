@@ -215,11 +215,12 @@ getMyDraft(): Observable<any> {
   );
 }
 
-getRegistrationById(
+getSenderIdById(
   id: number
 ): Observable<unknown> {
 
-  return this.mockApi
-    .getRegistrationById(id);
+   return this.http.get<any>(
+    `${this.senderIdsApi}/${id}`
+  );
 }
 }

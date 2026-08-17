@@ -2,7 +2,8 @@ import {
   Component,
   OnInit,
   inject,
-  signal
+  signal,
+  computed
 } from '@angular/core';
 
 import {
@@ -11,8 +12,20 @@ import {
 } from '@angular/router';
 
 import {
+  CommonModule
+} from '@angular/common';
+
+import {
+  DomSanitizer,
+  SafeResourceUrl
+} from '@angular/platform-browser';
+
+
+
+import {
   RegistrationService
 } from '../../../core/services/registration-service';
+
 
 @Component({
   selector: 'app-sender-id-details',
@@ -20,6 +33,7 @@ import {
   standalone: true,
 
   imports: [
+    CommonModule,
     RouterLink
   ],
 
@@ -30,7 +44,7 @@ import {
     './sender-id-details.css'
 })
 export class SenderIdDetails
-implements OnInit {
+  implements OnInit {
 
   private readonly route =
     inject(ActivatedRoute);
@@ -38,9 +52,21 @@ implements OnInit {
   private readonly registrationService =
     inject(RegistrationService);
 
+  private readonly sanitizer =
+    inject(DomSanitizer);
+
+
+  readonly senderId =
+    signal<any | null>(null);
 
   readonly registration =
     signal<any | null>(null);
+
+  readonly activeDocument =
+    signal<any | null>(null);
+
+  readonly activePreviewUrl =
+    signal<SafeResourceUrl | null>(null);
 
   readonly loading =
     signal(true);
@@ -49,72 +75,193 @@ implements OnInit {
     signal('');
 
 
+  /*
+   * TDRA comment.
+   *
+   * First try Sender ID remarks.
+   * If backend currently stores the comment
+   * on Registration, use infoRequestComments.
+   */
+  readonly tdraRemark =
+    computed(() => {
+
+      return (
+        this.senderId()?.remarks ||
+        this.senderId()?.infoRequestComments ||
+        // this.registration()?.infoRequestComments ||
+        ''
+      );
+
+    });
+
+
   ngOnInit(): void {
 
     const id =
       Number(
-        this.route.snapshot.paramMap.get('id')
+        this.route.snapshot
+          .paramMap
+          .get('id')
       );
-
-    console.log(
-      'Registration ID from URL:',
-      id
-    );
 
     if (!id) {
 
       this.loading.set(false);
 
       this.errorMessage.set(
-        'Invalid registration ID.'
+        'Invalid Sender ID.'
       );
 
       return;
     }
 
-    this.loadRegistration(id);
+    this.loadDetails(id);
   }
 
 
-  private loadRegistration(
-    id: number
-  ): void {
+ private loadDetails(
+  id: number
+): void {
 
-    this.loading.set(true);
-    this.errorMessage.set('');
+  this.loading.set(true);
+  this.errorMessage.set('');
 
-    this.registrationService
-      .getRegistrationById(id)
-      .subscribe({
 
-        next: response => {
+  // 1. Load the selected Sender ID
+  this.registrationService
+    .getSenderIdById(id)
+    .subscribe({
 
-          console.log(
-            'REGISTRATION DETAILS:',
-            response
-          );
+      next: senderResponse => {
 
-          this.registration.set(
-            response
-          );
+        console.log(
+          'SENDER ID RESPONSE:',
+          senderResponse
+        );
 
-          this.loading.set(false);
-        },
+        this.senderId.set(
+          senderResponse
+        );
 
-        error: error => {
 
-          console.error(
-            'REGISTRATION DETAILS ERROR:',
-            error
-          );
+        // 2. Load company / documents separately
+        this.loadRegistrationData();
 
-          this.loading.set(false);
+      },
 
-          this.errorMessage.set(
-            'Unable to load registration details.'
+      error: error => {
+
+        console.error(
+          'SENDER ID DETAILS ERROR:',
+          error
+        );
+
+        this.loading.set(false);
+
+        this.errorMessage.set(
+          'Unable to load Sender ID details.'
+        );
+      }
+
+    });
+}
+
+
+private loadRegistrationData(): void {
+
+  this.registrationService
+    .getMyDraft()
+    .subscribe({
+
+      next: registrationResponse => {
+
+        console.log(
+          'REGISTRATION RESPONSE:',
+          registrationResponse
+        );
+
+        this.registration.set(
+          registrationResponse
+        );
+
+
+        const documents =
+          registrationResponse
+            ?.documents ?? [];
+
+
+        if (documents.length > 0) {
+
+          this.previewDocument(
+            documents[0]
           );
         }
 
-      });
+
+        this.loading.set(false);
+      },
+
+      error: error => {
+
+        console.error(
+          'REGISTRATION DETAILS ERROR:',
+          error
+        );
+
+        /*
+         * Sender ID has already loaded,
+         * so don't destroy the entire page.
+         */
+        this.loading.set(false);
+
+        this.errorMessage.set(
+          'Sender ID loaded, but company registration details could not be retrieved.'
+        );
+      }
+
+    });
+}
+
+  previewDocument(
+    doc: any
+  ): void {
+
+    this.activeDocument.set(doc);
+
+    if (doc?.presignedUrl) {
+
+      this.activePreviewUrl.set(
+        this.sanitizer
+          .bypassSecurityTrustResourceUrl(
+            doc.presignedUrl
+          )
+      );
+
+    } else {
+
+      this.activePreviewUrl.set(null);
+    }
+  }
+
+
+  isImage(
+    doc: any
+  ): boolean {
+
+    return (
+      doc?.contentType
+        ?.startsWith('image/')
+    );
+  }
+
+
+  isPdf(
+    doc: any
+  ): boolean {
+
+    return (
+      doc?.contentType ===
+      'application/pdf'
+    );
   }
 }

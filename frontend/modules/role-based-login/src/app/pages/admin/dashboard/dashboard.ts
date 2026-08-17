@@ -7,6 +7,7 @@ import { AdminRegistrationService } from '../../../core/services/admin-registrat
   standalone: true,
   imports: [CommonModule],
   templateUrl: './dashboard.html',
+  styleUrl: './dashboard.css'
 })
 export class AdminDashboardComponent implements OnInit {
   private adminService = inject(AdminRegistrationService);
@@ -21,10 +22,11 @@ export class AdminDashboardComponent implements OnInit {
     this.adminService.getAllRegistrations().subscribe({
       next: (data) => {
         this.totalCount.set(data.length);
-        this.pendingCount.set(data.filter(r => r.currentStatus === 'SUBMITTED' || r.currentStatus === 'UNDER_REVIEW').length);
+        this.pendingCount.set(data.filter(r => r.currentStatus === 'SUBMITTED' || r.currentStatus === 'INFO_REQUESTED').length);
         this.approvedCount.set(data.filter(r => r.currentStatus === 'APPROVED').length);
         this.rejectedCount.set(data.filter(r => r.currentStatus === 'REJECTED').length); 
         this.isLoading.set(false);
+        console.log("registrations data", data);
       },
       error: () => {
         this.isLoading.set(false);

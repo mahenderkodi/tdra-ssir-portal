@@ -1,8 +1,529 @@
-.card {
+/* ==================================================
+   Page
+   ================================================== */
+
+.audit-page {
+  color: #1f2937;
+}
+
+
+.audit-loader {
+  min-height: 400px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.audit-page-title {
+  color: #1f2937;
+
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+
+.audit-back-btn {
+  color: var(--tdra-primary);
+
+  text-decoration: none;
+
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+
+.audit-back-btn:hover {
+  color: var(--tdra-primary-hover);
+
+  text-decoration: underline;
+}
+
+
+/* ==================================================
+   Standard Cards
+   ================================================== */
+
+.audit-card {
+  background-color: #ffffff;
+
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 2px 8px
+    rgba(0, 0, 0, 0.05);
+}
+
+
+.audit-card-header {
+  padding: 1rem 1.25rem;
+
+  background-color:
+    rgba(
+      var(--tdra-primary-rgb),
+      0.06
+    );
+
+  color: var(--tdra-primary);
+
+  border-bottom: 1px solid #e5e7eb;
+
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+
+.audit-card-body {
+  padding: 1.25rem;
+}
+
+
+/* ==================================================
+   Information Grid
+   ================================================== */
+
+.detail-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 1.25rem;
+}
+
+
+.detail-item {
+  min-width: 0;
+}
+
+
+.detail-full {
+  grid-column: 1 / -1;
+}
+
+
+.detail-label {
+  display: block;
+
+  margin-bottom: 0.3rem;
+
+  color: #6b7280;
+
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.03em;
+}
+
+
+.detail-value {
+  display: block;
+
+  color: #1f2937;
+
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  word-break: break-word;
+}
+
+
+/* ==================================================
+   Status
+   ================================================== */
+
+.status-badge {
+  padding: 0.45rem 0.8rem;
+
+  border-radius: 999px;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  letter-spacing: 0.04em;
+
+  text-transform: uppercase;
+}
+
+
+.status-submitted {
+  color: #92400e;
+  background-color: #fef3c7;
+}
+
+
+.status-approved {
+  color: var(--tdra-success);
+  background-color: #dcfce7;
+}
+
+
+.status-rejected {
+  color: #b91c1c;
+  background-color: #fee2e2;
+}
+
+
+.status-info {
+  color: #9a3412;
+  background-color: #ffedd5;
+}
+
+
+/* ==================================================
+   Document List
+   ================================================== */
+
+.document-count {
+  min-width: 26px;
+  height: 26px;
+
+  padding: 0 8px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+
+  background-color:
+    rgba(
+      var(--tdra-primary-rgb),
+      0.12
+    );
+
+  color: var(--tdra-primary);
+
+  font-size: 0.75rem;
+}
+
+
+.document-list {
+  padding: 0.5rem;
+}
+
+
+.document-item {
+  width: 100%;
+
+  padding: 0.85rem;
+
+  display: flex;
+  align-items: center;
+
+  gap: 0.8rem;
+
+  background-color: #ffffff;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  text-align: left;
+
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+
+.document-item:hover {
+  background-color: #f8fafc;
+}
+
+
+.document-item.selected {
+  background-color:
+    rgba(
+      var(--tdra-primary-rgb),
+      0.07
+    );
+
+  border-color:
+    rgba(
+      var(--tdra-primary-rgb),
+      0.28
+    );
+}
+
+
+.document-icon {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 8px;
+
+  background-color:
+    rgba(
+      var(--tdra-primary-rgb),
+      0.08
+    );
+}
+
+
+.document-info {
+  min-width: 0;
+
+  flex-grow: 1;
+}
+
+
+.document-name {
+  overflow: hidden;
+
+  color: #1f2937;
+
+  font-size: 0.875rem;
+  font-weight: 600;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.document-meta {
+  margin-top: 2px;
+
+  color: #6b7280;
+
+  font-size: 0.75rem;
+}
+
+
+.document-view-label {
+  color: var(--tdra-primary);
+
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+
+.empty-documents {
+  padding: 2rem;
+
+  color: #6b7280;
+
+  text-align: center;
+
+  font-size: 0.875rem;
+}
+
+
+/* ==================================================
+   Document Viewer
+   ================================================== */
+
+.document-viewer-header {
+  background-color:
+    rgba(
+      var(--tdra-primary-rgb),
+      0.06
+    );
+}
+
+
+.viewer-eyebrow {
+  margin-bottom: 2px;
+
+  color: #6b7280;
+
+  font-size: 0.65rem;
+  font-weight: 700;
+
+  letter-spacing: 0.06em;
+}
+
+
+.viewer-title {
+  color: var(--tdra-primary);
+
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+
+.document-preview {
+  height: 520px;
+
+  background-color: #f3f4f6;
+
   overflow: hidden;
 }
 
-iframe {
-  border-radius: 0 0 12px 12px;
+
+/* IMAGE FIX */
+
+.image-preview-container {
+  width: 100%;
+  height: 100%;
+
+  padding: 24px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: auto;
+}
+
+
+.document-image {
+  display: block;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
+
+  border-radius: 6px;
+
+  box-shadow:
+    0 2px 8px
+    rgba(0, 0, 0, 0.08);
+}
+
+
+/* PDF */
+
+.pdf-preview {
+  width: 100%;
+  height: 100%;
+
+  border: 0;
+
+  background-color: #ffffff;
+}
+
+
+/* Unsupported / Empty */
+
+.preview-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 2rem;
+
+  color: #6b7280;
+
+  text-align: center;
+}
+
+
+.preview-placeholder-icon {
+  margin-bottom: 1rem;
+
+  font-size: 2.5rem;
+}
+
+
+/* ==================================================
+   Review
+   ================================================== */
+
+.review-actions {
+  border-top: 1px solid #e5e7eb;
+
+  padding-top: 1rem;
+}
+
+
+.request-info-btn {
+  color: #92400e;
+
+  background-color: #fef3c7;
+
+  border: 1px solid #f59e0b;
+}
+
+
+.request-info-btn:hover {
+  color: #ffffff;
+
+  background-color: #d97706;
+
+  border-color: #d97706;
+}
+
+
+/* ==================================================
+   Responsive
+   ================================================== */
+
+@media (max-width: 991.98px) {
+
+  .document-preview {
+    height: 450px;
+  }
+
+}
+
+
+@media (max-width: 767.98px) {
+
+  .audit-page {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .detail-full {
+    grid-column: auto;
+  }
+
+
+  .document-preview {
+    height: 380px;
+  }
+
+
+  .review-actions {
+    flex-direction: column;
+  }
+
+
+  .review-actions .btn {
+    width: 100%;
+  }
+
+}
+
+
+@media (max-width: 575.98px) {
+
+  .document-preview {
+    height: 320px;
+  }
+
+
+  .image-preview-container {
+    padding: 12px;
+  }
+
 }

@@ -1,49 +1,319 @@
+/* ==================================================
+   TDRA Admin Layout
+   ================================================== */
+
 .admin-wrapper {
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   overflow: hidden;
+  background-color: #f8fafc;
 }
+
+
+/* ==================================================
+   Sidebar
+   ================================================== */
 
 .admin-sidebar {
   width: 280px;
   min-width: 280px;
-  background-color: #0f172a; /* Deep Slate 900 */
-  border-right: 1px solid #1e293b;
+
+  background-color: var(--tdra-primary);
+  color: #ffffff;
+
+  display: flex;
+  flex-direction: column;
+
+  border-right: 1px solid
+    rgba(255, 255, 255, 0.12);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+
+  z-index: 1050;
 }
+
+
+/* ==================================================
+   Sidebar Header
+   ================================================== */
+
+.sidebar-header {
+  min-height: 88px;
+
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.12);
+}
+
 
 .logo-badge {
-  width: 40px;
-  height: 40px;
-  background-color: #0d6efd !important;
+  width: 42px;
+  height: 42px;
+
+  background-color: #ffffff !important;
+  color: var(--tdra-primary) !important;
+
+  font-size: 0.9rem;
+  font-weight: 800;
+
+  flex-shrink: 0;
 }
+
+
+.sidebar-title {
+  color: #ffffff;
+}
+
+
+.sidebar-subtitle {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+
+/* ==================================================
+   Navigation
+   ================================================== */
 
 .sidebar-link {
-  color: #94a3b8;
+  color: rgba(255, 255, 255, 0.78);
+
   text-decoration: none;
-  transition: all 0.2s ease-in-out;
+
+  border-radius: 8px;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 }
+
 
 .sidebar-link:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  color: #f8fafc;
+  background-color:
+    rgba(255, 255, 255, 0.10);
+
+  color: #ffffff;
+
+  transform: translateX(2px);
 }
+
 
 .sidebar-link.active {
-  background-color: #0d6efd !important; /* Premium Blue */
-  color: #ffffff !important;
+  background-color: #ffffff !important;
+  color: var(--tdra-primary) !important;
+
+  font-weight: 600;
 }
+
+
+.sidebar-link.active .nav-icon {
+  color: var(--tdra-primary);
+}
+
+
+.nav-icon {
+  width: 24px;
+  text-align: center;
+
+  font-size: 1rem;
+}
+
 
 .py-2-5 {
-  padding-top: 0.625rem;
-  padding-bottom: 0.625rem;
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
 }
+
+
+/* ==================================================
+   Sidebar Footer
+   ================================================== */
+
+.sidebar-footer {
+  border-top: 1px solid
+    rgba(255, 255, 255, 0.12) !important;
+}
+
 
 .avatar {
-  width: 38px;
-  height: 38px;
-  background-color: #334155 !important;
+  width: 40px;
+  height: 40px;
+
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.16
+  ) !important;
+
+  color: #ffffff;
+
+  flex-shrink: 0;
 }
 
+
+.user-role {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+
+.logout-btn {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+
+.logout-btn:hover {
+  background-color: #ffffff;
+  border-color: #ffffff;
+  color: var(--tdra-primary);
+}
+
+
+/* ==================================================
+   Main Content
+   ================================================== */
+
 .admin-main {
+  min-width: 0;
   max-height: 100vh;
+
+  overflow-y: auto;
+
+  background-color: #f8fafc;
+}
+
+
+/* ==================================================
+   Mobile Header
+   ================================================== */
+
+.mobile-admin-header {
+  display: none;
+
+  height: 64px;
+
+  background-color: #ffffff;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  padding: 0 1rem;
+
+  align-items: center;
+  justify-content: space-between;
+
+  position: sticky;
+  top: 0;
+
+  z-index: 1030;
+}
+
+
+.mobile-brand {
+  color: var(--tdra-primary);
+
+  font-weight: 700;
+}
+
+
+.menu-button {
+  width: 42px;
+  height: 42px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  background-color: #ffffff;
+  color: var(--tdra-primary);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 1.35rem;
+}
+
+
+/* ==================================================
+   Mobile Overlay
+   ================================================== */
+
+.sidebar-overlay {
+  display: none;
+
+  position: fixed;
+  inset: 0;
+
+  background-color:
+    rgba(15, 23, 42, 0.45);
+
+  z-index: 1040;
+}
+
+
+/* ==================================================
+   Responsive
+   ================================================== */
+
+@media (max-width: 991.98px) {
+
+  .admin-wrapper {
+    display: block !important;
+    overflow: auto;
+  }
+
+
+  .admin-sidebar {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    transform: translateX(-100%);
+
+    box-shadow:
+      6px 0 20px
+      rgba(0, 0, 0, 0.15);
+  }
+
+
+  .admin-sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+
+
+  .sidebar-overlay.show {
+    display: block;
+  }
+
+
+  .mobile-admin-header {
+    display: flex;
+  }
+
+
+  .admin-main {
+    max-height: none;
+    min-height: calc(100vh - 64px);
+
+    padding: 1rem !important;
+  }
+
+}
+
+
+@media (max-width: 575.98px) {
+
+  .admin-sidebar {
+    width: 270px;
+    min-width: 270px;
+  }
+
+
+  .admin-main {
+    padding: 0.75rem !important;
+  }
+
 }

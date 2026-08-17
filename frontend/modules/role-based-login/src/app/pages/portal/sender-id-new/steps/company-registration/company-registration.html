@@ -503,12 +503,17 @@
       </label>
 
       <input
-        id="proposedSenderId"
-        type="text"
-        class="form-control"
-        formControlName="proposedSenderId"
-        placeholder="Enter proposed sender ID"
-      />
+  id="proposedSenderId"
+  type="text"
+  class="form-control"
+  formControlName="proposedSenderId"
+  placeholder="Enter proposed sender ID"
+
+  [class.is-invalid]="
+    group.get('proposedSenderId')?.touched &&
+    group.get('proposedSenderId')?.invalid
+  "
+/>
 
       @if (
         group.get('proposedSenderId')?.touched &&
