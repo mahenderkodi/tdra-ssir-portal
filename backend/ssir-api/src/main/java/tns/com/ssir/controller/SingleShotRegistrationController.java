@@ -14,9 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import tns.com.ssir.dto.RegistrationRequestDto;
 import tns.com.ssir.dto.RegistrationSuccessResponse;
+import tns.com.ssir.dto.AdminRegistrationResponseDto;
+import tns.com.ssir.dto.OnboardingDetailResponseDto;
 import tns.com.ssir.security.UserPrincipal;
 import tns.com.ssir.core.entity.RegistrationRequest;
 import tns.com.ssir.service.SingleShotRegistrationService;
+
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -97,5 +101,21 @@ public class SingleShotRegistrationController {
                 .build();
 
         return ResponseEntity.ok(successResponse);
+    }
+    
+ // NEW: G. GET ALL ONBOARDING REQUESTS FOR TDRA ADMIN (Includes resolved Sender ID details) [3]
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ROLE_TDRA_SUPER_ADMIN', 'ROLE_TDRA_REVIEWER')")
+    public ResponseEntity<List<AdminRegistrationResponseDto>> getAllOnboardingRequests() {
+        List<AdminRegistrationResponseDto> list = singleShotService.getAllOnboardingRequests();
+        return ResponseEntity.ok(list);
+    }
+
+ // NEW: H. GET SINGLE ONBOARDING REQUEST BY ID (Corrected to return flat DTO) [3]
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_TDRA_SUPER_ADMIN', 'ROLE_TDRA_REVIEWER')")
+    public ResponseEntity<OnboardingDetailResponseDto> getOnboardingRequestById(@PathVariable("id") Long id) {
+        OnboardingDetailResponseDto response = singleShotService.getOnboardingRequestById(id);
+        return ResponseEntity.ok(response);
     }
 }

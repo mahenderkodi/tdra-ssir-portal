@@ -81,13 +81,18 @@ public class SecurityConfig {
 				// --- ADDED SWAGGER UI WHITELISTS [1] ---
 				.requestMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll()
 				.requestMatchers("/swagger-ui", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-				// Permit single-shot onboarding requests for pending and approved roles [3]
-				.requestMatchers("/api/v1/onboarding-single/**").hasAnyRole("COMPANY_PENDING", "COMPANY_ADMIN")
-				
-				.requestMatchers(HttpMethod.PUT, "/api/v1/onboarding-single/**")
-				.hasAnyRole("COMPANY_ADMIN", "COMPANY_USER")
-				
-				// ---------------------------------------
+
+				// =====================================================================
+				// CONSOLIDATED SINGLE-SHOT ONBOARDING RULES (No Conflicts) [3]
+				// =====================================================================
+				// A. Only Company Admins can POST/PUT submissions & resubmissions
+				.requestMatchers(HttpMethod.POST, "/api/v1/onboarding-single/submit").hasRole("COMPANY_ADMIN")
+				.requestMatchers(HttpMethod.PUT, "/api/v1/onboarding-single/submit").hasRole("COMPANY_ADMIN")
+
+				// B. Only TDRA Admin staff can GET lists and inspect detailed applications
+				.requestMatchers(HttpMethod.GET, "/api/v1/onboarding-single", "/api/v1/onboarding-single/**")
+				.hasAnyRole("TDRA_SUPER_ADMIN", "TDRA_APPROVER", "REVIEWER")
+				// =====================================================================
 
 				// 3. SECURE ENDPOINTS
 				// Secure Onboarding Draft Updates & Submissions (Allowed for pending users) [1, 3]

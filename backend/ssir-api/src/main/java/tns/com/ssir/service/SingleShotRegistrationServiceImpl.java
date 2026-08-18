@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -304,4 +305,151 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
     private String convertCamelCaseToUnderscore(String camelCase) {
         return camelCase.replaceAll("(?<!_)(?=[A-Z])", "_");
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<AdminRegistrationResponseDto> getAllOnboardingRequests() {
+        log.info("Fetching all onboarding registrations for TDRA Admin Queue...");
+        List<RegistrationRequest> requests = registrationRepository.findAll();
+
+        return requests.stream()
+                .map(this::mapToAdminResponseDto)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public OnboardingDetailResponseDto getOnboardingRequestById(Long id) {
+        log.info("Fetching detailed onboarding application for ID: {}", id);
+        RegistrationRequest request = registrationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Registration Request not found with ID: " + id));
+
+        Company company = request.getCompany();
+
+        // FIX: Find the specific SenderId record in MySQL that matches this request's tracking ID [3]
+        SenderId matchedSenderId = company.getSenderIds().stream()
+                .filter(s -> request.getTrackingId().equals(s.getTrackingId()))
+                .findFirst()
+                .orElse(null);
+
+        String senderIdName = matchedSenderId != null ? matchedSenderId.getSenderIdName() : company.getProposedSenderId();
+        String senderIdStatus = matchedSenderId != null ? matchedSenderId.getStatus() : "PENDING";
+        String remarks = matchedSenderId != null ? matchedSenderId.getRemarks() : null;
+
+        // Extract Representative details safely
+        String repFirstName = null, repLastName = null, repDesignation = null, repDepartment = null;
+        String repOfficialEmail = null, repMobileNumber = null, repOfficeNumber = null;
+        String repAddress = null, repUaePassId = null, repPassportEmiratesId = null;
+
+        if (company.getContacts() != null && !company.getContacts().isEmpty()) {
+            CompanyContact contact = company.getContacts().get(0);
+            repFirstName = contact.getFirstName();
+            repLastName = contact.getLastName();
+            repDesignation = contact.getDesignation();
+            repDepartment = contact.getDepartment();
+            repOfficialEmail = contact.getOfficialEmail();
+            repMobileNumber = contact.getMobileNumber();
+            repOfficeNumber = contact.getOfficeNumber();
+            repAddress = contact.getAddress();
+            repUaePassId = contact.getUaePassId();
+            repPassportEmiratesId = contact.getPassportEmiratesId();
+        }
+
+        // Extract Address details safely
+        String addressLine1 = null, country = "United Arab Emirates", emirate = null, city = null, postalCode = null;
+        if (company.getAddress() != null) {
+            CompanyAddress addr = company.getAddress();
+            addressLine1 = addr.getAddressLine1();
+            country = addr.getCountry();
+            emirate = addr.getEmirate();
+            city = addr.getCity();
+            postalCode = addr.getPostalCode();
+        }
+
+        // Generate short-lived presigned URL for MinIO [2]
+        String documentFileName = null;
+        String documentUrl = null;
+        if (request.getDocuments() != null && !request.getDocuments().isEmpty()) {
+            LegalDocument doc = request.getDocuments().get(0);
+            documentFileName = doc.getFileName();
+            documentUrl = storageService.generatePresignedUrl(doc.getFileStoragePath());
+        }
+
+        return OnboardingDetailResponseDto.builder()
+                .id(request.getId())
+                .trackingId(request.getTrackingId())
+                .currentStatus(request.getCurrentStatus())
+                .submittedAt(request.getCreatedAt())
+                .companyName(company.getCompanyName())
+                .legalEntityName(company.getLegalEntityName())
+                .tradeLicenseNumber(company.getTradeLicenseNumber())
+                .registrationNumber(company.getRegistrationNumber())
+                .taxVatNumber(company.getTaxVatNumber())
+                .companyType(company.getCompanyType())
+                .industryType(company.getIndustryType())
+                .dateOfIncorporation(company.getDateOfIncorporation())
+                .email(company.getEmail())
+                .companyPhone(company.getCompanyPhone())
+                .website(company.getWebsite())
+                .addressLine1(addressLine1)
+                .country(country)
+                .emirate(emirate)
+                .city(city)
+                .postalCode(postalCode)
+                .repFirstName(repFirstName)
+                .repLastName(repLastName)
+                .repDesignation(repDesignation)
+                .repDepartment(repDepartment)
+                .repOfficialEmail(repOfficialEmail)
+                .repMobileNumber(repMobileNumber)
+                .repOfficeNumber(repOfficeNumber)
+                .repAddress(repAddress)
+                .repUaePassId(repUaePassId)
+                .repPassportEmiratesId(repPassportEmiratesId)
+                .proposedSenderId(senderIdName) // Maps the targeted Sender ID [3]
+                .senderIdStatus(senderIdStatus)
+                .remarks(remarks)
+                .documentFileName(documentFileName)
+                .documentUrl(documentUrl) // Presigned URL [2]
+                .build();
+    }
+
+    private AdminRegistrationResponseDto mapToAdminResponseDto(RegistrationRequest request) {
+        Company company = request.getCompany();
+        
+        // FIX: Find the specific SenderId record in database that matches this request's trackingId [3]
+        String resolvedSenderId = "N/A";
+        if (company.getSenderIds() != null) {
+            resolvedSenderId = company.getSenderIds().stream()
+                    .filter(s -> request.getTrackingId().equals(s.getTrackingId()))
+                    .map(SenderId::getSenderIdName)
+                    .findFirst()
+                    .orElse(company.getProposedSenderId()); // Fallback to company level proposed id if not found [3]
+        }
+
+        String repName = "N/A";
+        String repEmail = "N/A";
+        if (company.getContacts() != null && !company.getContacts().isEmpty()) {
+            CompanyContact contact = company.getContacts().get(0);
+            repName = contact.getFirstName() + " " + contact.getLastName();
+            repEmail = contact.getOfficialEmail();
+        }
+
+        int docCount = request.getDocuments() != null ? request.getDocuments().size() : 0;
+
+        return AdminRegistrationResponseDto.builder()
+                .id(request.getId())
+                .trackingId(request.getTrackingId())
+                .companyName(company.getCompanyName())
+                .companyType(company.getCompanyType())
+                .proposedSenderId(resolvedSenderId) // Now returns the correct, unique Sender ID [3]
+                .representativeName(repName)
+                .representativeEmail(repEmail)
+                .currentStatus(request.getCurrentStatus())
+                .submittedAt(request.getCreatedAt())
+                .documentCount(docCount)
+                .build();
+    }
+    
+    
 }
