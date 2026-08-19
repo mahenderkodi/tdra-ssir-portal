@@ -134,21 +134,64 @@ styleUrl: './sender-id-new.css',
 })
 export class SenderIdNew implements OnInit{
 
-  ngOnInit(): void {
+ ngOnInit(): void {
 
+  /*
+   * ADDITIONAL SENDER ID
+   *
+   * Load the existing company and representative
+   * details, but keep the new Sender ID blank.
+   */
   if (this.isAdditionalSenderId) {
 
-    /*
-     * Existing documents should not
-     * be mandatory again.
-     */
+    // Existing documents should not be required
     this.configureAdditionalSenderIdMode();
 
-    /*
-     * Load existing company data.
-     */
+    // Autofill company + representative + existing documents
     this.loadMyDraft();
+
+    return;
   }
+
+
+  /*
+   * EDIT / RESUBMIT SENDER ID
+   */
+  if (this.isEditMode) {
+
+    if (!this.editSenderId) {
+
+      this.toast.error(
+        'Missing Sender ID.'
+      );
+
+      void this.router.navigate(
+        ['/portal/dashboard']
+      );
+
+      return;
+    }
+
+    // Existing documents are optional during resubmission
+    this.configureAdditionalSenderIdMode();
+
+    // Load existing company + representative + documents
+    this.loadMyDraft();
+
+    // Load the specific Sender ID being edited
+    this.loadSenderIdForEdit(
+      this.editSenderId
+    );
+
+    return;
+  }
+
+
+  /*
+   * NORMAL NEW REGISTRATION
+   *
+   * No autofill required.
+   */
 }
 
 
@@ -173,25 +216,41 @@ export class SenderIdNew implements OnInit{
   private readonly route =
   inject(ActivatedRoute);
 
-  readonly isAdditionalSenderId =
-  this.route.snapshot.queryParamMap.get('mode')
-    === 'additional';
+  readonly mode =
+  this.route.snapshot.queryParamMap.get('mode');
+
+readonly isAdditionalSenderId =
+  this.mode === 'additional';
+
+readonly isEditMode =
+  this.mode === 'edit';
+
+readonly editSenderId =
+  Number(
+    this.route.snapshot.queryParamMap.get('id')
+  );
 
 readonly steps = [
   {
     number: 1,
-    title: this.isAdditionalSenderId
-      ? 'Company & Sender ID'
-      : 'Company Registration'
+    title:
+      this.isAdditionalSenderId
+        ? 'Company & Sender ID'
+        : this.isEditMode
+          ? 'Company & Sender ID'
+          : 'Company Registration'
   },
+
   {
     number: 2,
     title: 'Legal Documents'
   },
+
   {
     number: 3,
     title: 'Authorized Representative'
   },
+
   {
     number: 4,
     title: 'Account Setup'
@@ -652,7 +711,7 @@ readonly steps = [
   }
 
 
-  private loadMyDraft(): void {
+ private loadMyDraft(): void {
 
   this.registrationService
     .getMyDraft()
@@ -678,6 +737,11 @@ readonly steps = [
         /*
          * STEP 1:
          * Prefill existing company data.
+         *
+         * proposedSenderId is NOT filled here.
+         * Additional mode needs a blank Sender ID.
+         * Edit mode gets the exact Sender ID
+         * from /sender-ids/{id}.
          */
         this.registrationForm
           .controls.company
@@ -695,39 +759,18 @@ readonly steps = [
             registrationNumber:
               company.registrationNumber ?? '',
 
-
-            /*
-             * Backend:
-             * taxVatNumber
-             *
-             * Frontend:
-             * taxId
-             */
             taxId:
               company.taxVatNumber ?? '',
 
             companyType:
               company.companyType ?? '',
 
-
-            /*
-             * Backend:
-             * industryType
-             *
-             * Frontend:
-             * industry
-             */
             industry:
               company.industryType ?? '',
 
             dateOfIncorporation:
               company.dateOfIncorporation ?? '',
 
-
-            /*
-             * Our current FE uses one
-             * registeredAddress field.
-             */
             registeredAddress:
               [
                 address?.addressLine1,
@@ -756,18 +799,23 @@ readonly steps = [
               company.email ?? '',
 
             companyPhone:
-              company.companyPhone ?? '',
+              company.companyPhone ?? ''
 
-
-            /*
-             * IMPORTANT:
-             * We are creating another
-             * Sender ID.
-             *
-             * Never copy the old one.
-             */
-            proposedSenderId: ''
           });
+
+
+        /*
+         * ADDITIONAL SENDER ID:
+         * explicitly keep Sender ID blank.
+         */
+        if (this.isAdditionalSenderId) {
+
+          this.registrationForm
+            .controls.company
+            .controls.proposedSenderId
+            .setValue('');
+
+        }
 
 
         /*
@@ -809,26 +857,34 @@ readonly steps = [
 
               passportOrEmiratesId:
                 representative.passportEmiratesId ?? ''
+
             });
+
         }
 
 
         /*
          * STEP 2:
-         * Existing backend document metadata.
-         *
-         * We cannot programmatically prefill
-         * <input type="file">.
+         * Display existing documents.
          */
         this.existingDocuments.set(
           response.documents ?? []
         );
 
-        this.existingDocuments.set(
-  response.documents ?? []
-);
 
-this.lockExistingCompanyData();
+        /*
+         * Additional Sender ID:
+         * existing company and representative
+         * should remain locked.
+         *
+         * Edit mode:
+         * do NOT lock them.
+         */
+        if (this.isAdditionalSenderId) {
+
+          this.lockExistingCompanyData();
+
+        }
 
 
         console.log(
@@ -837,6 +893,7 @@ this.lockExistingCompanyData();
         );
 
       },
+
 
       error: error => {
 
@@ -848,10 +905,59 @@ this.lockExistingCompanyData();
         this.toast.error(
           'Unable to load existing company information.'
         );
+
       }
+
     });
+
 }
 
+private loadSenderIdForEdit(
+  id: number
+): void {
+
+  this.registrationService
+    .getSenderIdById(id)
+    .subscribe({
+
+      next: (response: any) => {
+
+        console.log(
+          'EDIT SENDER ID RESPONSE:',
+          response
+        );
+
+
+        /*
+         * For resubmit, keep the existing
+         * Sender ID instead of creating a new one.
+         */
+        this.registrationForm
+          .controls.company
+          .controls.proposedSenderId
+          .setValue(
+            response.senderIdName ?? ''
+          );
+
+      },
+
+
+      error: error => {
+
+        console.error(
+          'EDIT LOAD ERROR:',
+          error
+        );
+
+        this.toast.error(
+          'Unable to load Sender ID details.'
+        );
+
+      }
+
+    });
+
+}
 
 
 private configureAdditionalSenderIdMode(): void {
@@ -1234,92 +1340,89 @@ if (accountGroup.invalid) {
   return;
 }
 
-    const formData =
-      this.buildRegistrationFormData();
+   const formData =
+  this.buildRegistrationFormData();
 
-    this.isSubmitting.set(true);
-    this.successMessage.set('');
-    this.errorMessage.set('');
+this.isSubmitting.set(true);
+this.successMessage.set('');
+this.errorMessage.set('');
 
-    formData.forEach((value, key) => {
-      console.log(key, value);
-    });
-
-    this.registrationService
-      .createRegistration(formData)
-      .subscribe({
-
-        next: (response) => {
-          console.log(
-            'Backend response:',
-            response
-          );
-
-          this.isSubmitting.set(false);
-
-          /*
-           * Clear documents only after successful submission.
-           */
-          this.resetDocuments();
-
-          this.successMessage.set(
-            'Registration and documents submitted successfully.'
-          );
-
-          this.toast.success(
-            'Registration submitted successfully.'
-          );
+formData.forEach((value, key) => {
+  console.log(key, value);
+});
 
 
-          void this.router.navigate(
-            ['/portal/dashboard'],
-            // {
-            //   state: {
-            //     trackingId:
-            //       response.trackingId,
-
-            //     status:
-            //       response.status,
-
-            //     message:
-            //       response.message,
-
-            //     submittedAt:
-            //       response.submittedAt,
-
-            //     username: response.username,
-            //     tempPassword: response.tempPassword
-            //   }
-            // }
-          );
-
-        },
-
-        error: (error) => {
-          console.error(
-            'Registration API error:',
-            error
-          );
-
-          this.isSubmitting.set(false);
+const request$ = this.isEditMode
+  ? this.registrationService.resubmitRegistration(
+      this.editSenderId,
+      formData
+    )
+  : this.registrationService.createRegistration(
+      formData
+    );
 
 
+request$.subscribe({
 
-          /*
-           * Do not reset documents here.
-           * The user may retry the submission.
-           */
-          this.errorMessage.set(
-            'Registration could not be submitted. Please try again.'
-          );
+  next: response => {
 
-          this.toast.error(
-            'Registration could not be submitted. Please try again.'
-          );
-        }
-      });
+    console.log(
+      'Backend response:',
+      response
+    );
+
+    this.isSubmitting.set(false);
+
+    this.resetDocuments();
+
+    if (this.isEditMode) {
+
+      this.toast.success(
+        'Sender ID resubmitted successfully.'
+      );
+
+    } else {
+
+      this.toast.success(
+        'Registration submitted successfully.'
+      );
+    }
+
+    void this.router.navigate(
+      ['/portal/dashboard']
+    );
+  },
+
+  error: error => {
+
+    console.error(
+      'Registration API error:',
+      error
+    );
+
+    this.isSubmitting.set(false);
+
+    this.errorMessage.set(
+      this.isEditMode
+        ? 'Sender ID could not be resubmitted. Please try again.'
+        : 'Registration could not be submitted. Please try again.'
+    );
+
+    this.toast.error(
+      this.errorMessage()
+    );
   }
-  private lockExistingCompanyData(): void {
+
+});
+
+    
+
+   
+  }
+
+
+
+private lockExistingCompanyData(): void {
 
   const companyControls =
     this.registrationForm.controls.company.controls;

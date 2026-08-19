@@ -14,7 +14,7 @@ export class AdminRegistrationService {
 
   private readonly http = inject(HttpClient);
 
-  // private readonly API_URL = 'http://localhost:8080/api/v1/registrations';
+  private readonly API_URL2 = 'http://localhost:8080/api/v1/registrations';
 
   private readonly API_URL = 'http://localhost:8080/api/v1/onboarding-single';
  
@@ -47,7 +47,7 @@ updateRegistrationStatus(
     .set('comments', comments);
 
   return this.http.put<any>(
-    `${this.API_URL}/${id}/status`,
+    `${this.API_URL2}/${id}/status`,
     {},
     { params }
   );

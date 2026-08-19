@@ -119,56 +119,105 @@
       </div>
 
 
-      <!-- ==============================
-           TDRA REMARK
-           ============================== -->
-
-      @if (tdraRemark()) {
+@if (
+  tdraRemark() ||
+  sender.status === 'INFO_REQUESTED'
+) {
 
   <div
     class="tdra-feedback-card mb-4"
     [ngClass]="{
+
       'feedback-approved':
-        record.currentStatus === 'APPROVED',
+        sender.status === 'ACTIVE',
 
       'feedback-info':
-        record.currentStatus === 'INFO_REQUESTED',
+        sender.status === 'INFO_REQUESTED',
 
       'feedback-rejected':
-        record.currentStatus === 'REJECTED'
+        sender.status === 'REJECTED'
+
     }"
   >
 
+    <!-- Icon -->
     <div class="feedback-icon">
 
-      @if (sender.status === 'APPROVED') {
+      @if (sender.status === 'ACTIVE') {
+
         ✓
-      } @else if (sender.status === 'REJECTED') {
+
+      }
+      @else if (sender.status === 'REJECTED') {
+
         ×
-      } @else {
+
+      }
+      @else {
+
         !
+
       }
 
     </div>
 
 
-    <div>
+    <!-- Comment -->
+    <div class="flex-grow-1">
 
       <div class="feedback-title">
 
-        @if (sender.status === 'APPROVED') {
+        @if (sender.status === 'ACTIVE') {
+
           TDRA Approval Comment
-        } @else if (sender.status === 'REJECTED') {
+
+        }
+        @else if (sender.status === 'REJECTED') {
+
           TDRA Rejection Comment
-        } @else {
+
+        }
+        @else if (sender.status === 'INFO_REQUESTED') {
+
+          TDRA Information Request
+
+        }
+        @else {
+
           TDRA Review Comment
+
         }
 
       </div>
 
-      <div class="feedback-text">
-        {{ tdraRemark() }}
+
+      <div class="feedback-text mb-3">
+
+        {{
+          tdraRemark() ||
+          'TDRA has requested additional information.'
+        }}
+
       </div>
+
+
+      <!-- Only shown when TDRA requests more information -->
+      @if (sender.status === 'INFO_REQUESTED') {
+
+        <a
+          [routerLink]="[
+            '/portal/sender-id/new'
+          ]"
+          [queryParams]="{
+            mode: 'edit',
+            id: sender.id
+          }"
+          class="btn btn-primary btn-sm"
+        >
+          Edit & Resubmit
+        </a>
+
+      }
 
     </div>
 

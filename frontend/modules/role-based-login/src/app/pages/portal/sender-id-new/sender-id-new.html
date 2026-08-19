@@ -8,22 +8,44 @@
         TDRA Sender Registry
       </p>
 
-      <h1 class="h3 fw-bold mb-2">
-  @if (isAdditionalSenderId) {
+ <h1 class="h3 fw-bold mb-2">
+
+  @if (isEditMode) {
+
+    Edit & Resubmit Sender ID
+
+  } @else if (isAdditionalSenderId) {
+
     Create New Sender ID
+
   } @else {
+
     Company Registration
+
   }
+
 </h1>
 
-     <p class="text-secondary mb-0">
-  @if (isAdditionalSenderId) {
+  <p class="text-secondary mb-0">
+
+  @if (isEditMode) {
+
+    Review the TDRA feedback, update the
+    requested information and resubmit
+    your Sender ID application.
+
+  } @else if (isAdditionalSenderId) {
+
     Review your existing company information
     and enter the new Sender ID.
+
   } @else {
+
     Complete all four sections before
     submitting your registration request.
+
   }
+
 </p>
     </header>
 
@@ -117,7 +139,9 @@
         <app-legal-documents
   [group]="registrationForm.controls.documents"
   [existingDocuments]="existingDocuments()"
-  [isAdditionalSenderId]="isAdditionalSenderId"
+ [isAdditionalSenderId]="
+  isAdditionalSenderId || isEditMode
+"
 ></app-legal-documents>
         }
 
@@ -202,11 +226,19 @@
 
     } @else {
 
-      @if (isAdditionalSenderId) {
-        Create Sender ID
-      } @else {
-        Submit Registration
-      }
+      @if (isEditMode) {
+
+  Resubmit Application
+
+} @else if (isAdditionalSenderId) {
+
+  Create Sender ID
+
+} @else {
+
+  Submit Registration
+
+}
 
     }
 

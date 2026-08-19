@@ -223,4 +223,14 @@ getSenderIdById(
     `${this.senderIdsApi}/${id}`
   );
 }
+
+resubmitRegistration(
+  id: number,
+  formData: FormData
+) {
+  return this.http.put<any>(
+    `http://localhost:8080/api/v1/onboarding-single/${id}/resubmit`,
+    formData
+  );
+}
 }
