@@ -17,7 +17,7 @@ public interface SingleShotRegistrationService {
     // FIX: Removed the accidental 'findByCompany' method declaration from here [3]
     
     // NEW: Handle single-shot resubmissions after INFO_REQUESTED status transitions [1, 3]
-    RegistrationRequest resubmitSingleShot(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap, Long userId, Long companyId);
+    RegistrationRequest resubmitSingleShot(RegistrationRequestDto dto, MultiValueMap<String, MultipartFile> fileMap, Long userId, Long companyId, Long requestId);
     
     // Get all requests with dynamically resolved individual Sender IDs for TDRA Admin [3]
     List<AdminRegistrationResponseDto> getAllOnboardingRequests();

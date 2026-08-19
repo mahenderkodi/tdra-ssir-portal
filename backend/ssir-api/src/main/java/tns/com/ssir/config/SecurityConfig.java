@@ -114,6 +114,7 @@ public class SecurityConfig {
 
 				// Only TDRA Admins can execute approvals/rejections (PUT status transitions)
 				.requestMatchers(HttpMethod.PUT, "/api/v1/registrations/**").hasAnyRole("TDRA_SUPER_ADMIN","COMPANY_ADMIN")
+				.requestMatchers(HttpMethod.PUT,"/api/v1/onboarding-single/{id}/resubmit").hasAnyRole("TDRA_SUPER_ADMIN", "COMPANY_ADMIN")
 
 				// Secure Password Setup (Requires user to be logged in with their temporary credentials) [1]
 				.requestMatchers(HttpMethod.POST, "/api/v1/auth/setup-password").hasRole("COMPANY_PENDING")

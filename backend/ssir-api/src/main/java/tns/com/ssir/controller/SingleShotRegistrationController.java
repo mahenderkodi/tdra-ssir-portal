@@ -70,14 +70,15 @@ public class SingleShotRegistrationController {
     }
 
     // I. SECURE AUTHENTICATED SINGLE-SHOT RESUBMISSION (PUT)
-    @PutMapping(value = "/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+ // I. SECURE AUTHENTICATED TARGETED SINGLE-SHOT RESUBMISSION (PUT)
+    @PutMapping(value = "/{id}/resubmit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ROLE_COMPANY_ADMIN')")
     public ResponseEntity<RegistrationSuccessResponse> resubmitOnboardingSingle(
+            @PathVariable("id") Long id, // Extracted specific request ID [3]
             @RequestPart("registrationData") String registrationDataJson,
             MultipartHttpServletRequest request,
             @AuthenticationPrincipal UserPrincipal principal) throws Exception {
 
-        // FIX: Replaced manual initialization with injected mapper [3]
         RegistrationRequestDto dto = objectMapper.readValue(registrationDataJson, RegistrationRequestDto.class);
 
         Set<ConstraintViolation<RegistrationRequestDto>> violations = validator.validate(dto);
@@ -85,11 +86,13 @@ public class SingleShotRegistrationController {
             throw new ConstraintViolationException(violations);
         }
 
+        // Passes the specific request ID to target the exact registration row [3]
         RegistrationRequest savedRequest = singleShotService.resubmitSingleShot(
                 dto, 
                 request.getMultiFileMap(), 
                 principal.getId(),
-                principal.getCompanyId()
+                principal.getCompanyId(),
+                id // Pass targeted ID
         );
 
         RegistrationSuccessResponse successResponse = RegistrationSuccessResponse.builder()
