@@ -14,7 +14,9 @@ export class AdminRegistrationService {
 
   private readonly http = inject(HttpClient);
 
-  private readonly API_URL = 'http://localhost:8080/api/v1/registrations';
+  // private readonly API_URL = 'http://localhost:8080/api/v1/registrations';
+
+  private readonly API_URL = 'http://localhost:8080/api/v1/onboarding-single';
  
   // 1. Fetch pending registrations list (Admin Queue View) [3]
 

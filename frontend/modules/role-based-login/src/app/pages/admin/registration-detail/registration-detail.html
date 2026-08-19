@@ -1,3 +1,10 @@
+<!--
+  TDRA registration review page.
+  Displays the complete registration, company, representative,
+  Sender ID and submitted document details returned by the backend,
+  and allows TDRA users to approve, reject or request information.
+-->
+
 <!-- Loading -->
 <div
   *ngIf="isLoading()"
@@ -20,7 +27,7 @@
 >
 
   <!-- ==================================================
-       Page Header
+       PAGE HEADER
        ================================================== -->
 
   <div
@@ -45,24 +52,30 @@
         ← Back to Onboarding Queue
       </button>
 
+
       <h2 class="audit-page-title mb-1">
         Registration Review
       </h2>
 
+
       <div class="text-secondary small">
-        {{ registration().company.companyName }}
+
+        {{ registration().companyName }}
 
         <span class="mx-2">•</span>
 
         {{ registration().trackingId }}
+
       </div>
 
     </div>
 
 
+    <!-- Registration Status -->
     <span
       class="status-badge"
       [ngClass]="{
+
         'status-submitted':
           registration().currentStatus === 'SUBMITTED' ||
           registration().currentStatus === 'UNDER_REVIEW',
@@ -75,6 +88,7 @@
 
         'status-info':
           registration().currentStatus === 'INFO_REQUESTED'
+
       }"
     >
       {{ registration().currentStatus }}
@@ -100,7 +114,11 @@
 
     <div class="col-xl-5 col-lg-6">
 
-      <!-- Company Information -->
+
+      <!-- ==================================================
+           COMPANY INFORMATION
+           ================================================== -->
+
       <div class="audit-card mb-4">
 
         <div class="audit-card-header">
@@ -112,78 +130,240 @@
 
           <div class="detail-grid">
 
+
             <div class="detail-item">
+
               <span class="detail-label">
                 Company Name
               </span>
 
               <span class="detail-value">
-                {{ registration().company.companyName }}
+                {{ registration().companyName || '—' }}
               </span>
+
             </div>
 
 
             <div class="detail-item">
+
               <span class="detail-label">
                 Legal Entity Name
               </span>
 
               <span class="detail-value">
-                {{ registration().company.legalEntityName }}
+                {{ registration().legalEntityName || '—' }}
               </span>
+
             </div>
 
 
             <div class="detail-item">
+
               <span class="detail-label">
                 Trade License Number
               </span>
 
               <span class="detail-value">
-                {{ registration().company.tradeLicenseNumber }}
+                {{ registration().tradeLicenseNumber || '—' }}
               </span>
+
             </div>
 
 
             <div class="detail-item">
+
               <span class="detail-label">
-                VAT Number
+                Registration Number
               </span>
 
               <span class="detail-value">
-                {{ registration().company.taxVatNumber || '—' }}
+                {{ registration().registrationNumber || '—' }}
               </span>
+
             </div>
 
 
             <div class="detail-item">
+
+              <span class="detail-label">
+                VAT / Tax Number
+              </span>
+
+              <span class="detail-value">
+                {{ registration().taxVatNumber || '—' }}
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
               <span class="detail-label">
                 Company Type
               </span>
 
               <span class="detail-value">
-                {{ registration().company.companyType }}
+                {{ registration().companyType || '—' }}
               </span>
+
             </div>
 
 
             <div class="detail-item">
+
               <span class="detail-label">
                 Industry
               </span>
 
               <span class="detail-value">
-                {{ registration().company.industryType }}
+                {{ registration().industryType || '—' }}
               </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Date of Incorporation
+              </span>
+
+              <span class="detail-value">
+                {{
+                  registration().dateOfIncorporation
+                    | date:'mediumDate'
+                }}
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Company Email
+              </span>
+
+              <span class="detail-value">
+                {{ registration().email || '—' }}
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Company Phone
+              </span>
+
+              <span class="detail-value">
+                {{ registration().companyPhone || '—' }}
+              </span>
+
+            </div>
+
+
+            <div class="detail-item detail-full">
+
+              <span class="detail-label">
+                Website
+              </span>
+
+              <a
+                *ngIf="registration().website"
+                [href]="registration().website"
+                target="_blank"
+                rel="noopener"
+                class="detail-value"
+              >
+                {{ registration().website }}
+              </a>
+
+              <span
+                *ngIf="!registration().website"
+                class="detail-value"
+              >
+                —
+              </span>
+
             </div>
 
           </div>
 
         </div>
+
       </div>
 
 
-      <!-- Registered Address -->
+      <!-- ==================================================
+           SENDER ID INFORMATION
+           ================================================== -->
+
+      <div class="audit-card mb-4">
+
+        <div class="audit-card-header">
+          Sender ID Information
+        </div>
+
+
+        <div class="audit-card-body">
+
+          <div class="detail-grid">
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Proposed Sender ID
+              </span>
+
+              <span class="detail-value fw-bold">
+                {{ registration().proposedSenderId || '—' }}
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Sender ID Status
+              </span>
+
+              <span class="detail-value">
+                {{ registration().senderIdStatus || '—' }}
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Submitted On
+              </span>
+
+              <span class="detail-value">
+                {{
+                  registration().submittedAt
+                    | date:'medium'
+                }}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ==================================================
+           REGISTERED OFFICE
+           ================================================== -->
+
       <div class="audit-card mb-4">
 
         <div class="audit-card-header">
@@ -195,56 +375,82 @@
 
           <div class="detail-grid">
 
+
             <div class="detail-item detail-full">
+
               <span class="detail-label">
                 Address
               </span>
 
               <span class="detail-value">
-                {{ registration().company.address?.addressLine1 }}
+                {{ registration().addressLine1 || '—' }}
               </span>
+
             </div>
 
 
             <div class="detail-item">
+
               <span class="detail-label">
                 City
               </span>
 
               <span class="detail-value">
-                {{ registration().company.address?.city }}
+                {{ registration().city || '—' }}
               </span>
+
             </div>
 
 
             <div class="detail-item">
+
               <span class="detail-label">
-                Emirate
+                Emirate / State
               </span>
 
               <span class="detail-value">
-                {{ registration().company.address?.emirate }}
+                {{ registration().emirate || '—' }}
               </span>
+
             </div>
 
 
             <div class="detail-item">
+
               <span class="detail-label">
                 Country
               </span>
 
               <span class="detail-value">
-                {{ registration().company.address?.country }}
+                {{ registration().country || '—' }}
               </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Postal Code
+              </span>
+
+              <span class="detail-value">
+                {{ registration().postalCode || '—' }}
+              </span>
+
             </div>
 
           </div>
 
         </div>
+
       </div>
 
 
-      <!-- Representative -->
+      <!-- ==================================================
+           AUTHORIZED REPRESENTATIVE
+           ================================================== -->
+
       <div class="audit-card mb-4">
 
         <div class="audit-card-header">
@@ -252,183 +458,223 @@
         </div>
 
 
-        <div
-          class="audit-card-body"
-          *ngIf="
-            registration().company.contacts &&
-            registration().company.contacts.length > 0
-          "
-        >
+        <div class="audit-card-body">
 
           <div class="detail-grid">
 
+
             <div class="detail-item">
+
               <span class="detail-label">
                 Name
               </span>
 
               <span class="detail-value">
                 {{
-                  registration().company.contacts[0].firstName
-                }}
-                {{
-                  registration().company.contacts[0].lastName
+                  (
+                    registration().repFirstName +
+                    ' ' +
+                    registration().repLastName
+                  ).trim() || '—'
                 }}
               </span>
+
             </div>
 
 
             <div class="detail-item">
+
               <span class="detail-label">
                 Designation
               </span>
 
               <span class="detail-value">
-                {{
-                  registration().company.contacts[0].designation
-                }}
+                {{ registration().repDesignation || '—' }}
               </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                Department
+              </span>
+
+              <span class="detail-value">
+                {{ registration().repDepartment || '—' }}
+              </span>
+
             </div>
 
 
             <div class="detail-item detail-full">
+
               <span class="detail-label">
                 Official Email
               </span>
 
               <span class="detail-value">
-                {{
-                  registration().company.contacts[0].officialEmail
-                }}
+                {{ registration().repOfficialEmail || '—' }}
               </span>
+
             </div>
 
 
             <div class="detail-item">
+
               <span class="detail-label">
                 Mobile
               </span>
 
               <span class="detail-value">
-                {{
-                  registration().company.contacts[0].mobileNumber
-                }}
+                {{ registration().repMobileNumber || '—' }}
               </span>
+
             </div>
 
 
             <div class="detail-item">
+
+              <span class="detail-label">
+                Office Number
+              </span>
+
+              <span class="detail-value">
+                {{ registration().repOfficeNumber || '—' }}
+              </span>
+
+            </div>
+
+
+            <div class="detail-item detail-full">
+
+              <span class="detail-label">
+                Address
+              </span>
+
+              <span class="detail-value">
+                {{ registration().repAddress || '—' }}
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
+              <span class="detail-label">
+                UAE Pass ID
+              </span>
+
+              <span class="detail-value">
+                {{ registration().repUaePassId || '—' }}
+              </span>
+
+            </div>
+
+
+            <div class="detail-item">
+
               <span class="detail-label">
                 Emirates ID / Passport
               </span>
 
               <span class="detail-value">
                 {{
-                  registration().company.contacts[0].passportEmiratesId
+                  registration().repPassportEmiratesId ||
+                  '—'
                 }}
               </span>
+
             </div>
 
           </div>
 
         </div>
 
+      </div>
 
-        <div
-          *ngIf="
-            !registration().company.contacts ||
-            registration().company.contacts.length === 0
-          "
-          class="audit-card-body text-secondary small"
-        >
-          No authorized representative details available.
+
+      <!-- ==================================================
+     SUBMITTED DOCUMENTS
+     ================================================== -->
+
+<div class="audit-card">
+
+  <div
+    class="
+      audit-card-header
+      d-flex
+      justify-content-between
+      align-items-center
+    "
+  >
+
+    <span>
+      Submitted Documents
+    </span>
+
+    <span class="document-count">
+      {{ registration().documents?.length || 0 }}
+    </span>
+
+  </div>
+
+
+  <div class="document-list">
+
+    <button
+      *ngFor="let doc of registration().documents; let i = index"
+      type="button"
+      class="document-item"
+      [class.selected]="
+        activeDocument()?.presignedUrl === doc.presignedUrl
+      "
+      (click)="previewDocument(doc)"
+    >
+
+      <div class="document-icon">
+        📄
+      </div>
+
+
+      <div class="document-info">
+
+        <div class="document-name">
+
+          {{ doc.fileName || ('Document ' + (i + 1)) }}
+
+        </div>
+
+        <div class="document-meta">
+
+          {{ doc.documentType || 'FILE' }}
+
         </div>
 
       </div>
 
 
-      <!-- Documents List -->
-      <div class="audit-card">
-
-        <div
-          class="
-            audit-card-header
-            d-flex
-            justify-content-between
-            align-items-center
-          "
-        >
-          <span>
-            Submitted Documents
-          </span>
-
-          <span class="document-count">
-            {{ registration().documents?.length || 0 }}
-          </span>
-        </div>
-
-
-        <div class="document-list">
-
-          <button
-            *ngFor="let doc of registration().documents"
-            type="button"
-            class="document-item"
-            [class.selected]="
-              activeDocument()?.id === doc.id
-            "
-            (click)="previewDocument(doc)"
-          >
-
-            <div class="document-icon">
-              📄
-            </div>
-
-
-            <div class="document-info">
-
-              <div class="document-name">
-                {{ doc.fileName || 'Document' }}
-              </div>
-
-              <div class="document-meta">
-
-                {{ doc.contentType || doc.documentType }}
-
-                <span *ngIf="doc.fileSizeBytes">
-                  •
-                  {{
-                    (doc.fileSizeBytes / 1024)
-                      | number:'1.0-0'
-                  }}
-                  KB
-                </span>
-
-              </div>
-
-            </div>
-
-
-            <div class="document-view-label">
-              View
-            </div>
-
-          </button>
-
-
-          <div
-            *ngIf="
-              !registration().documents ||
-              registration().documents.length === 0
-            "
-            class="empty-documents"
-          >
-            No documents were submitted.
-          </div>
-
-        </div>
-
+      <div class="document-view-label">
+        View
       </div>
+
+    </button>
+
+
+    <div
+      *ngIf="
+        !registration().documents ||
+        registration().documents.length === 0
+      "
+      class="empty-documents"
+    >
+      No documents were submitted.
+    </div>
+
+  </div>
+
+</div>
 
     </div>
 
@@ -439,143 +685,189 @@
 
     <div class="col-xl-7 col-lg-6">
 
-      <!-- Document Viewer -->
-      <div class="audit-card document-viewer-card mb-4">
 
-        <div
-          class="
-            audit-card-header
-            document-viewer-header
-            d-flex
-            justify-content-between
-            align-items-center
-            gap-3
-          "
-        >
+     <!-- ==================================================
+     DOCUMENT VIEWER
+     ================================================== -->
 
-          <div class="overflow-hidden">
+<div
+  class="
+    audit-card
+    document-viewer-card
+    mb-4
+  "
+>
 
-            <div class="viewer-eyebrow">
-              DOCUMENT PREVIEW
-            </div>
+  <div
+    class="
+      audit-card-header
+      document-viewer-header
+      d-flex
+      justify-content-between
+      align-items-center
+      gap-3
+    "
+  >
 
-            <div class="viewer-title text-truncate">
-              {{
-                activeDocument()?.fileName ||
-                'Select a document'
-              }}
-            </div>
+    <div class="overflow-hidden">
 
-          </div>
+      <div class="viewer-eyebrow">
+        DOCUMENT PREVIEW
+      </div>
+
+      <div class="viewer-title text-truncate">
+
+        {{
+          activeDocument()?.fileName ||
+          'Select a document'
+        }}
+
+      </div>
+
+    </div>
 
 
-          <a
-            *ngIf="activeDocument()?.presignedUrl"
-            [href]="activeDocument().presignedUrl"
-            target="_blank"
-            rel="noopener"
-            class="btn btn-outline-primary btn-sm flex-shrink-0"
-          >
-            Open in New Tab
-          </a>
+    <a
+      *ngIf="activeDocument()?.presignedUrl"
+      [href]="activeDocument().presignedUrl"
+      target="_blank"
+      rel="noopener"
+      class="
+        btn
+        btn-outline-primary
+        btn-sm
+        flex-shrink-0
+      "
+    >
+      Open in New Tab
+    </a>
 
+  </div>
+
+
+  <div class="document-preview">
+
+
+    <!-- IMAGE -->
+    <div
+      *ngIf="
+        activeDocument() &&
+        isImage(activeDocument())
+      "
+      class="image-preview-container"
+    >
+
+      <img
+        [src]="activeDocument().presignedUrl"
+        [alt]="activeDocument().fileName"
+        class="document-image"
+      >
+
+    </div>
+
+
+    <!-- PDF -->
+    <iframe
+      *ngIf="
+        activeDocument() &&
+        isPdf(activeDocument()) &&
+        activePreviewUrl()
+      "
+      [src]="activePreviewUrl()"
+      class="pdf-preview"
+      title="Document preview"
+    ></iframe>
+
+
+    <!-- OTHER FILE TYPE -->
+    <div
+      *ngIf="
+        activeDocument() &&
+        !isImage(activeDocument()) &&
+        !isPdf(activeDocument())
+      "
+      class="preview-placeholder"
+    >
+
+      <div class="preview-placeholder-icon">
+        📄
+      </div>
+
+      <h6>
+        Preview unavailable
+      </h6>
+
+      <p>
+        Open this document in a new tab to view it.
+      </p>
+
+
+      <a
+        [href]="activeDocument().presignedUrl"
+        target="_blank"
+        rel="noopener"
+        class="btn btn-primary"
+      >
+        Open Document
+      </a>
+
+    </div>
+
+
+    <!-- NO DOCUMENT -->
+    <div
+      *ngIf="!activeDocument()"
+      class="preview-placeholder"
+    >
+
+      <div class="preview-placeholder-icon">
+        📁
+      </div>
+
+      <h6>
+        No document selected
+      </h6>
+
+      <p>
+        Select a submitted document to preview it.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+      <!-- ==================================================
+           EXISTING TDRA REMARK
+           ================================================== -->
+
+      <div
+        *ngIf="registration().remarks"
+        class="audit-card mb-4"
+      >
+
+        <div class="audit-card-header">
+          Existing TDRA Remark
         </div>
 
 
-        <div class="document-preview">
+        <div class="audit-card-body">
 
-          <!-- IMAGE -->
-          <div
-            *ngIf="
-              activeDocument() &&
-              isImage(activeDocument())
-            "
-            class="image-preview-container"
-          >
-
-            <img
-              [src]="activeDocument().presignedUrl"
-              [alt]="activeDocument().fileName"
-              class="document-image"
-            >
-
-          </div>
-
-
-          <!-- PDF -->
-          <iframe
-            *ngIf="
-              activeDocument() &&
-              isPdf(activeDocument()) &&
-              activePreviewUrl()
-            "
-            [src]="activePreviewUrl()"
-            class="pdf-preview"
-            title="Document preview"
-          ></iframe>
-
-
-          <!-- Unsupported Type -->
-          <div
-            *ngIf="
-              activeDocument() &&
-              !isImage(activeDocument()) &&
-              !isPdf(activeDocument())
-            "
-            class="preview-placeholder"
-          >
-
-            <div class="preview-placeholder-icon">
-              📄
-            </div>
-
-            <h6>
-              Preview unavailable
-            </h6>
-
-            <p>
-              Open this document in a new tab to view it.
-            </p>
-
-
-            <a
-              [href]="activeDocument().presignedUrl"
-              target="_blank"
-              rel="noopener"
-              class="btn btn-primary"
-            >
-              Open Document
-            </a>
-
-          </div>
-
-
-          <!-- Nothing Selected -->
-          <div
-            *ngIf="!activeDocument()"
-            class="preview-placeholder"
-          >
-
-            <div class="preview-placeholder-icon">
-              📁
-            </div>
-
-            <h6>
-              No document selected
-            </h6>
-
-            <p>
-              Select a submitted document to preview it.
-            </p>
-
-          </div>
+          <p class="mb-0">
+            {{ registration().remarks }}
+          </p>
 
         </div>
 
       </div>
 
 
-      <!-- Review -->
+      <!-- ==================================================
+           TDRA REVIEW
+           ================================================== -->
+
       <div class="audit-card">
 
         <div class="audit-card-header">
@@ -623,34 +915,57 @@
             "
           >
 
+
+            <!-- Reject -->
             <button
               type="button"
               class="btn btn-outline-danger"
               [disabled]="isProcessing()"
               (click)="executeAction('REJECTED')"
             >
-               <span
-    *ngIf="activeAction() === 'REJECTED'"
-    class="spinner-border spinner-border-sm me-2"
-  ></span>
+
+              <span
+                *ngIf="
+                  activeAction() === 'REJECTED'
+                "
+                class="
+                  spinner-border
+                  spinner-border-sm
+                  me-2
+                "
+              ></span>
+
               Reject
+
             </button>
 
 
+            <!-- Request Information -->
             <button
               type="button"
               class="btn request-info-btn"
               [disabled]="isProcessing()"
               (click)="executeAction('INFO_REQUESTED')"
             >
-            <span
-    *ngIf="activeAction() === 'INFO_REQUESTED'"
-    class="spinner-border spinner-border-sm me-2"
-  ></span>
+
+              <span
+                *ngIf="
+                  activeAction() ===
+                  'INFO_REQUESTED'
+                "
+                class="
+                  spinner-border
+                  spinner-border-sm
+                  me-2
+                "
+              ></span>
+
               Request Information
+
             </button>
 
 
+            <!-- Approve -->
             <button
               type="button"
               class="btn btn-success"
@@ -659,9 +974,15 @@
             >
 
               <span
-    *ngIf="activeAction() === 'APPROVED'"
-    class="spinner-border spinner-border-sm me-2"
-  ></span>
+                *ngIf="
+                  activeAction() === 'APPROVED'
+                "
+                class="
+                  spinner-border
+                  spinner-border-sm
+                  me-2
+                "
+              ></span>
 
               Approve
 

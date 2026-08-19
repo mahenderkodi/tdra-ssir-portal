@@ -57,7 +57,7 @@
   <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
     <div class="card-header bg-white border-0 py-4 px-4">
       <h4 class="mb-0 fw-bold text-dark">Onboarding Registrations Queue</h4>
-      <p class="text-muted small mb-0 mt-1">Review applicant profiles, inspect S3 documents, and manage approvals [3].</p>
+      <p class="text-muted small mb-0 mt-1">Review applicant profiles, inspect documents, and manage approvals.</p>
     </div>
 
     <div class="card-body p-0">
@@ -67,101 +67,326 @@
       </div>
 
       <!-- Table View -->
-      <div class="table-responsive" *ngIf="!isLoading() && registrations().length > 0">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="bg-light border-bottom">
-            <tr>
-              <th scope="col" class="py-3 px-4 text-uppercase small text-muted fw-bold">Company details</th>
-              <!-- <th scope="col" class="py-3 text-uppercase small text-muted fw-bold">Tracking ID</th> -->
-              <th scope="col" class="py-3 text-uppercase small text-muted fw-bold">Proposed Sender ID</th>
-              <th scope="col" class="py-3 text-uppercase small text-muted fw-bold">Authorized Representative</th>
-              <th scope="col" class="py-3 text-uppercase small text-muted fw-bold">Documents</th>
-              <th scope="col" class="py-3 text-uppercase small text-muted fw-bold">Status</th>
-              <th scope="col" class="py-3 text-center text-uppercase small text-muted fw-bold" style="width: 220px;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let reg of registrations()" class="table-row-animate">
-              <!-- Company Name -->
-              <td class="py-3 px-4">
-                <div class="d-flex flex-column">
-                  <span class="fw-bold text-dark fs-6 mb-1">{{ reg.company.companyName }}</span>
-                  <span class="text-muted small">{{ reg.company.companyType }}</span>
-                </div>
-              </td>
+      <div
+  class="table-responsive"
+  *ngIf="
+    !isLoading() &&
+    registrations().length > 0
+  "
+>
 
-              <!-- Tracking ID -->
-              <!-- <td class="py-3">
-                <div class="d-flex flex-column">
-                  <span class="fw-semibold text-primary mb-1"><code>{{ reg.trackingId }}</code></span>
-                  <span class="text-muted small">{{ reg.createdAt | date:'mediumDate' }}</span>
-                </div>
-              </td> -->
+  <table
+    class="
+      table
+      table-hover
+      align-middle
+      mb-0
+      
+    "
+  >
 
-              <!-- NEW FIELD: Proposed Sender ID [3] -->
-              <td class="py-3">
-                <span class="fw-bold text-dark">
-                  <code>{{ reg.company.proposedSenderId || 'N/A' }}</code>
-                </span>
-              </td>
+    <thead class="bg-light border-bottom ">
 
-              <!-- Representative contact details -->
-              <td class="py-3">
-                <div class="d-flex flex-column">
-                  <span class="fw-semibold text-dark mb-1">
-                    {{ reg.company.contacts && reg.company.contacts.length > 0 ? reg.company.contacts[0].firstName + ' ' + reg.company.contacts[0].lastName : 'N/A' }}
-                  </span>
-                  <span class="text-muted small">
-                    {{ reg.company.contacts && reg.company.contacts.length > 0 ? reg.company.contacts[0].officialEmail : reg.company.email }}
-                  </span>
-                </div>
-              </td>
+      <tr >
 
-              <!-- Document counters -->
-              <td class="py-3">
-                <span class="badge bg-secondary-subtle text-secondary border px-2 py-1 small">
-                  📁 {{ reg.documents ? reg.documents.length : 0 }} Files Attached
-                </span>
-              </td>
+        <th
+          scope="col"
+          class="
+            py-3
+            px-3
+            text-uppercase
+            small
+            text-muted
+            fw-bold
+          "
+        >
+          Company Details
+        </th>
 
-              
-              <!-- Dynamic status badge (Updated with explicit info_requested class mapping) [3] -->
-                  <td class="py-3">
-                    <span class="badge rounded-pill px-3 py-1 fw-bold text-uppercase fs-7" 
-                          [ngClass]="{
-                            'status-submitted': reg.currentStatus === 'SUBMITTED' || reg.currentStatus === 'UNDER_REVIEW',
-                            'status-approved': reg.currentStatus === 'APPROVED',
-                            'status-rejected': reg.currentStatus === 'REJECTED',
-                            'status-info-requested': reg.currentStatus === 'INFO_REQUESTED'
-                          }">
-                      {{ reg.currentStatus }}
-                    </span>
-                  </td>
 
-                  <!-- Action buttons (Updated to allow quick-approvals for info-requested rows) [3] -->
-                  <td class="py-3 text-center px-4">
-                    <div class="d-flex justify-content-center gap-2">
-                      <a [routerLink]="['/admin/registrations', reg.id]" 
-                         class="btn btn-outline-primary btn-sm px-3 fw-semibold">
-                        Inspect
-                      </a>
+        <!-- <th
+          scope="col"
+          class="
+            py-3
+            text-uppercase
+            small
+            text-muted
+            fw-bold
+          "
+        >
+          Tracking ID
+        </th> -->
 
-                      <!-- Quick Approve Button [3] -->
-                      <!-- <button *ngIf="reg.currentStatus === 'SUBMITTED' || reg.currentStatus === 'UNDER_REVIEW' || reg.currentStatus === 'INFO_REQUESTED'"
-                              type="button" 
-                              class="btn btn-success btn-sm px-3 fw-semibold d-flex align-items-center justify-content-center"
-                              [disabled]="actionInProgressId() !== null"
-                              (click)="approveCompany(reg.id)">
-                        <span class="spinner-border spinner-border-sm me-1" *ngIf="actionInProgressId() === reg.id"></span>
-                        Approve
-                      </button> -->
-  
-                    </div>
-                </td>
-             </tr>
-          </tbody>
-        </table>
-      </div>
+
+        <th
+          scope="col"
+          class="
+            py-3
+            text-uppercase
+            small
+            text-muted
+            fw-bold
+          "
+        >
+          Proposed Sender ID
+        </th>
+
+
+        <th
+          scope="col"
+          class="
+            py-3
+            text-uppercase
+            small
+            text-muted
+            fw-bold
+          "
+        >
+          Authorized Representative
+        </th>
+
+
+        <th
+          scope="col"
+          class="
+            py-3
+            text-uppercase
+            small
+            text-muted
+            fw-bold
+          "
+        >
+          Documents
+        </th>
+
+
+        <th
+          scope="col"
+          class="
+            py-3
+            text-uppercase
+            small
+            text-muted
+            fw-bold
+          "
+        >
+          Status
+        </th>
+
+
+        <th
+          scope="col"
+          class="
+            py-3
+            px-3
+            text-center
+            text-uppercase
+            small
+            text-muted
+            fw-bold
+          "
+          style="width: 140px;"
+        >
+          Actions
+        </th>
+
+      </tr>
+
+    </thead>
+
+
+    <tbody>
+
+      <tr
+        *ngFor="let reg of registrations()"
+        class="table-row-animate"
+      >
+
+        <!-- Company -->
+        <td class="py-3 px-3">
+
+          <div class="d-flex flex-column">
+
+            <span
+              class="
+                fw-bold
+                text-dark
+                fs-6
+                mb-1
+              "
+            >
+              {{ reg.companyName }}
+            </span>
+
+            <span class="text-muted small">
+              {{ reg.companyType || 'N/A' }}
+            </span>
+
+          </div>
+
+        </td>
+
+
+        <!-- Tracking ID + Submitted Date
+        <td class="py-3">
+
+          <div class="d-flex flex-column">
+
+            <span
+              class="
+                fw-semibold
+                text-primary
+                mb-1
+              "
+            >
+              <code>
+                {{ reg.trackingId }}
+              </code>
+            </span>
+
+            <span class="text-muted small">
+              {{
+                reg.submittedAt
+                  | date:'mediumDate'
+              }}
+            </span>
+
+          </div>
+
+        </td> -->
+
+
+        <!-- Sender ID -->
+        <td class="py-3">
+
+          <span class="fw-bold text-dark">
+            <code>
+              {{
+                reg.proposedSenderId ||
+                'N/A'
+              }}
+            </code>
+          </span>
+
+        </td>
+
+
+        <!-- Representative -->
+        <td class="py-3">
+
+          <div class="d-flex flex-column">
+
+            <span
+              class="
+                fw-semibold
+                text-dark
+                mb-1
+              "
+            >
+              {{
+                reg.representativeName ||
+                'N/A'
+              }}
+            </span>
+
+            <span class="text-muted small">
+              {{
+                reg.representativeEmail ||
+                'N/A'
+              }}
+            </span>
+
+          </div>
+
+        </td>
+
+
+        <!-- Documents -->
+        <td class="py-3">
+
+          <span
+            class="
+              badge
+              bg-secondary-subtle
+              text-secondary
+              border
+              px-2
+              py-1
+              small
+            "
+          >
+            📁
+            {{ reg.documentCount || 0 }}
+            Files Attached
+          </span>
+
+        </td>
+
+
+        <!-- Status -->
+        <td class="py-3">
+
+          <span
+            class="
+              badge
+              rounded-pill
+              px-3
+              py-1
+              fw-bold
+              text-uppercase
+              fs-7
+            "
+            [ngClass]="{
+
+              'status-submitted':
+                reg.currentStatus === 'SUBMITTED' ||
+                reg.currentStatus === 'UNDER_REVIEW',
+
+              'status-approved':
+                reg.currentStatus === 'APPROVED',
+
+              'status-rejected':
+                reg.currentStatus === 'REJECTED',
+
+              'status-info-requested':
+                reg.currentStatus === 'INFO_REQUESTED'
+
+            }"
+          >
+            {{ reg.currentStatus }}
+          </span>
+
+        </td>
+
+
+        <!-- Action -->
+        <td class="py-3 px-4 text-center">
+
+          <a
+            [routerLink]="[
+              '/admin/registrations',
+              reg.id
+            ]"
+            class="
+              btn
+              btn-outline-primary
+              btn-sm
+              px-3
+              fw-semibold
+            "
+          >
+            Inspect
+          </a>
+
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+</div>
 
       <div *ngIf="!isLoading() && registrations().length === 0" class="text-center p-5 my-5">
         <p class="text-muted mb-0">No onboarding applications found in the queue.</p>

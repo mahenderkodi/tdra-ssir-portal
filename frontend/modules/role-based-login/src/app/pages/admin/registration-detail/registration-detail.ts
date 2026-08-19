@@ -3,7 +3,8 @@ import {
   OnInit,
   signal,
   inject,
-  Input
+  Input,
+  
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -78,6 +79,7 @@ signal<string | null>(null);
   
   
 
+
   ngOnInit(): void {
 
     const resolvedId =
@@ -125,21 +127,31 @@ signal<string | null>(null);
   }
 
 
-  isImage(doc: any): boolean {
+  
 
-    return (
-      doc?.contentType?.startsWith('image/')
-    );
+isImage(doc: any): boolean {
+
+  const fileName = doc?.fileName;
+
+  if (!fileName) {
+    return false;
   }
 
+  return /\.(png|jpg|jpeg|gif|webp)$/i
+    .test(fileName);
+}
 
-  isPdf(doc: any): boolean {
 
-    return (
-      doc?.contentType === 'application/pdf'
-    );
+isPdf(doc: any): boolean {
+
+  const fileName = doc?.fileName;
+
+  if (!fileName) {
+    return false;
   }
 
+  return /\.pdf$/i.test(fileName);
+}
 
   executeAction(status: string): void {
 
