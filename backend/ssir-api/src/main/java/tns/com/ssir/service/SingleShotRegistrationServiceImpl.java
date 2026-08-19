@@ -374,6 +374,18 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
             documentFileName = doc.getFileName();
             documentUrl = storageService.generatePresignedUrl(doc.getFileStoragePath());
         }
+        
+        List<DocumentDetailDto> documentDtos = new java.util.ArrayList<>();
+        if (request.getDocuments() != null) {
+            for (LegalDocument doc : request.getDocuments()) {
+                String secureUrl = storageService.generatePresignedUrl(doc.getFileStoragePath());
+                documentDtos.add(DocumentDetailDto.builder()
+                        .documentType(doc.getDocumentType())
+                        .fileName(doc.getFileName())
+                        .presignedUrl(secureUrl)
+                        .build());
+            }
+        }
 
         return OnboardingDetailResponseDto.builder()
                 .id(request.getId())
@@ -409,8 +421,7 @@ public class SingleShotRegistrationServiceImpl implements SingleShotRegistration
                 .proposedSenderId(senderIdName) // Maps the targeted Sender ID [3]
                 .senderIdStatus(senderIdStatus)
                 .remarks(remarks)
-                .documentFileName(documentFileName)
-                .documentUrl(documentUrl) // Presigned URL [2]
+                .documents(documentDtos)
                 .build();
     }
 

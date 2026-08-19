@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -54,7 +55,7 @@ public class OnboardingDetailResponseDto {
     private String senderIdStatus;
     private String remarks;
 
-    // Document File Reference
-    private String documentFileName;
-    private String documentUrl; // Presigned URL [2]
+    // UPDATED: Return the full List of uploaded documents [3]
+    private List<DocumentDetailDto> documents;
+
 }

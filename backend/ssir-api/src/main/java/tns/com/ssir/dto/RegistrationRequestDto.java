@@ -14,7 +14,7 @@ public class RegistrationRequestDto {
     private CompanyDto company; 
 
     @Valid
-    private DocumentsDto documents = new DocumentsDto();
+    private DocumentDetailDto documents = new DocumentDetailDto();
 
     @Valid
     private RepresentativeDto representative = new RepresentativeDto();
