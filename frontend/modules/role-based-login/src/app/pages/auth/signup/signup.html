@@ -48,7 +48,26 @@
           class="form-control"
           formControlName="email"
           placeholder="name@company.com"
+          autocomplete="email"
         />
+
+        @if (
+          signupForm.controls.email.touched &&
+          signupForm.controls.email.hasError('required')
+        ) {
+          <div class="text-danger small mt-1">
+            Email is required.
+          </div>
+        }
+
+        @if (
+          signupForm.controls.email.touched &&
+          signupForm.controls.email.hasError('email')
+        ) {
+          <div class="text-danger small mt-1">
+            Please enter a valid email address.
+          </div>
+        }
       </div>
 
 
@@ -63,7 +82,17 @@
           class="form-control"
           formControlName="username"
           placeholder="fatima_nova"
+          autocomplete="username"
         />
+
+        @if (
+          signupForm.controls.username.touched &&
+          signupForm.controls.username.hasError('required')
+        ) {
+          <div class="text-danger small mt-1">
+            Username is required.
+          </div>
+        }
       </div>
 
 
@@ -78,7 +107,87 @@
           class="form-control"
           formControlName="password"
           placeholder="••••••••"
+          autocomplete="new-password"
         />
+
+        @if (
+          signupForm.controls.password.touched
+        ) {
+
+          @if (
+            signupForm.controls.password
+              .hasError('required')
+          ) {
+            <div class="text-danger small mt-1">
+              Password is required.
+            </div>
+          }
+
+          @if (
+            signupForm.controls.password
+              .hasError('minlength')
+          ) {
+            <div class="text-danger small mt-1">
+              Password must be at least 6 characters.
+            </div>
+          }
+
+          @if (
+            signupForm.controls.password
+              .hasError('maxlength')
+          ) {
+            <div class="text-danger small mt-1">
+              Password cannot exceed 15 characters.
+            </div>
+          }
+
+          @if (
+            signupForm.controls.password
+              .hasError('alphabetRequired')
+          ) {
+            <div class="text-danger small mt-1">
+              Password must contain at least one alphabetic character.
+            </div>
+          }
+
+          @if (
+            signupForm.controls.password
+              .hasError('numberOrSpecialRequired')
+          ) {
+            <div class="text-danger small mt-1">
+              Password must contain at least one numeric
+              or special character.
+            </div>
+          }
+
+          @if (
+            signupForm.controls.password
+              .hasError('sameAsUserId')
+          ) {
+            <div class="text-danger small mt-1">
+              Password cannot be the same as your User ID.
+            </div>
+          }
+
+          @if (
+            signupForm.controls.password
+              .hasError('reverseOfUserId')
+          ) {
+            <div class="text-danger small mt-1">
+              Password cannot be the reverse of your User ID.
+            </div>
+          }
+
+          @if (
+            signupForm.controls.password
+              .hasError('circularShiftOfUserId')
+          ) {
+            <div class="text-danger small mt-1">
+              Password cannot be a circular shift of your User ID.
+            </div>
+          }
+
+        }
       </div>
 
 
@@ -87,7 +196,10 @@
         <button
           type="submit"
           class="btn btn-primary"
-          [disabled]="isSubmitting()"
+          [disabled]="
+            isSubmitting() ||
+            signupForm.invalid
+          "
         >
 
           @if (isSubmitting()) {
@@ -98,6 +210,7 @@
                 spinner-border-sm
                 me-2
               "
+              aria-hidden="true"
             ></span>
 
             Creating Account...

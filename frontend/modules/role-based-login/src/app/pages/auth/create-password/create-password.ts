@@ -19,6 +19,7 @@ import {
 import {
   AuthService
 } from '../../../core/auth/auth-service';
+import { passwordPolicyValidator } from '../../../core/validators/password-policy.validator';
 
 @Component({
   selector: 'app-create-password',
@@ -30,6 +31,11 @@ import {
   styleUrl: './create-password.css'
 })
 export class CreatePassword {
+
+  ngOnInit(): void {
+    console.log(this.authService
+                  .currentUser());
+  }
   private readonly router =
     inject(Router);
 
@@ -51,7 +57,15 @@ export class CreatePassword {
           '',
           [
             Validators.required,
-            Validators.minLength(8)
+            Validators.minLength(6),
+            Validators.maxLength(15),
+
+            passwordPolicyValidator(
+              () =>
+                this.authService
+                  .currentUser()
+                  ?.username ?? ''
+            )
           ]
         ],
 

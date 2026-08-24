@@ -17,8 +17,8 @@ export interface RegistrationSuccessDetails {
   message: string;
   submittedAt: string;
 
-  username: string;
-  tempPassword: string;
+  // username: string;
+  // tempPassword: string;
 }
 
 
@@ -56,11 +56,11 @@ export class RegistrationSuccessComponent {
     submittedAt:
       history.state.submittedAt ?? '',
 
-    username:
+    /*username:
       history.state.username ?? '',
 
     tempPassword:
-      history.state.tempPassword ?? ''
+      history.state.tempPassword ?? ''*/
   };
 
 }

@@ -19,6 +19,11 @@ import {
   AuthService
 } from '../../../core/auth/auth-service';
 
+import {
+  passwordPolicyValidator
+} from '../../../core/validators/password-policy.validator';
+
+
 @Component({
   selector: 'app-signup',
   standalone: true,
@@ -40,48 +45,70 @@ export class Signup {
   private readonly router =
     inject(Router);
 
+
   readonly errorMessage =
     signal('');
 
   readonly isSubmitting =
     signal(false);
 
+
   readonly signupForm =
-    this.fb.nonNullable.group({
+  this.fb.nonNullable.group({
 
-      email: [
-        '',
-        [
-          Validators.required,
-          Validators.email
-        ]
-      ],
-
-      username: [
-        '',
-        Validators.required
-      ],
-
-      password: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(8)
-        ]
+    email: [
+      '',
+      [
+        Validators.required,
+        Validators.email
       ]
-    });
+    ],
+
+    username: [
+      '',
+      Validators.required
+    ],
+
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(6),
+        Validators.maxLength(15),
+
+        passwordPolicyValidator(
+          () => this.getUsername()
+        )
+      ]
+    ]
+  });
+
+
+private getUsername(): string {
+
+  return this.signupForm
+    ?.controls
+    .username
+    .value ?? '';
+}
 
 
   onSubmit(): void {
 
     this.errorMessage.set('');
 
+
     if (this.signupForm.invalid) {
-      this.signupForm.markAllAsTouched();
+
+      this.signupForm
+        .markAllAsTouched();
+
       return;
     }
 
+
     this.isSubmitting.set(true);
+
 
     this.authService
       .registerInit(
@@ -92,6 +119,7 @@ export class Signup {
         next: response => {
 
           this.isSubmitting.set(false);
+
 
           /*
            * Newly registered company users
@@ -106,10 +134,12 @@ export class Signup {
             return;
           }
 
+
           void this.router.navigate([
             '/portal/dashboard'
           ]);
         },
+
 
         error: error => {
 
@@ -118,13 +148,16 @@ export class Signup {
             error
           );
 
+
           this.isSubmitting.set(false);
+
 
           this.errorMessage.set(
             error.error?.message ??
             'Unable to create account.'
           );
         }
+
       });
   }
 }

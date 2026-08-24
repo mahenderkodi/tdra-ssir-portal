@@ -14,9 +14,10 @@ import {
 } from '@angular/router';
 
 import {
-  DomSanitizer,
   SafeResourceUrl
 } from '@angular/platform-browser';
+
+import {SafeResourceUrlService} from '../../../core/services/safe-url';
 
 import {
   AdminRegistrationService
@@ -41,8 +42,8 @@ export class AdminRegistrationDetailComponent
   private readonly route =
     inject(ActivatedRoute);
 
-  private readonly sanitizer =
-    inject(DomSanitizer);
+  private readonly safeUrlService =
+  inject(SafeResourceUrlService);
 
   private readonly adminService =
     inject(AdminRegistrationService);
@@ -114,11 +115,11 @@ signal<string | null>(null);
     if (doc?.presignedUrl) {
 
       this.activePreviewUrl.set(
-        this.sanitizer
-          .bypassSecurityTrustResourceUrl(
-            doc.presignedUrl
-          )
-      );
+  this.safeUrlService
+    .getTrustedDocumentUrl(
+      doc.presignedUrl
+    )
+);
 
     } else {
 

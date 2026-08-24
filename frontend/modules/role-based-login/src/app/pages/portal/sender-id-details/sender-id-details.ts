@@ -16,11 +16,10 @@ import {
 } from '@angular/common';
 
 import {
-  DomSanitizer,
   SafeResourceUrl
 } from '@angular/platform-browser';
 
-
+import {SafeResourceUrlService} from '../../../core/services/safe-url';
 
 import {
   RegistrationService
@@ -52,8 +51,8 @@ export class SenderIdDetails
   private readonly registrationService =
     inject(RegistrationService);
 
-  private readonly sanitizer =
-    inject(DomSanitizer);
+    private readonly safeUrlService =
+  inject(SafeResourceUrlService);
 
 
   readonly senderId =
@@ -231,11 +230,11 @@ private loadRegistrationData(): void {
     if (doc?.presignedUrl) {
 
       this.activePreviewUrl.set(
-        this.sanitizer
-          .bypassSecurityTrustResourceUrl(
-            doc.presignedUrl
-          )
-      );
+  this.safeUrlService
+    .getTrustedDocumentUrl(
+      doc.presignedUrl
+    )
+);
 
     } else {
 
