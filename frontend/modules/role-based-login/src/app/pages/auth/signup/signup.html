@@ -1,26 +1,17 @@
-<div class="card shadow border-0">
+<div class="login-wrapper">
 
-  <div
-    class="
-      card-header
-      bg-primary
-      text-white
-      text-center
-      p-4
-      rounded-top
-    "
-  >
-    <h3 class="mb-0 fw-bold">
+  <div class="login-header text-center">
+    <h3 class="mb-0">
       Create Account
     </h3>
 
-    <p class="small mb-0 text-white-50 mt-1">
+    <p class="small mb-0 mt-1">
       TDRA SMS Sender ID Registry Portal
     </p>
   </div>
 
 
-  <div class="card-body p-4">
+  <div class="login-body">
 
     @if (errorMessage()) {
       <div
@@ -37,15 +28,26 @@
       (ngSubmit)="onSubmit()"
     >
 
-      <div class="mb-3">
-        <label class="form-label fw-bold small">
+      <!-- EMAIL -->
+      <div
+        class="mb-3"
+        [class.has-danger]="
+          signupForm.controls.email.touched &&
+          signupForm.controls.email.invalid
+        "
+      >
+
+        <label class="form-label required">
           Email
-          <span class="text-danger">*</span>
         </label>
 
         <input
           type="email"
           class="form-control"
+          [class.form-control-danger]="
+            signupForm.controls.email.touched &&
+            signupForm.controls.email.invalid
+          "
           formControlName="email"
           placeholder="name@company.com"
           autocomplete="email"
@@ -55,7 +57,7 @@
           signupForm.controls.email.touched &&
           signupForm.controls.email.hasError('required')
         ) {
-          <div class="text-danger small mt-1">
+          <div class="form-control-feedback">
             Email is required.
           </div>
         }
@@ -64,22 +66,34 @@
           signupForm.controls.email.touched &&
           signupForm.controls.email.hasError('email')
         ) {
-          <div class="text-danger small mt-1">
+          <div class="form-control-feedback">
             Please enter a valid email address.
           </div>
         }
+
       </div>
 
 
-      <div class="mb-3">
-        <label class="form-label fw-bold small">
+      <!-- USERNAME -->
+      <div
+        class="mb-3"
+        [class.has-danger]="
+          signupForm.controls.username.touched &&
+          signupForm.controls.username.invalid
+        "
+      >
+
+        <label class="form-label required">
           Username
-          <span class="text-danger">*</span>
         </label>
 
         <input
           type="text"
           class="form-control"
+          [class.form-control-danger]="
+            signupForm.controls.username.touched &&
+            signupForm.controls.username.invalid
+          "
           formControlName="username"
           placeholder="fatima_nova"
           autocomplete="username"
@@ -89,22 +103,34 @@
           signupForm.controls.username.touched &&
           signupForm.controls.username.hasError('required')
         ) {
-          <div class="text-danger small mt-1">
+          <div class="form-control-feedback">
             Username is required.
           </div>
         }
+
       </div>
 
 
-      <div class="mb-4">
-        <label class="form-label fw-bold small">
+      <!-- PASSWORD -->
+      <div
+        class="mb-4"
+        [class.has-danger]="
+          signupForm.controls.password.touched &&
+          signupForm.controls.password.invalid
+        "
+      >
+
+        <label class="form-label required">
           Password
-          <span class="text-danger">*</span>
         </label>
 
         <input
           type="password"
           class="form-control"
+          [class.form-control-danger]="
+            signupForm.controls.password.touched &&
+            signupForm.controls.password.invalid
+          "
           formControlName="password"
           placeholder="••••••••"
           autocomplete="new-password"
@@ -115,82 +141,76 @@
         ) {
 
           @if (
-            signupForm.controls.password
-              .hasError('required')
+            signupForm.controls.password.hasError('required')
           ) {
-            <div class="text-danger small mt-1">
+            <div class="form-control-feedback">
               Password is required.
             </div>
           }
 
           @if (
-            signupForm.controls.password
-              .hasError('minlength')
+            signupForm.controls.password.hasError('minlength')
           ) {
-            <div class="text-danger small mt-1">
+            <div class="form-control-feedback">
               Password must be at least 6 characters.
             </div>
           }
 
           @if (
-            signupForm.controls.password
-              .hasError('maxlength')
+            signupForm.controls.password.hasError('maxlength')
           ) {
-            <div class="text-danger small mt-1">
+            <div class="form-control-feedback">
               Password cannot exceed 15 characters.
             </div>
           }
 
           @if (
-            signupForm.controls.password
-              .hasError('alphabetRequired')
+            signupForm.controls.password.hasError('alphabetRequired')
           ) {
-            <div class="text-danger small mt-1">
+            <div class="form-control-feedback">
               Password must contain at least one alphabetic character.
             </div>
           }
 
           @if (
-            signupForm.controls.password
-              .hasError('numberOrSpecialRequired')
+            signupForm.controls.password.hasError('numberOrSpecialRequired')
           ) {
-            <div class="text-danger small mt-1">
+            <div class="form-control-feedback">
               Password must contain at least one numeric
               or special character.
             </div>
           }
 
           @if (
-            signupForm.controls.password
-              .hasError('sameAsUserId')
+            signupForm.controls.password.hasError('sameAsUserId')
           ) {
-            <div class="text-danger small mt-1">
+            <div class="form-control-feedback">
               Password cannot be the same as your User ID.
             </div>
           }
 
           @if (
-            signupForm.controls.password
-              .hasError('reverseOfUserId')
+            signupForm.controls.password.hasError('reverseOfUserId')
           ) {
-            <div class="text-danger small mt-1">
+            <div class="form-control-feedback">
               Password cannot be the reverse of your User ID.
             </div>
           }
 
           @if (
-            signupForm.controls.password
-              .hasError('circularShiftOfUserId')
+            signupForm.controls.password.hasError('circularShiftOfUserId')
           ) {
-            <div class="text-danger small mt-1">
+            <div class="form-control-feedback">
               Password cannot be a circular shift of your User ID.
             </div>
           }
 
         }
+
       </div>
 
 
+      <!-- SUBMIT -->
       <div class="d-grid mb-3">
 
         <button
@@ -205,11 +225,7 @@
           @if (isSubmitting()) {
 
             <span
-              class="
-                spinner-border
-                spinner-border-sm
-                me-2
-              "
+              class="spinner-border spinner-border-sm me-2"
               aria-hidden="true"
             ></span>
 
@@ -232,14 +248,12 @@
 
       Already have an account?
 
-      <a
-        routerLink="/auth/login"
-        class="text-decoration-none fw-semibold"
-      >
+      <a routerLink="/auth/login">
         Sign In
       </a>
 
     </div>
 
   </div>
+
 </div>

@@ -1,9 +1,9 @@
-<div class="card shadow border-0">
-  <div class="card-header bg-primary text-white text-center p-4 rounded-top">
-    <h3 class="mb-0 fw-bold">Sign In</h3>
-    <p class="small mb-0 text-white-50 mt-1">TDRA SMS Sender ID Registry Portal</p>
+<div class="login-wrapper">
+  <div class="login-header text-center">
+    <h3 class="mb-0 ">Sign In</h3>
+    <p class="small mb-0  mt-1">TDRA SMS Sender ID Registry Portal</p>
   </div>
-  <div class="card-body p-4">
+  <div class="login-body ">
 
     <!-- Modern @if control flow handles security error outputs [2] -->
     @if (errorMessage()) {
@@ -15,21 +15,21 @@
     <!-- Single, Consolidated Credentials Login Form [2] -->
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="mb-3">
-        <label class="form-label fw-bold small">Username or Email  <span class="text-danger">*</span></label>
+        <label class="form-label required">Username or Email  </label>
         <input type="text" class="form-control" formControlName="usernameOrEmail" placeholder="admin_masdar">
       </div>
-      <div class="mb-4">
-        <label class="form-label fw-bold small">Password  <span class="text-danger">*</span></label>
+      <div class="mb-3">
+        <label class="form-label required">Password  </label>
         <input type="password" class="form-control" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
       </div>
  
       <!-- Forgot Password Link [3] -->
-      <div class="text-end mb-4">
-        <a routerLink="/auth/forgot-password" class="small text-decoration-none fw-semibold">Forgot password?</a>
+      <div class="text-end mb-3">
+        <a routerLink="/auth/forgot-password" >Forgot password?</a>
       </div>
 
       <div class="d-grid mb-3">
-        <button type="submit" class="btn btn-primary btn-lg fs-6" [disabled]="isSubmitting()">
+        <button type="submit" class="btn btn-primary" [disabled]="isSubmitting()">
           @if (isSubmitting()) {
             <span class="spinner-border spinner-border-sm me-2" role="status"></span>
             Signing In...
@@ -45,7 +45,7 @@
 
   <a
     routerLink="/auth/signup"
-    class="text-decoration-none fw-semibold"
+    
   >
     Sign Up
   </a>
@@ -60,7 +60,7 @@
     <div class="d-grid">
       <button type="button" class="btn btn-outline-dark d-flex align-items-center justify-content-center gap-1" (click)="loginWithUaePass()">
         <span class="fw-bold text-danger">UAE</span>
-        <span class="fw-bold text-dark">PASS</span>
+        <span >PASS</span>
         <span class="small ms-2 fw-semibold">Single Sign-On</span>
       </button>
     </div>

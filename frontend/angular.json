@@ -142,8 +142,8 @@
                 "input": "modules/role-based-login/public"
               }
             ],
-            "styles": ["node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "modules/common/src/styles/brand-theme.css","modules/role-based-login/src/styles.css",
+            "styles": [
+              "modules/role-based-login/src/styles.css",
               "@ngxpert/hot-toast/styles.css"]
           },
           "configurations": {

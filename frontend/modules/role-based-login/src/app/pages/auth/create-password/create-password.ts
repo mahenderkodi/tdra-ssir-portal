@@ -103,11 +103,13 @@ export class CreatePassword {
       return;
     }
 
+    console.log("submit called");
+
     const formValue =
       this.passwordForm.getRawValue();
 
     this.isSubmitting.set(true);
-
+    console.log("is submitting touched");
     this.authService
       .setupPassword({
         password: formValue.password
