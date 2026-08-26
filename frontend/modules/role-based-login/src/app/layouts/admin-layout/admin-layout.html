@@ -1,260 +1,280 @@
-<div class="admin-wrapper d-flex">
+<div class="admin-wrapper">
 
-  <!-- Sidebar -->
-  <aside
-    class="admin-sidebar"
-    [class.sidebar-open]="sidebarOpen()"
-  >
+  <!-- =====================================
+       ICONectiv ADMIN HEADER
+       ===================================== -->
+  <header class="content-header clearfix">
 
-    <!-- Header -->
-    <div
-      class="
-        sidebar-header
-        d-flex
-        align-items-center
-        gap-3
-        p-4
-      "
-    >
+    <div class="container-fluid h-100">
 
-      <div
-        class="
-          logo-badge
-          rounded-3
-          d-flex
-          align-items-center
-          justify-content-center
-        "
-      >
-        TR
-      </div>
+      <div class="row h-100 align-items-center">
 
-
-      <div>
-        <h5
-          class="
-            sidebar-title
-            mb-0
-            fw-bold
-          "
-        >
-          TDRA SSIR
-        </h5>
-
-        <span
-          class="
-            sidebar-subtitle
-            small
-          "
-        >
-          Admin Control Room
-        </span>
-      </div>
-
-    </div>
-
-
-    <!-- Navigation -->
-    <nav
-      class="
-        nav
-        flex-column
-        gap-2
-        px-3
-        pt-3
-        flex-grow-1
-      "
-    >
-
-      <a
-        routerLink="/admin/dashboard"
-        routerLinkActive="active"
-        class="
-          sidebar-link
-          px-3
-          py-2-5
-          d-flex
-          align-items-center
-          gap-3
-        "
-        (click)="closeSidebar()"
-      >
-        <span class="nav-icon">
-          📊
-        </span>
-
-        <span class="nav-text">
-          Dashboard
-        </span>
-      </a>
-
-
-      <a
-        routerLink="/admin/registrations"
-        routerLinkActive="active"
-        class="
-          sidebar-link
-          px-3
-          py-2-5
-          d-flex
-          align-items-center
-          gap-3
-        "
-        (click)="closeSidebar()"
-      >
-        <span class="nav-icon">
-          📥
-        </span>
-
-        <span class="nav-text">
-          Onboarding Queue
-        </span>
-      </a>
-
-
-      <a
-        routerLink="/admin/users"
-        routerLinkActive="active"
-        class="
-          sidebar-link
-          px-3
-          py-2-5
-          d-flex
-          align-items-center
-          gap-3
-        "
-        (click)="closeSidebar()"
-      >
-        <span class="nav-icon">
-          👥
-        </span>
-
-        <span class="nav-text">
-          Manage Staff
-        </span>
-      </a>
-
-    </nav>
-
-
-    <!-- Footer -->
-    <div class="sidebar-footer p-4">
-
-      <div
-        class="
-          d-flex
-          align-items-center
-          gap-3
-          mb-3
-        "
-      >
-
+        <!-- Logo / Product Name -->
         <div
           class="
-            avatar
-            rounded-circle
+            col-8
+            col-lg-4
+            h-100
             d-flex
             align-items-center
-            justify-content-center
-            fw-semibold
           "
         >
-          A
+
+          <div class="logo">
+
+            <a
+              routerLink="/admin/dashboard"
+              class="text-decoration-none"
+            >
+
+              <div class="d-flex align-items-center gap-2">
+
+                <span class="fw-bold text-white">
+                  TDRA SSIR
+                </span>
+
+                <span class="small text-secondary">
+                  Admin
+                </span>
+
+              </div>
+
+            </a>
+
+          </div>
+
         </div>
 
 
-        <div class="overflow-hidden">
+        <!-- Desktop Navigation -->
+        <div
+          class="
+            col-4
+            col-lg-8
+            h-100
+            d-flex
+            align-items-center
+            justify-content-end
+          "
+        >
 
+          <nav
+            role="navigation"
+            aria-labelledby="block-icon-main-menu-menu"
+            id="block-icon-main-menu"
+          >
+
+            <h2
+              class="visually-hidden"
+              id="block-icon-main-menu-menu"
+            >
+              Main navigation
+            </h2>
+
+
+            <ul class="menu">
+
+              <li class="menu-item">
+
+                <a
+                  routerLink="/admin/dashboard"
+                  routerLinkActive="is-active"
+                  [routerLinkActiveOptions]="{
+                    exact: true
+                  }"
+                >
+                  Dashboard
+                </a>
+
+              </li>
+
+
+              <li class="menu-item">
+
+                <a
+                  routerLink="/admin/registrations"
+                  routerLinkActive="is-active"
+                >
+                  Onboarding Queue
+                </a>
+
+              </li>
+
+
+              <li class="menu-item">
+
+                <a
+                  routerLink="/admin/users"
+                  routerLinkActive="is-active"
+                >
+                  Manage Staff
+                </a>
+
+              </li>
+
+            </ul>
+
+          </nav>
+
+
+          <!-- Desktop Log Out -->
           <div
             class="
-              fw-bold
-              text-truncate
-              text-white
-              small
+              d-none
+              d-lg-flex
+              justify-content-center
+              align-items-baseline
             "
           >
-            {{ currentUser()?.username || 'Admin' }}
-          </div>
 
-          <div
-            class="
-              user-role
-              small
-              text-truncate
-            "
-          >
-            ROLE_TDRA_ADMIN
+            <a
+              href="#"
+              class="login"
+              (click)="
+                logout();
+                $event.preventDefault()
+              "
+            >
+              Log Out
+            </a>
+
           </div>
 
         </div>
 
       </div>
-
-
-      <button
-        type="button"
-        class="
-          btn
-          logout-btn
-          w-100
-          btn-sm
-          fw-semibold
-        "
-        (click)="logout()"
-      >
-        Sign Out
-      </button>
 
     </div>
 
-  </aside>
+
+    <!-- =====================================
+         MOBILE BURGER
+         Keep outside container like guide
+         ===================================== -->
+    <a
+      href="#"
+      class="burger d-lg-none"
+      [class.active]="sidebarOpen()"
+      (click)="
+        toggleSidebar();
+        $event.preventDefault()
+      "
+      aria-label="Toggle navigation menu"
+    ></a>
 
 
-  <!-- Mobile overlay -->
-  <div
-    class="sidebar-overlay"
-    [class.show]="sidebarOpen()"
-    (click)="closeSidebar()"
-  ></div>
+    <!-- =====================================
+         MOBILE MENU
+         ===================================== -->
+    @if (sidebarOpen()) {
 
-
-  <!-- Main -->
-  <div class="flex-grow-1">
-
-    <!-- Mobile Header -->
-    <header class="mobile-admin-header">
-
-      <button
-        type="button"
-        class="menu-button"
-        (click)="toggleSidebar()"
-        aria-label="Open navigation menu"
+      <div
+        class="
+          mobile-menu
+          d-block
+          d-lg-none
+        "
       >
-        ☰
-      </button>
+
+        <nav
+          role="navigation"
+          aria-labelledby="block-mobilenavigation-menu"
+          id="block-mobilenavigation"
+        >
+
+          <h2
+            class="visually-hidden"
+            id="block-mobilenavigation-menu"
+          >
+            Mobile Navigation
+          </h2>
 
 
-      <div class="mobile-brand">
-        TDRA SSIR
+          <ul class="menu">
+
+            <li class="menu-item">
+
+              <a
+                routerLink="/admin/dashboard"
+                routerLinkActive="is-active"
+                [routerLinkActiveOptions]="{
+                  exact: true
+                }"
+                (click)="closeSidebar()"
+              >
+                Dashboard
+              </a>
+
+            </li>
+
+
+            <li class="menu-item">
+
+              <a
+                routerLink="/admin/registrations"
+                routerLinkActive="is-active"
+                (click)="closeSidebar()"
+              >
+                Onboarding Queue
+              </a>
+
+            </li>
+
+
+            <li class="menu-item">
+
+              <a
+                routerLink="/admin/users"
+                routerLinkActive="is-active"
+                (click)="closeSidebar()"
+              >
+                Manage Staff
+              </a>
+
+            </li>
+
+          </ul>
+
+        </nav>
+
+
+        <!-- Mobile Log Out -->
+        <div
+          class="
+            d-flex
+            justify-content-center
+            align-items-baseline
+            pt-3
+          "
+        >
+
+          <a
+            href="#"
+            class="login"
+            (click)="
+              logout();
+              $event.preventDefault()
+            "
+          >
+            Log Out
+          </a>
+
+        </div>
+
       </div>
 
+    }
 
-      <!-- Keeps title visually centered -->
-      <div style="width: 42px;"></div>
-
-    </header>
+  </header>
 
 
-    <!-- Page Content -->
-    <main
-      class="
-        admin-main
-        p-4
-      "
-    >
-      <router-outlet></router-outlet>
-    </main>
+  <!-- =====================================
+       PAGE CONTENT
+       ===================================== -->
+  <main class="admin-main p-3 p-md-4">
 
-  </div>
+    <router-outlet></router-outlet>
+
+  </main>
 
 </div>

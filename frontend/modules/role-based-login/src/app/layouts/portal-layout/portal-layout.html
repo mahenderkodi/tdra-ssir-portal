@@ -1,94 +1,136 @@
 <div class="portal-shell">
 
-  <!-- Shared portal header -->
-  <header
+  <header class="content-header">
+
+    <div class="container-fluid h-100">
+
+      <div class="row h-100 align-items-center ">
+
+        <!-- LEFT: PORTAL IDENTITY -->
+        <div class="col-8 col-lg-4 h-100 d-flex align-items-center">
+
+          <div class="logo">
+
+            <a
+              routerLink="/portal"
+              class="text-decoration-none"
+            >
+
+              <div class="d-flex align-items-center gap-2">
+
+                <div class="portal-brand-title">
+                  Sender Registry
+                </div>
+
+                <div class="portal-brand-subtitle">
+                  Company Portal
+                </div>
+
+              </div>
+
+            </a>
+
+          </div>
+
+        </div>
+
+
+        <!-- RIGHT -->
+        <div
+  class="
+    col-4
+    col-lg-8
+    h-100
+    d-flex
+    align-items-center
+    justify-content-end
+  "
+>
+
+  <div
     class="
-      portal-header
-      bg-white
-      border-bottom
-      sticky-top
+      d-none
+      d-lg-flex
+      align-items-center
+      justify-content-end
     "
   >
+
+    <a
+      href="#"
+      class="login"
+      (click)="logout(); $event.preventDefault()"
+    >
+      Sign Out
+    </a>
+
+  </div>
+
+  <a
+    href="#"
+    class="burger d-lg-none"
+    [class.active]="mobileMenuOpen"
+    (click)="toggleMobileMenu(); $event.preventDefault()"
+    aria-label="Open navigation menu"
+  ></a>
+
+</div>
+
+      </div>
+
+    </div>
+
+
+    <!-- MOBILE MENU -->
+    @if (mobileMenuOpen) {
+
+  <div
+    class="mobile-menu d-block d-lg-none h-auto py-3"
+    style="min-height: 0;"
+  >
+
     <nav
-      class="
-        container-fluid
-        px-3
-        px-md-4
-        py-3
-        d-flex
-        justify-content-between
-        align-items-center
-        gap-3
-      "
+      role="navigation"
+      aria-labelledby="portal-mobile-navigation"
+      class="w-100"
     >
 
-      <!-- Portal identity -->
-      <a
-        class="
-          portal-brand
-          text-decoration-none
-          d-flex
-          align-items-center
-          gap-2
-        "
-        routerLink="/portal"
+      <h2
+        class="visually-hidden"
+        id="portal-mobile-navigation"
       >
-        <div class="brand-mark">
-          TDRA
-        </div>
+        Mobile Navigation
+      </h2>
 
-        <div>
-          <div class="fw-bold text-dark">
-            Sender Registry
-          </div>
-
-          <div
-            class="
-              small
-              text-secondary
-              d-none
-              d-sm-block
-            "
-          >
-            Company Portal
-          </div>
-        </div>
-      </a>
-
-
-      <!-- Right-side actions -->
       <div
         class="
           d-flex
+          w-100
+          justify-content-center
           align-items-center
-          gap-3
         "
       >
-        <span
-          class="
-            small
-            text-secondary
-            d-none
-            d-md-inline
-          "
-        >
-          Secure company session
-        </span>
 
-        <button
-          type="button"
-          class="btn btn-outline-danger"
-          (click)="logout()"
+        <a
+          href="#"
+          class="login"
+          (click)="logout(); $event.preventDefault()"
         >
           Sign Out
-        </button>
+        </a>
+
       </div>
 
     </nav>
+
+  </div>
+
+}
+
   </header>
 
 
-  <!-- Child portal page -->
+  <!-- PAGE CONTENT -->
   <main class="portal-content p-2">
 
     <router-outlet>

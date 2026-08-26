@@ -5,137 +5,28 @@
 .admin-dashboard {
   color: #1f2937;
 }
-
-/* ==================================================
-   Base metric card
-   ================================================== */
-
 .metric-card {
-  border: 1px solid transparent;
-  border-left: 5px solid transparent;
-
-  border-radius: 12px;
-
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.06);
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  border-left-width: 4px;
 }
-
-
-.metric-card:hover {
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 6px 16px rgba(
-      var(--tdra-primary-rgb),
-      0.12
-    );
-}
-
-
-/* ==================================================
-   Common text
-   ================================================== */
-
-.metric-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-
-.metric-value {
-  font-size: 2.25rem;
-  font-weight: 700;
-  line-height: 1.1;
-}
-
-
-.metric-description {
-  color: #64748b;
-  font-size: 0.875rem;
-}
-
-
-/* ==================================================
-   Pending
-   ================================================== */
 
 .metric-pending {
-  background-color: #fff7ed;
-  border-color: #fed7aa;
-  border-left-color: #d97706;
+  border-left-color: #ff4e00;
 }
-
-.metric-pending .metric-label,
-.metric-pending .metric-value {
-  color: #b45309;
-}
-
-
-/* ==================================================
-   Approved
-   ================================================== */
 
 .metric-approved {
-  background-color: #f0fdf4;
-  border-color: #bbf7d0;
-  border-left-color: var(--tdra-success);
+  border-left-color: #33647f;
 }
-
-.metric-approved .metric-label,
-.metric-approved .metric-value {
-  color: var(--tdra-success);
-}
-
-
-/* ==================================================
-   Rejected
-   ================================================== */
 
 .metric-rejected {
-  background-color: #fef2f2;
-  border-color: #fecaca;
-  border-left-color: #b91c1c;
+  border-left-color: #d71b36;
 }
-
-.metric-rejected .metric-label,
-.metric-rejected .metric-value {
-  color: #b91c1c;
-}
-
-
-/* ==================================================
-   Total — TDRA brand
-   ================================================== */
 
 .metric-total {
-  background-color: rgba(
-    var(--tdra-primary-rgb),
-    0.07
-  );
-
-  border-color: rgba(
-    var(--tdra-primary-rgb),
-    0.18
-  );
-
-  border-left-color: var(--tdra-primary);
-}
-
-.metric-total .metric-label,
-.metric-total .metric-value {
-  color: var(--tdra-primary);
+  border-left-color: #484c55;
 }
 
 
-/* ==================================================
-   Responsive
-   ================================================== */
+
 
 @media (max-width: 767.98px) {
 

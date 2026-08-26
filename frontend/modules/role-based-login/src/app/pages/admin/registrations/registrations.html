@@ -1,396 +1,349 @@
-<div class="container-fluid py-4">
+<div class="container-fluid py-3 py-md-4">
 
-  <!-- TOP SECTION: Metrics Grid (SaaS Dashboard Style) -->
-  <!-- TOP SECTION: Metrics Grid (Updated to 4 columns) [3] -->
-  <div class="row g-4 mb-5" *ngIf="!isLoading()">
-    <div class="col-xl-3 col-sm-6">
-      <div class="card h-100 border-0 shadow-sm custom-card bg-pending">
-        <div class="card-body p-4 d-flex flex-column justify-content-between">
-          <div>
-            <h6 class="text-uppercase text-muted fw-bold mb-2 tracking-wider small">Pending Reviews</h6>
-            <h2 class="display-6 fw-bold text-dark mb-0">{{ pendingCount() }}</h2>
+  <!-- =====================================
+       METRICS
+       ===================================== -->
+  <div
+    class="row g-3 g-md-4 mb-4"
+    *ngIf="!isLoading()"
+  >
+
+    <!-- Pending -->
+    <div class="col-12 col-sm-6 col-xl-3">
+
+      <div class="card metric-card metric-pending h-100">
+
+        <div class="card-body p-3 p-md-4">
+
+          <div class="small fw-bold mb-2">
+            Pending Reviews
           </div>
-          <p class="small mb-0 text-secondary mt-3">Applications awaiting audit</p>
+
+          <h2 class="mb-1">
+            {{ pendingCount() }}
+          </h2>
+
+          <p class="small text-muted mb-0">
+            Applications awaiting audit
+          </p>
+
         </div>
+
       </div>
+
     </div>
 
-    <div class="col-xl-3 col-sm-6">
-      <div class="card h-100 border-0 shadow-sm custom-card bg-approved">
-        <div class="card-body p-4 d-flex flex-column justify-content-between">
-          <div>
-            <h6 class="text-uppercase text-muted fw-bold mb-2 tracking-wider small">Approved Entities</h6>
-            <h2 class="display-6 fw-bold text-dark mb-0">{{ approvedCount() }}</h2>
+
+    <!-- Approved -->
+    <div class="col-12 col-sm-6 col-xl-3">
+
+      <div class="card metric-card metric-approved h-100">
+
+        <div class="card-body p-3 p-md-4">
+
+          <div class="small fw-bold mb-2">
+            Approved Entities
           </div>
-          <p class="small mb-0 text-secondary mt-3">Active registries on platform</p>
+
+          <h2 class="mb-1">
+            {{ approvedCount() }}
+          </h2>
+
+          <p class="small text-muted mb-0">
+            Active registries on platform
+          </p>
+
         </div>
+
       </div>
+
     </div>
 
-    <!-- NEW CARD: Rejected Clients [3] -->
-    <div class="col-xl-3 col-sm-6">
-      <div class="card h-100 border-0 shadow-sm custom-card bg-rejected">
-        <div class="card-body p-4 d-flex flex-column justify-content-between">
-          <div>
-            <h6 class="text-uppercase text-muted fw-bold mb-2 tracking-wider small">Rejected Clients</h6>
-            <h2 class="display-6 fw-bold text-dark mb-0">{{ rejectedCount() }}</h2>
+
+    <!-- Rejected -->
+    <div class="col-12 col-sm-6 col-xl-3">
+
+      <div class="card metric-card metric-rejected h-100">
+
+        <div class="card-body p-3 p-md-4">
+
+          <div class="small fw-bold mb-2">
+            Rejected Clients
           </div>
-          <p class="small mb-0 text-secondary mt-3">Applications rejected</p>
+
+          <h2 class="mb-1">
+            {{ rejectedCount() }}
+          </h2>
+
+          <p class="small text-muted mb-0">
+            Applications rejected
+          </p>
+
         </div>
+
       </div>
+
     </div>
 
-    <div class="col-xl-3 col-sm-6">
-      <div class="card h-100 border-0 shadow-sm custom-card bg-total">
-        <div class="card-body p-4 d-flex flex-column justify-content-between">
-          <div>
-            <h6 class="text-uppercase text-muted fw-bold mb-2 tracking-wider small">Total Submissions</h6>
-            <h2 class="display-6 fw-bold text-dark mb-0">{{ totalCount() }}</h2>
+
+    <!-- Total -->
+    <div class="col-12 col-sm-6 col-xl-3">
+
+      <div class="card metric-card metric-total h-100">
+
+        <div class="card-body p-3 p-md-4">
+
+          <div class="small fw-bold mb-2">
+            Total Submissions
           </div>
-          <p class="small mb-0 text-secondary mt-3">onboarding requests processed</p>
+
+          <h2 class="mb-1">
+            {{ totalCount() }}
+          </h2>
+
+          <p class="small text-muted mb-0">
+            Onboarding requests processed
+          </p>
+
         </div>
+
       </div>
+
     </div>
+
   </div>
-  
-  <!-- BOTTOM SECTION: Dynamic Queue Table -->
-  <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-    <div class="card-header bg-white border-0 py-4 px-4">
-      <h4 class="mb-0 fw-bold text-dark">Onboarding Registrations Queue</h4>
-      <p class="text-muted small mb-0 mt-1">Review applicant profiles, inspect documents, and manage approvals.</p>
-    </div>
 
-    <div class="card-body p-0">
-      <div *ngIf="isLoading()" class="text-center p-5">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-2 text-muted small">Synchronizing local queue...</p>
-      </div>
 
-      <!-- Table View -->
-      <div
-  class="table-responsive"
-  *ngIf="
-    !isLoading() &&
-    registrations().length > 0
-  "
->
+  <!-- =====================================
+       REGISTRATION QUEUE
+       ===================================== -->
 
-  <table
+  <div class="mb-3">
+
+    <h3 class="mb-1">
+      Onboarding Registrations Queue
+    </h3>
+
+    <p class="text-muted mb-0">
+      Review applicant profiles, inspect documents,
+      and manage approvals.
+    </p>
+
+  </div>
+
+
+  <!-- Loading -->
+  <div
+    *ngIf="isLoading()"
     class="
-      table
-      table-hover
-      align-middle
-      mb-0
-      
+      d-flex
+      justify-content-center
+      py-5
     "
   >
 
-    <thead class="bg-light border-bottom ">
+    <div class="loader">
+      Loading...
+    </div>
 
-      <tr >
+  </div>
 
-        <th
-          scope="col"
-          class="
-            py-3
-            px-3
-            text-uppercase
-            small
-            text-muted
-            fw-bold
-          "
+
+  <!-- Table -->
+  <div
+    class="table-responsive"
+    *ngIf="
+      !isLoading() &&
+      registrations().length > 0
+    "
+  >
+
+    <table
+      class="
+        table
+        table-default
+        table-hover
+        align-middle
+      "
+    >
+
+      <thead>
+
+        <tr>
+
+          <th scope="col">
+            Company Details
+          </th>
+
+          <th scope="col">
+            Proposed Sender ID
+          </th>
+
+          <th scope="col">
+            Authorized Representative
+          </th>
+
+          <th scope="col">
+            Documents
+          </th>
+
+          <th scope="col">
+            Status
+          </th>
+
+          <th
+            scope="col"
+            class="text-center"
+          >
+            Actions
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        <tr
+          *ngFor="let reg of registrations()"
         >
-          Company Details
-        </th>
+
+          <!-- Company -->
+          <td>
+
+            <div class="d-flex flex-column">
+
+              <span class="fw-bold mb-1">
+                {{ reg.companyName }}
+              </span>
+
+              <span class="small text-muted">
+                {{ reg.companyType || 'N/A' }}
+              </span>
+
+            </div>
+
+          </td>
 
 
-        <!-- <th
-          scope="col"
-          class="
-            py-3
-            text-uppercase
-            small
-            text-muted
-            fw-bold
-          "
-        >
-          Tracking ID
-        </th> -->
+          <!-- Sender ID -->
+          <td>
 
-
-        <th
-          scope="col"
-          class="
-            py-3
-            text-uppercase
-            small
-            text-muted
-            fw-bold
-          "
-        >
-          Proposed Sender ID
-        </th>
-
-
-        <th
-          scope="col"
-          class="
-            py-3
-            text-uppercase
-            small
-            text-muted
-            fw-bold
-          "
-        >
-          Authorized Representative
-        </th>
-
-
-        <th
-          scope="col"
-          class="
-            py-3
-            text-uppercase
-            small
-            text-muted
-            fw-bold
-          "
-        >
-          Documents
-        </th>
-
-
-        <th
-          scope="col"
-          class="
-            py-3
-            text-uppercase
-            small
-            text-muted
-            fw-bold
-          "
-        >
-          Status
-        </th>
-
-
-        <th
-          scope="col"
-          class="
-            py-3
-            px-3
-            text-center
-            text-uppercase
-            small
-            text-muted
-            fw-bold
-          "
-          style="width: 140px;"
-        >
-          Actions
-        </th>
-
-      </tr>
-
-    </thead>
-
-
-    <tbody>
-
-      <tr
-        *ngFor="let reg of registrations()"
-        class="table-row-animate"
-      >
-
-        <!-- Company -->
-        <td class="py-3 px-3">
-
-          <div class="d-flex flex-column">
-
-            <span
-              class="
-                fw-bold
-                text-dark
-                fs-6
-                mb-1
-              "
-            >
-              {{ reg.companyName }}
-            </span>
-
-            <span class="text-muted small">
-              {{ reg.companyType || 'N/A' }}
-            </span>
-
-          </div>
-
-        </td>
-
-
-        <!-- Tracking ID + Submitted Date
-        <td class="py-3">
-
-          <div class="d-flex flex-column">
-
-            <span
-              class="
-                fw-semibold
-                text-primary
-                mb-1
-              "
-            >
-              <code>
-                {{ reg.trackingId }}
-              </code>
-            </span>
-
-            <span class="text-muted small">
-              {{
-                reg.submittedAt
-                  | date:'mediumDate'
-              }}
-            </span>
-
-          </div>
-
-        </td> -->
-
-
-        <!-- Sender ID -->
-        <td class="py-3">
-
-          <span class="fw-bold text-dark">
-            <code>
+            <span class="fw-semibold">
               {{
                 reg.proposedSenderId ||
                 'N/A'
               }}
-            </code>
-          </span>
+            </span>
 
-        </td>
+          </td>
 
 
-        <!-- Representative -->
-        <td class="py-3">
+          <!-- Representative -->
+          <td>
 
-          <div class="d-flex flex-column">
+            <div class="d-flex flex-column">
+
+              <span class="fw-semibold mb-1">
+                {{
+                  reg.representativeName ||
+                  'N/A'
+                }}
+              </span>
+
+              <span class="small text-muted">
+                {{
+                  reg.representativeEmail ||
+                  'N/A'
+                }}
+              </span>
+
+            </div>
+
+          </td>
+
+
+          <!-- Documents -->
+          <td>
+
+            <span class="small">
+              {{ reg.documentCount || 0 }}
+              Files Attached
+            </span>
+
+          </td>
+
+
+          <!-- Status -->
+          <td>
 
             <span
+              class="status-indicator"
+              [ngClass]="{
+
+                'status-submitted':
+                  reg.currentStatus === 'SUBMITTED' ||
+                  reg.currentStatus === 'UNDER_REVIEW',
+
+                'status-approved':
+                  reg.currentStatus === 'APPROVED',
+
+                'status-rejected':
+                  reg.currentStatus === 'REJECTED',
+
+                'status-info-requested':
+                  reg.currentStatus === 'INFO_REQUESTED'
+
+              }"
+            >
+              {{ reg.currentStatus }}
+            </span>
+
+          </td>
+
+
+          <!-- Action -->
+          <td class="text-center">
+
+            <a
+              [routerLink]="[
+                '/admin/registrations',
+                reg.id
+              ]"
               class="
-                fw-semibold
-                text-dark
-                mb-1
+                btn
+                btn-primary-inv
+                btn-sm
               "
             >
-              {{
-                reg.representativeName ||
-                'N/A'
-              }}
-            </span>
+              Inspect
+            </a>
 
-            <span class="text-muted small">
-              {{
-                reg.representativeEmail ||
-                'N/A'
-              }}
-            </span>
+          </td>
 
-          </div>
+        </tr>
 
-        </td>
+      </tbody>
 
+    </table>
 
-        <!-- Documents -->
-        <td class="py-3">
-
-          <span
-            class="
-              badge
-              bg-secondary-subtle
-              text-secondary
-              border
-              px-2
-              py-1
-              small
-            "
-          >
-            📁
-            {{ reg.documentCount || 0 }}
-            Files Attached
-          </span>
-
-        </td>
-
-
-        <!-- Status -->
-        <td class="py-3">
-
-          <span
-            class="
-              badge
-              rounded-pill
-              px-3
-              py-1
-              fw-bold
-              text-uppercase
-              fs-7
-            "
-            [ngClass]="{
-
-              'status-submitted':
-                reg.currentStatus === 'SUBMITTED' ||
-                reg.currentStatus === 'UNDER_REVIEW',
-
-              'status-approved':
-                reg.currentStatus === 'APPROVED',
-
-              'status-rejected':
-                reg.currentStatus === 'REJECTED',
-
-              'status-info-requested':
-                reg.currentStatus === 'INFO_REQUESTED'
-
-            }"
-          >
-            {{ reg.currentStatus }}
-          </span>
-
-        </td>
-
-
-        <!-- Action -->
-        <td class="py-3 px-4 text-center">
-
-          <a
-            [routerLink]="[
-              '/admin/registrations',
-              reg.id
-            ]"
-            class="
-              btn
-              btn-outline-primary
-              btn-sm
-              px-3
-              fw-semibold
-            "
-          >
-            Inspect
-          </a>
-
-        </td>
-
-      </tr>
-
-    </tbody>
-
-  </table>
-
-</div>
-
-      <div *ngIf="!isLoading() && registrations().length === 0" class="text-center p-5 my-5">
-        <p class="text-muted mb-0">No onboarding applications found in the queue.</p>
-      </div>
-    </div>
   </div>
+
+
+  <!-- Empty State -->
+  <div
+    *ngIf="
+      !isLoading() &&
+      registrations().length === 0
+    "
+    class="text-center py-5"
+  >
+
+    <p class="text-muted mb-0">
+      No onboarding applications found in the queue.
+    </p>
+
+  </div>
+
 </div>

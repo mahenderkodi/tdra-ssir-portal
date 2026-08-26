@@ -2,36 +2,45 @@
 
   <!-- Section heading -->
   <div class="mb-4">
-    <h2 class="h5 fw-bold text-primary mb-1">
+
+    <h2 class="corp-font">
       Authorized Representative
     </h2>
 
-    <p class="text-secondary small mb-0">
+    <p class="corp-font-light mb-0">
       Enter the details of the person authorized to represent the company.
     </p>
+
   </div>
+
 
   <!-- Information message -->
   <div
     class="alert alert-info small mb-4"
     role="alert"
   >
-    Fields marked with
-    <span class="text-danger fw-bold">*</span>
-    are mandatory.
+    All fields in this section are mandatory.
   </div>
+
 
   <!-- Responsive form grid -->
   <div class="row g-4">
 
+
     <!-- First Name -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="
+        group.get('firstName')?.touched &&
+        group.get('firstName')?.invalid
+      "
+    >
+
       <label
         for="FirstName"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         First Name
-        <span class="text-danger">*</span>
       </label>
 
       <input
@@ -40,7 +49,7 @@
         class="form-control"
         formControlName="firstName"
         placeholder="Enter first name"
-        [class.is-invalid]="
+        [class.form-control-danger]="
           group.get('firstName')?.touched &&
           group.get('firstName')?.invalid
         "
@@ -50,20 +59,28 @@
         group.get('firstName')?.touched &&
         group.get('firstName')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           First name is required.
         </div>
       }
+
     </div>
 
+
     <!-- Last Name -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="
+        group.get('lastName')?.touched &&
+        group.get('lastName')?.invalid
+      "
+    >
+
       <label
         for="lastName"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         Last Name
-        <span class="text-danger">*</span>
       </label>
 
       <input
@@ -72,7 +89,7 @@
         class="form-control"
         formControlName="lastName"
         placeholder="Enter last name"
-        [class.is-invalid]="
+        [class.form-control-danger]="
           group.get('lastName')?.touched &&
           group.get('lastName')?.invalid
         "
@@ -82,20 +99,28 @@
         group.get('lastName')?.touched &&
         group.get('lastName')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Last name is required.
         </div>
       }
+
     </div>
 
+
     <!-- Designation -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="
+        group.get('designation')?.touched &&
+        group.get('designation')?.invalid
+      "
+    >
+
       <label
         for="designation"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         Designation
-        <span class="text-danger">*</span>
       </label>
 
       <input
@@ -104,7 +129,7 @@
         class="form-control"
         formControlName="designation"
         placeholder="Enter designation"
-        [class.is-invalid]="
+        [class.form-control-danger]="
           group.get('designation')?.touched &&
           group.get('designation')?.invalid
         "
@@ -114,20 +139,28 @@
         group.get('designation')?.touched &&
         group.get('designation')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Designation is required.
         </div>
       }
+
     </div>
 
+
     <!-- Department -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="
+        group.get('department')?.touched &&
+        group.get('department')?.invalid
+      "
+    >
+
       <label
         for="department"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         Department
-        <span class="text-danger">*</span>
       </label>
 
       <input
@@ -136,7 +169,7 @@
         class="form-control"
         formControlName="department"
         placeholder="Enter department"
-        [class.is-invalid]="
+        [class.form-control-danger]="
           group.get('department')?.touched &&
           group.get('department')?.invalid
         "
@@ -146,20 +179,28 @@
         group.get('department')?.touched &&
         group.get('department')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Department is required.
         </div>
       }
+
     </div>
 
+
     <!-- Official Email -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="
+        group.get('officialEmail')?.touched &&
+        group.get('officialEmail')?.invalid
+      "
+    >
+
       <label
         for="officialEmail"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         Official Email
-        <span class="text-danger">*</span>
       </label>
 
       <input
@@ -169,7 +210,7 @@
         formControlName="officialEmail"
         placeholder="name@company.com"
         autocomplete="email"
-        [class.is-invalid]="
+        [class.form-control-danger]="
           group.get('officialEmail')?.touched &&
           group.get('officialEmail')?.invalid
         "
@@ -179,7 +220,7 @@
         group.get('officialEmail')?.touched &&
         group.get('officialEmail')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Official email is required.
         </div>
       }
@@ -188,20 +229,28 @@
         group.get('officialEmail')?.touched &&
         group.get('officialEmail')?.hasError('email')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Enter a valid official email address.
         </div>
       }
+
     </div>
 
+
     <!-- Mobile Number -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="
+        group.get('mobileNumber')?.touched &&
+        group.get('mobileNumber')?.invalid
+      "
+    >
+
       <label
         for="mobileNumber"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         Mobile Number
-        <span class="text-danger">*</span>
       </label>
 
       <input
@@ -211,7 +260,7 @@
         formControlName="mobileNumber"
         placeholder="+971 50 123 4567"
         autocomplete="tel"
-        [class.is-invalid]="
+        [class.form-control-danger]="
           group.get('mobileNumber')?.touched &&
           group.get('mobileNumber')?.invalid
         "
@@ -221,7 +270,7 @@
         group.get('mobileNumber')?.touched &&
         group.get('mobileNumber')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Mobile number is required.
         </div>
       }
@@ -230,20 +279,28 @@
         group.get('mobileNumber')?.touched &&
         group.get('mobileNumber')?.hasError('pattern')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Enter a valid mobile number.
         </div>
       }
+
     </div>
 
+
     <!-- Office Number -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="
+        group.get('officeNumber')?.touched &&
+        group.get('officeNumber')?.invalid
+      "
+    >
+
       <label
         for="officeNumber"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         Office Number
-        <span class="text-danger">*</span>
       </label>
 
       <input
@@ -252,7 +309,7 @@
         class="form-control"
         formControlName="officeNumber"
         placeholder="+971 4 123 4567"
-        [class.is-invalid]="
+        [class.form-control-danger]="
           group.get('officeNumber')?.touched &&
           group.get('officeNumber')?.invalid
         "
@@ -262,7 +319,7 @@
         group.get('officeNumber')?.touched &&
         group.get('officeNumber')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Office number is required.
         </div>
       }
@@ -271,20 +328,28 @@
         group.get('officeNumber')?.touched &&
         group.get('officeNumber')?.hasError('pattern')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Enter a valid office number.
         </div>
       }
+
     </div>
 
+
     <!-- UAE PASS ID -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="
+        group.get('uaePassId')?.touched &&
+        group.get('uaePassId')?.invalid
+      "
+    >
+
       <label
         for="uaePassId"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         UAE PASS ID
-        <span class="text-danger">*</span>
       </label>
 
       <input
@@ -293,7 +358,7 @@
         class="form-control"
         formControlName="uaePassId"
         placeholder="Enter UAE PASS ID"
-        [class.is-invalid]="
+        [class.form-control-danger]="
           group.get('uaePassId')?.touched &&
           group.get('uaePassId')?.invalid
         "
@@ -303,20 +368,28 @@
         group.get('uaePassId')?.touched &&
         group.get('uaePassId')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           UAE PASS ID is required.
         </div>
       }
+
     </div>
 
+
     <!-- Passport / Emirates ID -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="
+        group.get('passportOrEmiratesId')?.touched &&
+        group.get('passportOrEmiratesId')?.invalid
+      "
+    >
+
       <label
         for="passportOrEmiratesId"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         Passport / Emirates ID
-        <span class="text-danger">*</span>
       </label>
 
       <input
@@ -325,7 +398,7 @@
         class="form-control"
         formControlName="passportOrEmiratesId"
         placeholder="Enter passport or Emirates ID"
-        [class.is-invalid]="
+        [class.form-control-danger]="
           group.get('passportOrEmiratesId')?.touched &&
           group.get('passportOrEmiratesId')?.invalid
         "
@@ -335,20 +408,28 @@
         group.get('passportOrEmiratesId')?.touched &&
         group.get('passportOrEmiratesId')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Passport or Emirates ID is required.
         </div>
       }
+
     </div>
 
+
     <!-- Address -->
-    <div class="col-12">
+    <div
+      class="col-12"
+      [class.has-danger]="
+        group.get('address')?.touched &&
+        group.get('address')?.invalid
+      "
+    >
+
       <label
         for="address"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         Address
-        <span class="text-danger">*</span>
       </label>
 
       <textarea
@@ -357,7 +438,7 @@
         formControlName="address"
         placeholder="Enter the complete representative address"
         rows="3"
-        [class.is-invalid]="
+        [class.form-control-danger]="
           group.get('address')?.touched &&
           group.get('address')?.invalid
         "
@@ -367,11 +448,13 @@
         group.get('address')?.touched &&
         group.get('address')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Address is required.
         </div>
       }
+
     </div>
 
   </div>
+
 </section>

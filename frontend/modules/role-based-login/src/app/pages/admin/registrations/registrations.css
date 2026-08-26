@@ -68,3 +68,24 @@
 .fs-7 {
   font-size: 0.75rem;
 }
+
+
+.metric-card {
+  border-left-width: 4px;
+}
+
+.metric-pending {
+  border-left-color: #ff4e00;
+}
+
+.metric-approved {
+  border-left-color: #33647f;
+}
+
+.metric-rejected {
+  border-left-color: #d71b36;
+}
+
+.metric-total {
+  border-left-color: #484c55;
+}

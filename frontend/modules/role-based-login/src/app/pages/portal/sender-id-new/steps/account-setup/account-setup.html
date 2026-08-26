@@ -2,14 +2,17 @@
 
   <!-- Section heading -->
   <div class="mb-4">
-    <h2 class="h5 fw-bold text-primary mb-1">
+
+    <h2 class="corp-font">
       Account Setup
     </h2>
 
-    <p class="text-secondary small mb-0">
+    <p class="corp-font-light mb-0">
       Configure the account and communication preferences.
     </p>
+
   </div>
+
 
   <!-- Password information -->
   <div
@@ -20,17 +23,22 @@
     is reviewed and approved by TDRA.
   </div>
 
+
   <!-- Responsive form grid -->
   <div class="row g-4">
 
+
     <!-- Username -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="isInvalid('Username')"
+    >
+
       <label
         for="Username"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         Username
-        <span class="text-danger">*</span>
       </label>
 
       <input
@@ -40,67 +48,77 @@
         formControlName="Username"
         placeholder="Enter username"
         autocomplete="username"
-        [class.is-invalid]="isInvalid('Username')"
+        [class.form-control-danger]="isInvalid('Username')"
       />
 
       <div class="form-text">
         Use 4–30 letters, numbers, dots, underscores or hyphens.
       </div>
 
+
       @if (
         group.get('Username')?.touched &&
         group.get('Username')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Username is required.
         </div>
       }
+
 
       @if (
         group.get('Username')?.touched &&
         group.get('Username')?.hasError('minlength')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Username must contain at least 4 characters.
         </div>
       }
+
 
       @if (
         group.get('Username')?.touched &&
         group.get('Username')?.hasError('maxlength')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Username cannot exceed 30 characters.
         </div>
       }
+
 
       @if (
         group.get('Username')?.touched &&
         group.get('Username')?.hasError('pattern')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Username can contain only letters, numbers, dots,
           underscores and hyphens.
         </div>
       }
+
     </div>
 
+
     <!-- Preferred Language -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="isInvalid('PreferredLanguage')"
+    >
+
       <label
         for="PreferredLanguage"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         Preferred Language
-        <span class="text-danger">*</span>
       </label>
 
       <select
         id="PreferredLanguage"
-        class="form-select"
+        class="form-control"
         formControlName="PreferredLanguage"
-        [class.is-invalid]="isInvalid('PreferredLanguage')"
+        [class.form-control-danger]="isInvalid('PreferredLanguage')"
       >
+
         <option
           value=""
           disabled
@@ -113,34 +131,42 @@
             {{ language }}
           </option>
         }
+
       </select>
+
 
       @if (
         group.get('PreferredLanguage')?.touched &&
         group.get('PreferredLanguage')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Preferred language is required.
         </div>
       }
+
     </div>
 
+
     <!-- Time Zone -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="isInvalid('TimeZone')"
+    >
+
       <label
         for="TimeZone"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         Time Zone
-        <span class="text-danger">*</span>
       </label>
 
       <select
         id="TimeZone"
-        class="form-select"
+        class="form-control"
         formControlName="TimeZone"
-        [class.is-invalid]="isInvalid('TimeZone')"
+        [class.form-control-danger]="isInvalid('TimeZone')"
       >
+
         <option
           value=""
           disabled
@@ -156,34 +182,42 @@
             {{ timeZone.label }}
           </option>
         }
+
       </select>
+
 
       @if (
         group.get('TimeZone')?.touched &&
         group.get('TimeZone')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Time zone is required.
         </div>
       }
+
     </div>
 
+
     <!-- MFA Preference -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="isInvalid('MfaPreference')"
+    >
+
       <label
         for="MfaPreference"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         MFA Preference
-        <span class="text-danger">*</span>
       </label>
 
       <select
         id="MfaPreference"
-        class="form-select"
+        class="form-control"
         formControlName="MfaPreference"
-        [class.is-invalid]="isInvalid('MfaPreference')"
+        [class.form-control-danger]="isInvalid('MfaPreference')"
       >
+
         <option
           value=""
           disabled
@@ -199,40 +233,49 @@
             {{ preference }}
           </option>
         }
+
       </select>
+
 
       <div class="form-text">
         MFA will be configured after TDRA approval.
       </div>
 
+
       @if (
         group.get('MfaPreference')?.touched &&
         group.get('MfaPreference')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           MFA preference is required.
         </div>
       }
+
     </div>
 
+
     <!-- Notification Preference -->
-    <div class="col-12 col-md-6 col-lg-4">
+    <div
+      class="col-12 col-md-6 col-lg-4"
+      [class.has-danger]="isInvalid('NotificationPreference')"
+    >
+
       <label
         for="NotificationPreference"
-        class="form-label fw-semibold"
+        class="form-control-label required"
       >
         Notification Preference
-        <span class="text-danger">*</span>
       </label>
 
       <select
         id="NotificationPreference"
-        class="form-select"
+        class="form-control"
         formControlName="NotificationPreference"
-        [class.is-invalid]="
+        [class.form-control-danger]="
           isInvalid('NotificationPreference')
         "
       >
+
         <option
           value=""
           disabled
@@ -248,17 +291,21 @@
             {{ preference }}
           </option>
         }
+
       </select>
+
 
       @if (
         group.get('NotificationPreference')?.touched &&
         group.get('NotificationPreference')?.hasError('required')
       ) {
-        <div class="invalid-feedback">
+        <div class="form-control-feedback">
           Notification preference is required.
         </div>
       }
+
     </div>
 
   </div>
+
 </section>

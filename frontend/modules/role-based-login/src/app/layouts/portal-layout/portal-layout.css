@@ -16,9 +16,12 @@
 
 .portal-brand {
   min-width: 0;
+  padding: 0;
+  margin: 0;
 }
 
 
+/* TDRA square */
 .brand-mark {
   width: 2.75rem;
   height: 2.75rem;
@@ -29,19 +32,48 @@
 
   flex-shrink: 0;
 
-  border-radius: 0.65rem;
+  background-color: #ffffff;
+  color: #484c55;
 
-  background-color:
-    var(--bs-primary);
-
-  color: white;
+  border: 1px solid #a3a7a9;
+  border-radius: 0.35rem;
 
   font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.03rem;
+  letter-spacing: 0.04rem;
+}
+
+
+/* Sender Registry */
+.portal-brand-title {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+
+/* Company Portal */
+.portal-brand-subtitle {
+  color: #a3a7a9;
 }
 
 
 .portal-content {
   flex: 1;
+}
+
+
+.logout-position {
+  position: absolute;
+
+  right: 2rem;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  z-index: 10;
+}
+
+.content-header .login {
+  position: static !important;
+  top: auto !important;
 }

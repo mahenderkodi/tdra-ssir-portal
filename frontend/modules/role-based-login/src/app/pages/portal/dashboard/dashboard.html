@@ -1,9 +1,9 @@
-<section class="dashboard-page py-4 py-md-5">
+<section class="dashboard-page py-3 py-md-5">
 
   <div class="container-fluid px-3 px-md-4">
 
     <!-- Page heading -->
-    <div class="mb-4">
+    <div class="mb-3 mb-md-4">
       <h1 class="h3 fw-bold mb-1">
         Corporate Dashboard
       </h1>
@@ -57,12 +57,18 @@
         </span>
 
         <button
-          type="button"
-          class="btn btn-sm btn-outline-danger"
-          (click)="retry()"
-        >
-          Retry
-        </button>
+  type="button"
+  class="
+    btn
+    btn-sm
+    btn-outline-danger
+    align-self-stretch
+    align-self-md-auto
+  "
+  (click)="retry()"
+>
+  Retry
+</button>
       </div>
     }
 
@@ -71,13 +77,16 @@
 @if (!loading() && !errorMessage()) {
 
   <div
-    class="
-      d-flex
-      justify-content-between
-      align-items-center
-      mb-3
-    "
-  >
+  class="
+    d-flex
+    flex-column
+    flex-sm-row
+    justify-content-sm-between
+    align-items-sm-center
+    gap-3
+    mb-3
+  "
+>
 
     <div>
       <h2 class="h5 fw-bold mb-1">
@@ -89,10 +98,14 @@
         registration requests.
       </p>
     </div>
-
-   <button
+<button
   type="button"
-  class="btn btn-primary"
+  class="
+    btn
+    btn-primary
+    align-self-stretch
+    align-self-sm-auto
+  "
   [routerLink]="['/portal/sender-id/new']"
   [queryParams]="{
     mode: 'additional'
@@ -116,15 +129,15 @@
 
       <div class="table-responsive">
 
-        <table
-          class="
-            table
-            table-hover
-            align-middle
-            mb-0
-          "
-        >
-
+       <table
+  class="
+    table
+    table-hover
+    align-middle
+    mb-0
+    text-nowrap
+  "
+>
           <thead>
 
             <tr>
@@ -181,22 +194,10 @@
 
 
                 <td>
-
-                  <span
-                    class="
-                      badge
-                      text-bg-warning
-                    "
-                  >
-
-                    {{
-                      registration
-                        .status
-                    }}
-
-                  </span>
-
-                </td>
+  <span class="badge bg-warning text-dark">
+    {{ registration.status }}
+  </span>
+</td>
 
 
                 <td>
@@ -214,15 +215,15 @@
                   <td>
 
   <button
-    type="button"
-    class="btn btn-sm btn-outline-primary"
-    [routerLink]="[
-      '/portal/sender-id',
-      registration.id
-    ]"
-  >
-    View
-  </button>
+  type="button"
+  class="btn btn-primary-inv btn-sm"
+  [routerLink]="[
+    '/portal/sender-id',
+    registration.id
+  ]"
+>
+  View
+</button>
 
 </td>
 

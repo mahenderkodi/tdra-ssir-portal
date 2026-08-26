@@ -1,16 +1,16 @@
 <section [formGroup]="group">
 
-  <!-- Heading -->
-  <div class="mb-4">
-    <h2 class="h5 fw-bold text-primary mb-1">
+<!-- Heading -->
+<div class="mb-3 mb-md-4">
+    <h2 class="corp-font">
       Legal Documents
     </h2>
 
-    <p class="text-secondary small mb-1">
+    <p class="corp-font-light mb-1">
       Upload and manage the required company documents.
     </p>
 
-    <p class="text-secondary small mb-0">
+    <p class="corp-font-light mb-0">
       Supported formats: PDF, PNG, JPG and JPEG.
     </p>
   </div>
@@ -51,29 +51,31 @@
   existingDocuments.length > 0
 ) {
 
-  <div class="mb-4">
+  <div class="mb-3 mb-md-4">
 
-    <h6 class="fw-bold mb-3">
+    <h3 class="corp-font mb-3">
       Existing Documents
-    </h6>
+    </h3>
 
     @for (
       document of existingDocuments;
       track document.id
     ) {
-
-      <div
-        class="
-          border
-          rounded
-          p-3
-          mb-2
-          d-flex
-          justify-content-between
-          align-items-center
-          gap-3
-        "
-      >
+<div
+  class="
+    border
+    rounded
+    p-3
+    mb-2
+    d-flex
+    flex-column
+    flex-sm-row
+    justify-content-sm-between
+    align-items-sm-center
+    gap-2
+    gap-sm-3
+  "
+>
 
         <div>
 
@@ -103,337 +105,398 @@
 }
 
   <!-- Responsive upload grid -->
-  <div class="row g-4">
+  <div class="row g-3 g-md-4">
 
     <!-- Trade License -->
-    <div class="col-12 col-md-6 col-lg-4">
-      <label
-        for="tradeLicense"
-        class="form-label fw-semibold"
-      >
-        Trade License
-         @if (!isAdditionalSenderId) {
-    <span class="text-danger">*</span>
-  } @else {
-    <span class="text-secondary fw-normal">
-      (Replace if required)
-    </span>
-  }
-      </label>
+ <!-- Trade License -->
+<div
+  class="col-12 col-md-6 col-lg-4"
+  [class.has-danger]="
+    group.get('tradeLicense')?.touched &&
+    group.get('tradeLicense')?.invalid
+  "
+>
 
-      <input
-        #fileInput
-        id="tradeLicense"
-        type="file"
-        class="form-control"
-        accept=".pdf,.png,.jpg,.jpeg"
-        (change)="
-          onFileSelected(
-            $event,
-            'tradeLicense'
-          )
-        "
-        [class.is-invalid]="
-          group.get('tradeLicense')?.touched &&
-          group.get('tradeLicense')?.invalid
-        "
-      />
+  <label
+    for="tradeLicense"
+    class="form-control-label fw-bold"
+    [class.required]="!isAdditionalSenderId"
+  >
+    Trade License
 
-      @if (
-        group.get('tradeLicense')?.touched &&
-        group.get('tradeLicense')?.hasError('required')
-      ) {
-        <div class="invalid-feedback">
-          Trade License is required.
-        </div>
-      }
+    @if (isAdditionalSenderId) {
+      <span class="text-secondary fw-normal">
+        (Replace if required)
+      </span>
+    }
+  </label>
 
-      @if (
-        group.get('tradeLicense')?.value;
-        as file
-      ) {
-        <div class="form-text text-success text-break">
-          Selected: {{ file.name }}
-        </div>
-      }
+
+  <input
+    #fileInput
+    id="tradeLicense"
+    type="file"
+    class="form-control"
+    accept=".pdf,.png,.jpg,.jpeg"
+    (change)="
+      onFileSelected(
+        $event,
+        'tradeLicense'
+      )
+    "
+    [class.form-control-danger]="
+      group.get('tradeLicense')?.touched &&
+      group.get('tradeLicense')?.invalid
+    "
+  />
+
+
+  @if (
+    group.get('tradeLicense')?.touched &&
+    group.get('tradeLicense')?.hasError('required')
+  ) {
+    <div class="form-control-feedback">
+      Trade License is required.
     </div>
+  }
+
+
+  @if (
+    group.get('tradeLicense')?.value;
+    as file
+  ) {
+    <div class="form-text text-success text-break">
+      Selected: {{ file.name }}
+    </div>
+  }
+
+</div>
 
 
     <!-- Certificate of Incorporation -->
-    <div class="col-12 col-md-6 col-lg-4">
-      <label
-        for="certificateOfIncorporation"
-        class="form-label fw-semibold"
-      >
-        Certificate of Incorporation
-         @if (!isAdditionalSenderId) {
-    <span class="text-danger">*</span>
-  } @else {
-    <span class="text-secondary fw-normal">
-      (Replace if required)
-    </span>
-  }
-      </label>
+  <div
+  class="col-12 col-md-6 col-lg-4"
+  [class.has-danger]="
+    group.get('certificateOfIncorporation')?.touched &&
+    group.get('certificateOfIncorporation')?.invalid
+  "
+>
 
-      <input
-        #fileInput
-        id="certificateOfIncorporation"
-        type="file"
-        class="form-control"
-        accept=".pdf,.png,.jpg,.jpeg"
-        (change)="
-          onFileSelected(
-            $event,
-            'certificateOfIncorporation'
-          )
-        "
-        [class.is-invalid]="
-          group.get('certificateOfIncorporation')?.touched &&
-          group.get('certificateOfIncorporation')?.invalid
-        "
-      />
+  <label
+    for="certificateOfIncorporation"
+    class="form-control-label fw-bold"
+    [class.required]="!isAdditionalSenderId"
+  >
+    Certificate of Incorporation
 
-      @if (
-        group.get('certificateOfIncorporation')?.touched &&
-        group.get('certificateOfIncorporation')?.hasError('required')
-      ) {
-        <div class="invalid-feedback">
-          Certificate of Incorporation is required.
-        </div>
-      }
+    @if (isAdditionalSenderId) {
+      <span class="text-secondary fw-normal">
+        (Replace if required)
+      </span>
+    }
+  </label>
 
-      @if (
-        group.get('certificateOfIncorporation')?.value;
-        as file
-      ) {
-        <div class="form-text text-success text-break">
-          Selected: {{ file.name }}
-        </div>
-      }
+
+  <input
+    #fileInput
+    id="certificateOfIncorporation"
+    type="file"
+    class="form-control"
+    accept=".pdf,.png,.jpg,.jpeg"
+    (change)="
+      onFileSelected(
+        $event,
+        'certificateOfIncorporation'
+      )
+    "
+    [class.form-control-danger]="
+      group.get('certificateOfIncorporation')?.touched &&
+      group.get('certificateOfIncorporation')?.invalid
+    "
+  />
+
+
+  @if (
+    group.get('certificateOfIncorporation')?.touched &&
+    group.get('certificateOfIncorporation')?.hasError('required')
+  ) {
+    <div class="form-control-feedback">
+      Certificate of Incorporation is required.
     </div>
+  }
+
+
+  @if (
+    group.get('certificateOfIncorporation')?.value;
+    as file
+  ) {
+    <div class="form-text text-success text-break">
+      Selected: {{ file.name }}
+    </div>
+  }
+
+</div>
 
 
     <!-- Tax Registration Certificate -->
-    <div class="col-12 col-md-6 col-lg-4">
-      <label
-        for="taxRegistrationCertificate"
-        class="form-label fw-semibold"
-      >
-        Tax Registration Certificate
-         @if (!isAdditionalSenderId) {
-    <span class="text-danger">*</span>
-  } @else {
-    <span class="text-secondary fw-normal">
-      (Replace if required)
-    </span>
-  }
-      </label>
+    <div
+  class="col-12 col-md-6 col-lg-4"
+  [class.has-danger]="
+    group.get('taxRegistrationCertificate')?.touched &&
+    group.get('taxRegistrationCertificate')?.invalid
+  "
+>
 
-      <input
-        #fileInput
-        id="taxRegistrationCertificate"
-        type="file"
-        class="form-control"
-        accept=".pdf,.png,.jpg,.jpeg"
-        (change)="
-          onFileSelected(
-            $event,
-            'taxRegistrationCertificate'
-          )
-        "
-        [class.is-invalid]="
-          group.get('taxRegistrationCertificate')?.touched &&
-          group.get('taxRegistrationCertificate')?.invalid
-        "
-      />
+  <label
+    for="taxRegistrationCertificate"
+    class="form-control-label fw-bold"
+    [class.required]="!isAdditionalSenderId"
+  >
+    Tax Registration Certificate
 
-      @if (
-        group.get('taxRegistrationCertificate')?.touched &&
-        group.get('taxRegistrationCertificate')?.hasError('required')
-      ) {
-        <div class="invalid-feedback">
-          Tax Registration Certificate is required.
-        </div>
-      }
+    @if (isAdditionalSenderId) {
+      <span class="text-secondary fw-normal">
+        (Replace if required)
+      </span>
+    }
+  </label>
 
-      @if (
-        group.get('taxRegistrationCertificate')?.value;
-        as file
-      ) {
-        <div class="form-text text-success text-break">
-          Selected: {{ file.name }}
-        </div>
-      }
+
+  <input
+    #fileInput
+    id="taxRegistrationCertificate"
+    type="file"
+    class="form-control"
+    accept=".pdf,.png,.jpg,.jpeg"
+    (change)="
+      onFileSelected(
+        $event,
+        'taxRegistrationCertificate'
+      )
+    "
+    [class.form-control-danger]="
+      group.get('taxRegistrationCertificate')?.touched &&
+      group.get('taxRegistrationCertificate')?.invalid
+    "
+  />
+
+
+  @if (
+    group.get('taxRegistrationCertificate')?.touched &&
+    group.get('taxRegistrationCertificate')?.hasError('required')
+  ) {
+    <div class="form-control-feedback">
+      Tax Registration Certificate is required.
     </div>
+  }
+
+
+  @if (
+    group.get('taxRegistrationCertificate')?.value;
+    as file
+  ) {
+    <div class="form-text text-success text-break">
+      Selected: {{ file.name }}
+    </div>
+  }
+
+</div>
 
 
     <!-- Authorized Signatory Letter -->
-    <div class="col-12 col-md-6 col-lg-4">
-      <label
-        for="authorizedSignatoryLetter"
-        class="form-label fw-semibold"
-      >
-        Authorized Signatory Letter
-         @if (!isAdditionalSenderId) {
-    <span class="text-danger">*</span>
-  } @else {
-    <span class="text-secondary fw-normal">
-      (Replace if required)
-    </span>
-  }
-      </label>
+   <div
+  class="col-12 col-md-6 col-lg-4"
+  [class.has-danger]="
+    group.get('authorizedSignatoryLetter')?.touched &&
+    group.get('authorizedSignatoryLetter')?.invalid
+  "
+>
 
-      <input
-        #fileInput
-        id="authorizedSignatoryLetter"
-        type="file"
-        class="form-control"
-        accept=".pdf,.png,.jpg,.jpeg"
-        (change)="
-          onFileSelected(
-            $event,
-            'authorizedSignatoryLetter'
-          )
-        "
-        [class.is-invalid]="
-          group.get('authorizedSignatoryLetter')?.touched &&
-          group.get('authorizedSignatoryLetter')?.invalid
-        "
-      />
+  <label
+    for="authorizedSignatoryLetter"
+    class="form-control-label fw-bold"
+  >
+    Authorized Signatory Letter
 
-      @if (
-        group.get('authorizedSignatoryLetter')?.touched &&
-        group.get('authorizedSignatoryLetter')?.hasError('required')
-      ) {
-        <div class="invalid-feedback">
-          Authorized Signatory Letter is required.
-        </div>
-      }
+    @if (!isAdditionalSenderId) {
+      <span class="text-danger">*</span>
+    } @else {
+      <span class="text-secondary fw-normal">
+        (Replace if required)
+      </span>
+    }
+  </label>
 
-      @if (
-        group.get('authorizedSignatoryLetter')?.value;
-        as file
-      ) {
-        <div class="form-text text-success text-break">
-          Selected: {{ file.name }}
-        </div>
-      }
+  <input
+    #fileInput
+    id="authorizedSignatoryLetter"
+    type="file"
+    class="form-control"
+    accept=".pdf,.png,.jpg,.jpeg"
+    (change)="
+      onFileSelected(
+        $event,
+        'authorizedSignatoryLetter'
+      )
+    "
+    [class.form-control-danger]="
+      group.get('authorizedSignatoryLetter')?.touched &&
+      group.get('authorizedSignatoryLetter')?.invalid
+    "
+  />
+
+  @if (
+    group.get('authorizedSignatoryLetter')?.touched &&
+    group.get('authorizedSignatoryLetter')?.hasError('required')
+  ) {
+    <div class="form-control-feedback">
+      Authorized Signatory Letter is required.
     </div>
+  }
+
+  @if (
+    group.get('authorizedSignatoryLetter')?.value;
+    as file
+  ) {
+    <div class="form-text text-success text-break">
+      Selected: {{ file.name }}
+    </div>
+  }
+
+</div>
 
 
     <!-- Signatory Identity Document -->
-    <div class="col-12 col-md-6 col-lg-4">
-      <label
-        for="signatoryIdentityDocument"
-        class="form-label fw-semibold"
-      >
-        Emirates ID / Passport of Signatory
-         @if (!isAdditionalSenderId) {
-    <span class="text-danger">*</span>
-  } @else {
-    <span class="text-secondary fw-normal">
-      (Replace if required)
-    </span>
-  }
-      </label>
+<div
+  class="col-12 col-md-6 col-lg-4"
+  [class.has-danger]="
+    group.get('signatoryIdentityDocument')?.touched &&
+    group.get('signatoryIdentityDocument')?.invalid
+  "
+>
 
-      <input
-        #fileInput
-        id="signatoryIdentityDocument"
-        type="file"
-        class="form-control"
-        accept=".pdf,.png,.jpg,.jpeg"
-        (change)="
-          onFileSelected(
-            $event,
-            'signatoryIdentityDocument'
-          )
-        "
-        [class.is-invalid]="
-          group.get('signatoryIdentityDocument')?.touched &&
-          group.get('signatoryIdentityDocument')?.invalid
-        "
-      />
+  <label
+    for="signatoryIdentityDocument"
+    class="form-control-label fw-bold"
+  >
+    Emirates ID / Passport of Signatory
 
-      @if (
-        group.get('signatoryIdentityDocument')?.touched &&
-        group.get('signatoryIdentityDocument')?.hasError('required')
-      ) {
-        <div class="invalid-feedback">
-          Emirates ID or Passport of Signatory is required.
-        </div>
-      }
+    @if (!isAdditionalSenderId) {
+      <span class="text-danger">*</span>
+    } @else {
+      <span class="text-secondary fw-normal">
+        (Replace if required)
+      </span>
+    }
+  </label>
 
-      @if (
-        group.get('signatoryIdentityDocument')?.value;
-        as file
-      ) {
-        <div class="form-text text-success text-break">
-          Selected: {{ file.name }}
-        </div>
-      }
+  <input
+    #fileInput
+    id="signatoryIdentityDocument"
+    type="file"
+    class="form-control"
+    accept=".pdf,.png,.jpg,.jpeg"
+    (change)="
+      onFileSelected(
+        $event,
+        'signatoryIdentityDocument'
+      )
+    "
+    [class.form-control-danger]="
+      group.get('signatoryIdentityDocument')?.touched &&
+      group.get('signatoryIdentityDocument')?.invalid
+    "
+  />
+
+  @if (
+    group.get('signatoryIdentityDocument')?.touched &&
+    group.get('signatoryIdentityDocument')?.hasError('required')
+  ) {
+    <div class="form-control-feedback">
+      Emirates ID or Passport of Signatory is required.
     </div>
-
-
-    <!-- Business Registration Certificate -->
-    <div class="col-12 col-md-6 col-lg-4">
-      <label
-        for="businessRegistrationCertificate"
-        class="form-label fw-semibold"
-      >
-        Business Registration Certificate
-         @if (!isAdditionalSenderId) {
-    <span class="text-danger">*</span>
-  } @else {
-    <span class="text-secondary fw-normal">
-      (Replace if required)
-    </span>
   }
-      </label>
 
-      <input
-        #fileInput
-        id="businessRegistrationCertificate"
-        type="file"
-        class="form-control"
-        accept=".pdf,.png,.jpg,.jpeg"
-        (change)="
-          onFileSelected(
-            $event,
-            'businessRegistrationCertificate'
-          )
-        "
-        [class.is-invalid]="
-          group.get('businessRegistrationCertificate')?.touched &&
-          group.get('businessRegistrationCertificate')?.invalid
-        "
-      />
-
-      @if (
-        group.get('businessRegistrationCertificate')?.touched &&
-        group.get('businessRegistrationCertificate')?.hasError('required')
-      ) {
-        <div class="invalid-feedback">
-          Business Registration Certificate is required.
-        </div>
-      }
-
-      @if (
-        group.get('businessRegistrationCertificate')?.value;
-        as file
-      ) {
-        <div class="form-text text-success text-break">
-          Selected: {{ file.name }}
-        </div>
-      }
+  @if (
+    group.get('signatoryIdentityDocument')?.value;
+    as file
+  ) {
+    <div class="form-text text-success text-break">
+      Selected: {{ file.name }}
     </div>
+  }
+
+</div>
+
+
+<!-- Business Registration Certificate -->
+<div
+  class="col-12 col-md-6 col-lg-4"
+  [class.has-danger]="
+    group.get('businessRegistrationCertificate')?.touched &&
+    group.get('businessRegistrationCertificate')?.invalid
+  "
+>
+
+  <label
+    for="businessRegistrationCertificate"
+    class="form-control-label fw-bold"
+  >
+    Business Registration Certificate
+
+    @if (!isAdditionalSenderId) {
+      <span class="text-danger">*</span>
+    } @else {
+      <span class="text-secondary fw-normal">
+        (Replace if required)
+      </span>
+    }
+  </label>
+
+  <input
+    #fileInput
+    id="businessRegistrationCertificate"
+    type="file"
+    class="form-control"
+    accept=".pdf,.png,.jpg,.jpeg"
+    (change)="
+      onFileSelected(
+        $event,
+        'businessRegistrationCertificate'
+      )
+    "
+    [class.form-control-danger]="
+      group.get('businessRegistrationCertificate')?.touched &&
+      group.get('businessRegistrationCertificate')?.invalid
+    "
+  />
+
+  @if (
+    group.get('businessRegistrationCertificate')?.touched &&
+    group.get('businessRegistrationCertificate')?.hasError('required')
+  ) {
+    <div class="form-control-feedback">
+      Business Registration Certificate is required.
+    </div>
+  }
+
+  @if (
+    group.get('businessRegistrationCertificate')?.value;
+    as file
+  ) {
+    <div class="form-text text-success text-break">
+      Selected: {{ file.name }}
+    </div>
+  }
+
+</div>
 
 
     <!-- Company Logo -->
     <div class="col-12 col-md-6 col-lg-4">
       <label
         for="companyLogo"
-        class="form-label fw-semibold"
+        class="form-control-label fw-bold"
       >
         Company Logo
 
@@ -471,7 +534,7 @@
     <div class="col-12 col-md-6 col-lg-4">
       <label
         for="additionalSupportingDocuments"
-        class="form-label fw-semibold"
+        class="form-control-label fw-bold"
       >
         Additional Supporting Documents
 

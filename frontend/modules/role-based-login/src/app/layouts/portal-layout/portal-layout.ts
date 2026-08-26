@@ -21,6 +21,18 @@ export class PortalLayout {
 
   private readonly router =
     inject(Router);
+
+
+    mobileMenuOpen = false;
+
+
+toggleMobileMenu(): void {
+
+  this.mobileMenuOpen =
+    !this.mobileMenuOpen;
+
+}
+
   logout(): void {
     this.authService.logout();
 
