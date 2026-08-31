@@ -1,4 +1,6 @@
-import { Routes } from '@angular/router';
+import { Routes } from '@angular/router'; //Typescript type given by angular/router
+
+//Navigation decision makers
 import { guestGuard } from './core/auth/guest-guard';
 import { authGuard } from './core/auth/auth-guard';
 import { roleGuard } from './core/auth/role-guard';
@@ -28,13 +30,14 @@ import { SenderIdDetails } from './pages/portal/sender-id-details/sender-id-deta
 
 import { Unauthorized } from './pages/unauthorized/unauthorized';
 
-
+//Routes - data type provided by angular/router. (array of route objects)
+// We imported this "routes" only into app.config.ts
 export const routes: Routes = [
 
   // Default application entry point
   {
     path: '',
-    pathMatch: 'full',
+    pathMatch: 'full', //Only use this redirect if the entire remaining URL is empty.
     redirectTo: 'auth/login'
   },
 

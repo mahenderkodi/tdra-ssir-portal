@@ -2,6 +2,12 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { TokenStorageService } from './token-storage';
 
+
+/* authInterceptor checks each outgoing HttpClient request and, for 
+protected endpoints, clones the request and attaches the current access 
+token as a Bearer Authorization header; if no access token exists, it 
+simply forwards the request unchanged.*/
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const tokenStorage = inject(TokenStorageService);
@@ -16,7 +22,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   // Automatically attaches the JWT to protected API requests.
   if (accessToken && !isPublicAuthRequest) {
-
+    //Angular HTTP requests are immutable.
     const authenticatedRequest = req.clone({
       setHeaders: {
         Authorization: `Bearer ${accessToken}`

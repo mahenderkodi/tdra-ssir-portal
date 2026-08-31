@@ -1,20 +1,22 @@
-import { ApplicationConfig } from '@angular/core';
+import { ApplicationConfig } from '@angular/core'; //Type or interface to describe configuration
 
-import { provideRouter } from '@angular/router';
+import { provideRouter } from '@angular/router'; // To enable angular routing
 
 import {
   provideHttpClient,
   withInterceptors
-} from '@angular/common/http';
+} from '@angular/common/http'; // enable http client to make http requests i.e., api calls, also allows us to add interceptors to modify requests and responses globally
 
 import { routes } from './app.routes';
 
 import { authInterceptor } from './core/auth/auth-interceptor';
 import { errorInterceptor } from './core/auth/error-interceptor';
 
-import { provideHotToastConfig } from '@ngxpert/hot-toast';
+import { provideHotToastConfig } from '@ngxpert/hot-toast';//This is a third-party library that provides a simple way to show toast notifications in Angular applications.
 
 export const appConfig: ApplicationConfig = {
+  //providers - This is an array of providers. Tells Angular's Dependency Injection system - something/capability that should be available to the application.
+
   providers: [
 
     // Enables Angular routing using routes defined in app.routes.ts

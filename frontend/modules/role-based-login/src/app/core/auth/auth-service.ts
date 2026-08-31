@@ -1,22 +1,23 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-
+import { Injectable, inject, signal, computed } from '@angular/core'; //Computed Signal is a derived value
+import { HttpClient } from '@angular/common/http';//Angular API for makinh HTTP calls, return obeservables
+import { Observable, tap, throwError } from 'rxjs';//asynchronously produce response or error, tap() for side effects and pass value without transforming like map()
 import { LoginRequest } from './models/login-request-model';
 import { LoginResponse } from './models/login-response-model';
+import { RefreshTokenResponse } from './models/refresh-token-response';
 import { SetupPasswordRequest } from './models/setup-password-model';
 import { AuthenticatedUser } from './models/authenticated-user-model';
 import { TokenStorageService } from './token-storage';
 import { MessageResponse } from './models/message-response-model';
-
+import { LoggerService } from '../../layouts/logging/loggerService';
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
+  //Authservice uses these properties directly and their references are not re-assigned later
   private readonly http = inject(HttpClient);
   private readonly tokenStorage = inject(TokenStorageService);
-
+  private readonly logger = inject(LoggerService);
   private readonly AUTH_API =
     'http://localhost:8080/api/v1/auth';
 
@@ -24,34 +25,45 @@ export class AuthService {
   readonly currentUser =
     signal<AuthenticatedUser | null>(null);
 
+  // isLoggedIn should always be derived from whether an access token exists.
+  // recalculates automatically when that accessToken() Signal changes.It is derived value We cant set().
   readonly isLoggedIn =
     computed(() =>
-      this.tokenStorage.accessToken() !== null
+      this.currentUser() !== null
     );
-
+  
+  
+  // Runs when angular creates AuthService instance- since we are using providerIn: 'root'
+  // its a root level instance(application level service instance), Inside this we register browser event-listener
   constructor() {
-
-    // Synchronizes logout across multiple browser tabs.
+    
+    //listening for browser event assocaited with change in local storage
     window.addEventListener('storage', event => {
 
       if (
         event.key === 'ssir_refresh_token' &&
         event.newValue === null
       ) {
+
+        this.logger.info('Authentication session cleared in another browser tab');
+        // removes access token and refresh token
         this.tokenStorage.clearSession();
         this.currentUser.set(null);
 
-        window.location.replace('/auth/login');
+        window.location.replace('/auth/login'); //removes current entry from browser history, so back button wont take to authenticated route
       }
     });
   }
 
 
   // Authenticates user and creates the frontend session from returned tokens.
+  // Input--> LoginRequest Output--> async LoginResponse
   login(
     credentials: LoginRequest
   ): Observable<LoginResponse> {
-
+    //post(url,requestBody)
+    //pipe() - is how RxJS operators are chained to an Observable
+    //tap() - is side effect, although we initialized user session, we still get entire response as output of login() function
     return this.http
       .post<LoginResponse>(
         `${this.AUTH_API}/login`,
@@ -86,31 +98,47 @@ export class AuthService {
 
 
   isAuthenticated(): boolean {
-    return Boolean(
-      this.tokenStorage.getAccessToken()
-    );
+    return this.currentUser()!==null;
+
   }
 
 
   // Uses the refresh token to obtain a new access token.
-  refreshToken(): Observable<any> {
+  refreshToken(): Observable<RefreshTokenResponse> {
+  console.log(
+  '[AuthService] refreshToken called'
+);
+  const refreshTokenValue =
+    this.tokenStorage.getRefreshToken();
 
-    const refreshTokenValue =
-      this.tokenStorage.getRefreshToken();
+  if (!refreshTokenValue) {
+    return throwError(
+      () => new Error(
+        'No refresh token available'
+      )
+    );
+  }
 
-    return this.http.post<any>(
+   const existingCompanyId =
+    this.currentUser()?.companyId;
+
+  return this.http
+    .post<RefreshTokenResponse>(
       `${this.AUTH_API}/refresh`,
-      { refreshToken: refreshTokenValue }
+      {
+        refreshToken: refreshTokenValue
+      }
     )
     .pipe(
       tap(response =>
         this.initializeUserSession(
           response.accessToken,
-          response.refreshToken
+          response.refreshToken,
+          existingCompanyId
         )
       )
     );
-  }
+}
 
 
   setupPassword(
@@ -125,6 +153,8 @@ export class AuthService {
 
 
   logout(): void {
+
+    this.logger.info('Authentication session cleared');
     this.tokenStorage.clearSession();
     this.currentUser.set(null);
   }
@@ -150,13 +180,22 @@ export class AuthService {
     companyId?: number | null
   ): void {
 
-    this.tokenStorage.saveAccessToken(accessToken);
-    this.tokenStorage.saveRefreshToken(refreshToken);
-
     const decodedUser =
       this.tokenStorage.decodeUserFromToken(
         accessToken
       );
+
+    if (!decodedUser) {
+
+      this.tokenStorage.clearSession();
+      this.currentUser.set(null);
+
+      return;
+    }
+    this.tokenStorage.saveAccessToken(accessToken);
+    this.tokenStorage.saveRefreshToken(refreshToken);
+
+
 
     if (decodedUser) {
       this.currentUser.set({

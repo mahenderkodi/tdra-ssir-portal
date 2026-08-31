@@ -5,6 +5,7 @@ import {
 } from '@angular/router';
 
 import { AuthService } from './auth-service';
+import { LoggerService } from '../../layouts/logging/loggerService';
 
 /**
  * Restricts routes based on the roles configured in app.routes.ts.
@@ -19,6 +20,7 @@ export const roleGuard: CanActivateFn = (
 
   const authService = inject(AuthService);
   const router = inject(Router);
+  const logger = inject(LoggerService);
 
   // Prevent unauthenticated users from accessing role-protected routes.
   if (!authService.isAuthenticated()) {
@@ -45,6 +47,10 @@ export const roleGuard: CanActivateFn = (
   if (authService.hasAnyRole(allowedRoles)) {
     return true;
   }
+
+  logger.warn(
+  'Route access denied because required role is missing'
+);
 
   // Logged-in user does not have permission for this route.
   return router.createUrlTree([

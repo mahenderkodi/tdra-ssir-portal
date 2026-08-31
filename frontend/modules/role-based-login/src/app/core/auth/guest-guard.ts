@@ -1,10 +1,20 @@
+/* guestGuard prevents an already authenticated/restorable 
+user from seeing guest pages like Login. If the access token 
+is gone but a refresh token still exists, it restores the session 
+using the refresh token and redirects the user back to the appropriate page. If no refresh token exists, it allows the Login page to open. */
+
 import { inject } from '@angular/core';
 
+// Angular type for a functional route guard - CanActivateFn
+// Router - lets guard construct redirects
 import {
   CanActivateFn,
   Router
 } from '@angular/router';
 
+//map() -> transform successful emittedvalue
+//catchError() -> handle an observable failure
+//of() -> create an observable that immediately emits a value
 import {
   catchError,
   map,
@@ -13,6 +23,7 @@ import {
 
 import { AuthService } from './auth-service';
 import { TokenStorageService } from './token-storage';
+import { LoggerService } from '../../layouts/logging/loggerService';
 
 
 const TDRA_ROLES: string[] = [
@@ -22,7 +33,8 @@ const TDRA_ROLES: string[] = [
   'ROLE_TDRA_AUDITOR'
 ];
 
-
+//authGuard does nothing using route, but authguard uses 
+// route to read query parameters from it
 export const guestGuard: CanActivateFn =
   (route) => {
 
@@ -35,7 +47,8 @@ export const guestGuard: CanActivateFn =
     const router =
       inject(Router);
 
-
+    const logger =
+      inject(LoggerService);
     /*
      * Original page that the user was
      * trying to access before auth/session
@@ -193,11 +206,10 @@ export const guestGuard: CanActivateFn =
           redirectByRole()
         ),
 
-        catchError(error => {
+        catchError(() => {
 
-          console.error(
-            'Unable to restore session:',
-            error
+          logger.error(
+            'Unable to restore authentication session'
           );
 
           authService.logout();
