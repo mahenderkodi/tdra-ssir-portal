@@ -4,7 +4,7 @@ import {
   signal,
   inject,
   Input,
-  
+
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -17,14 +17,16 @@ import {
   SafeResourceUrl
 } from '@angular/platform-browser';
 
-import {SafeResourceUrlService} from '../../../core/services/safe-url';
+import { SafeResourceUrlService } from '../../../core/services/safe-url';
 
 import {
   AdminRegistrationService
 } from '../../../core/services/admin-registration';
 
 import { HotToastService } from '@ngxpert/hot-toast';
-
+import {
+  LoggerService
+} from '../../../layouts/logging/loggerService';
 
 @Component({
   selector: 'app-admin-registration-detail',
@@ -43,13 +45,16 @@ export class AdminRegistrationDetailComponent
     inject(ActivatedRoute);
 
   private readonly safeUrlService =
-  inject(SafeResourceUrlService);
+    inject(SafeResourceUrlService);
 
   private readonly adminService =
     inject(AdminRegistrationService);
 
   private readonly toast =
-  inject(HotToastService);
+    inject(HotToastService);
+
+  private readonly logger =
+    inject(LoggerService);
 
   @Input() id!: string;
 
@@ -76,9 +81,9 @@ export class AdminRegistrationDetailComponent
     signal('');
 
   activeAction =
-signal<string | null>(null);
-  
-  
+    signal<string | null>(null);
+
+
 
 
   ngOnInit(): void {
@@ -88,6 +93,10 @@ signal<string | null>(null);
       this.route.snapshot.paramMap.get('id');
 
     if (!resolvedId) {
+
+      this.logger.warn(
+        'Registration detail opened without a valid identifier'
+      );
 
       this.errorMessage.set(
         'Missing registration identifier.'
@@ -115,11 +124,11 @@ signal<string | null>(null);
     if (doc?.presignedUrl) {
 
       this.activePreviewUrl.set(
-  this.safeUrlService
-    .getTrustedDocumentUrl(
-      doc.presignedUrl
-    )
-);
+        this.safeUrlService
+          .getTrustedDocumentUrl(
+            doc.presignedUrl
+          )
+      );
 
     } else {
 
@@ -128,31 +137,31 @@ signal<string | null>(null);
   }
 
 
-  
 
-isImage(doc: any): boolean {
 
-  const fileName = doc?.fileName;
+  isImage(doc: any): boolean {
 
-  if (!fileName) {
-    return false;
+    const fileName = doc?.fileName;
+
+    if (!fileName) {
+      return false;
+    }
+
+    return /\.(png|jpg|jpeg|gif|webp)$/i
+      .test(fileName);
   }
 
-  return /\.(png|jpg|jpeg|gif|webp)$/i
-    .test(fileName);
-}
 
+  isPdf(doc: any): boolean {
 
-isPdf(doc: any): boolean {
+    const fileName = doc?.fileName;
 
-  const fileName = doc?.fileName;
+    if (!fileName) {
+      return false;
+    }
 
-  if (!fileName) {
-    return false;
+    return /\.pdf$/i.test(fileName);
   }
-
-  return /\.pdf$/i.test(fileName);
-}
 
   executeAction(status: string): void {
 
@@ -177,27 +186,27 @@ isPdf(doc: any): boolean {
      * require explanation.
      */
     if (
-  (
-    status === 'REJECTED' ||
-    status === 'INFO_REQUESTED'
-  ) &&
-  !comments
-) {
+      (
+        status === 'REJECTED' ||
+        status === 'INFO_REQUESTED'
+      ) &&
+      !comments
+    ) {
 
-  if (status === 'REJECTED') {
-    this.toast.error(
-      'Please enter the reason for rejection.'
-    );
-  }
+      if (status === 'REJECTED') {
+        this.toast.error(
+          'Please enter the reason for rejection.'
+        );
+      }
 
-  if (status === 'INFO_REQUESTED') {
-    this.toast.error(
-      'Please enter what additional information is required.'
-    );
-  }
+      if (status === 'INFO_REQUESTED') {
+        this.toast.error(
+          'Please enter what additional information is required.'
+        );
+      }
 
-  return;
-}
+      return;
+    }
 
 
     /*
@@ -227,37 +236,58 @@ isPdf(doc: any): boolean {
 
         next: () => {
 
-  this.isProcessing.set(false);
-  this.activeAction.set(null);
+          this.isProcessing.set(false);
+          this.activeAction.set(null);
 
-  if (status === 'APPROVED') {
+          if (status === 'APPROVED') {
 
-    this.toast.success(
-      'Registration approved successfully.'
-    );
+            this.logger.info(
+              'Admin registration approved successfully'
+            );
+            this.toast.success(
+              'Registration approved successfully.'
+            );
 
-  } else if (status === 'REJECTED') {
+          } else if (status === 'REJECTED') {
+            this.logger.info(
+              'Admin registration rejected successfully'
+            );
+            this.toast.success(
+              'Registration rejected successfully.'
+            );
 
-    this.toast.success(
-      'Registration rejected successfully.'
-    );
+          } else if (status === 'INFO_REQUESTED') {
+            this.logger.info(
+              'Admin registration information request sent successfully'
+            );
+            this.toast.success(
+              'Information request sent successfully.'
+            );
 
-  } else if (status === 'INFO_REQUESTED') {
+          }
 
-    this.toast.success(
-      'Information request sent successfully.'
-    );
-
-  }
-
-  void this.router.navigate(
-    ['/admin/registrations']
-  );
-},
+          void this.router.navigate(
+            ['/admin/registrations']
+          );
+        },
 
         error: err => {
 
+          if (err.status >= 500) {
+
+            this.logger.error(
+              'Admin registration action failed due to server error'
+            );
+
+          } else {
+
+            this.logger.warn(
+              'Admin registration action request rejected'
+            );
+          }
+
           this.isProcessing.set(false);
+
           this.activeAction.set(null);
 
           this.errorMessage.set(
@@ -303,6 +333,10 @@ isPdf(doc: any): boolean {
         },
 
         error: () => {
+
+          this.logger.error(
+            'Unable to load admin registration details'
+          );
 
           this.isLoading.set(false);
 

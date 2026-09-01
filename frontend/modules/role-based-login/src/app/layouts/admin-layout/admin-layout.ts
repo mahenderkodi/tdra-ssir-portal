@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth-service';
-import { signal } from '@angular/core';
+
 
 
 @Component({
@@ -13,11 +13,11 @@ import { signal } from '@angular/core';
   styleUrl: './admin-layout.css'     // Pointing to CSS [3]
 })
 export class AdminLayoutComponent {
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   readonly sidebarOpen =
   signal(false);
-  readonly currentUser = this.authService.currentUser;
+  
 
   logout(): void {
     this.authService.logout();

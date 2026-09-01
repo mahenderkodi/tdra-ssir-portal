@@ -19,12 +19,15 @@ import {
   SafeResourceUrl
 } from '@angular/platform-browser';
 
-import {SafeResourceUrlService} from '../../../core/services/safe-url';
+import { SafeResourceUrlService } from '../../../core/services/safe-url';
 
 import {
   RegistrationService
 } from '../../../core/services/registration-service';
 
+import {
+  LoggerService
+} from '../../../layouts/logging/loggerService';
 
 @Component({
   selector: 'app-sender-id-details',
@@ -51,9 +54,11 @@ export class SenderIdDetails
   private readonly registrationService =
     inject(RegistrationService);
 
-    private readonly safeUrlService =
-  inject(SafeResourceUrlService);
+  private readonly safeUrlService =
+    inject(SafeResourceUrlService);
 
+  private readonly logger =
+    inject(LoggerService);
 
   readonly senderId =
     signal<any | null>(null);
@@ -104,7 +109,9 @@ export class SenderIdDetails
       );
 
     if (!id) {
-
+      this.logger.warn(
+        'Sender ID details opened with an invalid identifier'
+      );
       this.loading.set(false);
 
       this.errorMessage.set(
@@ -118,108 +125,99 @@ export class SenderIdDetails
   }
 
 
- private loadDetails(
-  id: number
-): void {
+  private loadDetails(
+    id: number
+  ): void {
 
-  this.loading.set(true);
-  this.errorMessage.set('');
-
-
-  // 1. Load the selected Sender ID
-  this.registrationService
-    .getSenderIdById(id)
-    .subscribe({
-
-      next: senderResponse => {
-
-        console.log(
-          'SENDER ID RESPONSE:',
-          senderResponse
-        );
-
-        this.senderId.set(
-          senderResponse
-        );
+    this.loading.set(true);
+    this.errorMessage.set('');
 
 
-        // 2. Load company / documents separately
-        this.loadRegistrationData();
+    // 1. Load the selected Sender ID
+    this.registrationService
+      .getSenderIdById(id)
+      .subscribe({
 
-      },
-
-      error: error => {
-
-        console.error(
-          'SENDER ID DETAILS ERROR:',
-          error
-        );
-
-        this.loading.set(false);
-
-        this.errorMessage.set(
-          'Unable to load Sender ID details.'
-        );
-      }
-
-    });
-}
+        next: senderResponse => {
 
 
-private loadRegistrationData(): void {
 
-  this.registrationService
-    .getMyDraft()
-    .subscribe({
-
-      next: registrationResponse => {
-
-        console.log(
-          'REGISTRATION RESPONSE:',
-          registrationResponse
-        );
-
-        this.registration.set(
-          registrationResponse
-        );
+          this.senderId.set(
+            senderResponse
+          );
 
 
-        const documents =
-          registrationResponse
-            ?.documents ?? [];
+          // 2. Load company / documents separately
+          this.loadRegistrationData();
 
+        },
 
-        if (documents.length > 0) {
+        error: error => {
 
-          this.previewDocument(
-            documents[0]
+          this.logger.error(
+            'Unable to load Sender ID details'
+          );
+
+          this.loading.set(false);
+
+          this.errorMessage.set(
+            'Unable to load Sender ID details.'
           );
         }
 
+      });
+  }
 
-        this.loading.set(false);
-      },
 
-      error: error => {
+  private loadRegistrationData(): void {
 
-        console.error(
-          'REGISTRATION DETAILS ERROR:',
-          error
-        );
+    this.registrationService
+      .getMyDraft()
+      .subscribe({
 
-        /*
-         * Sender ID has already loaded,
-         * so don't destroy the entire page.
-         */
-        this.loading.set(false);
+        next: registrationResponse => {
 
-        this.errorMessage.set(
-          'Sender ID loaded, but company registration details could not be retrieved.'
-        );
-      }
 
-    });
-}
+          this.registration.set(
+            registrationResponse
+          );
+
+
+          const documents =
+            registrationResponse
+              ?.documents ?? [];
+
+
+          if (documents.length > 0) {
+
+            this.previewDocument(
+              documents[0]
+            );
+          }
+
+
+          this.loading.set(false);
+        },
+
+        error: error => {
+
+          this.logger.error(
+            'Unable to load Sender ID registration details'
+          );
+
+          /*
+           * Sender ID has already loaded,
+           * so don't destroy the entire page.
+           */
+          this.loading.set(false);
+
+          this.errorMessage.set(
+            'Sender ID loaded, but company registration details could not be retrieved.'
+          );
+        }
+
+      });
+  }
 
   previewDocument(
     doc: any
@@ -230,11 +228,11 @@ private loadRegistrationData(): void {
     if (doc?.presignedUrl) {
 
       this.activePreviewUrl.set(
-  this.safeUrlService
-    .getTrustedDocumentUrl(
-      doc.presignedUrl
-    )
-);
+        this.safeUrlService
+          .getTrustedDocumentUrl(
+            doc.presignedUrl
+          )
+      );
 
     } else {
 

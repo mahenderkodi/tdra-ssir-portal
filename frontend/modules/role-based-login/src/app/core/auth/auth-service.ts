@@ -105,9 +105,7 @@ export class AuthService {
 
   // Uses the refresh token to obtain a new access token.
   refreshToken(): Observable<RefreshTokenResponse> {
-  console.log(
-  '[AuthService] refreshToken called'
-);
+ 
   const refreshTokenValue =
     this.tokenStorage.getRefreshToken();
 

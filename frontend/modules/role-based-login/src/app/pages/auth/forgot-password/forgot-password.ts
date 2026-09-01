@@ -1,32 +1,74 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, FormGroup,ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../../core/auth/auth-service';
-import { CommonModule } from '@angular/common';
+import {
+  Component,
+  inject,
+  signal
+} from '@angular/core';
+
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
+
+import {
+  RouterModule
+} from '@angular/router';
+
+import {
+  AuthService
+} from '../../../core/auth/auth-service';
+
+import {
+  LoggerService
+} from '../../../layouts/logging/loggerService';
 
 @Component({
   selector: 'app-forgot-password',
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [
+    ReactiveFormsModule,
+    RouterModule
+  ],
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.css',
 })
-export class ForgotPassword implements OnInit {
-  private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
+export class ForgotPassword {
 
-  forgotForm!: FormGroup;
-  successMessage = signal('');
-  errorMessage = signal('');
-  isSubmitting = signal(false);
+  private readonly fb =
+    inject(FormBuilder);
 
-  ngOnInit(): void {
-    this.forgotForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]]
+  private readonly authService =
+    inject(AuthService);
+
+  private readonly logger =
+    inject(LoggerService);
+
+  readonly forgotForm =
+    this.fb.nonNullable.group({
+      email: [
+        '',
+        [
+          Validators.required,
+          Validators.email
+        ]
+      ]
     });
-  }
+
+  readonly successMessage =
+    signal('');
+
+  readonly errorMessage =
+    signal('');
+
+  readonly isSubmitting =
+    signal(false);
 
   onSubmit(): void {
+
     if (this.forgotForm.invalid) {
+
+      this.forgotForm
+        .markAllAsTouched();
+
       return;
     }
 
@@ -34,18 +76,41 @@ export class ForgotPassword implements OnInit {
     this.successMessage.set('');
     this.errorMessage.set('');
 
-    const email = this.forgotForm.value.email;
+    const email =
+      this.forgotForm.getRawValue().email;
 
-    this.authService.forgotPassword(email).subscribe({
-      next: (response) => {
-        this.isSubmitting.set(false);
-        this.successMessage.set(response.message);
-        this.forgotForm.reset();
-      },
-      error: (err) => {
-        this.isSubmitting.set(false);
-        this.errorMessage.set(err.error?.message || 'Failed to submit request.');
-      }
-    });
+    this.authService
+      .forgotPassword(email)
+      .subscribe({
+
+        next: (response) => {
+
+          this.logger.info(
+            'Password reset link requested'
+          );
+
+          this.isSubmitting.set(false);
+
+          this.successMessage.set(
+            response.message
+          );
+
+          this.forgotForm.reset();
+        },
+
+        error: (err) => {
+
+          this.logger.warn(
+            'Password reset link request failed'
+          );
+
+          this.isSubmitting.set(false);
+
+          this.errorMessage.set(
+            err.error?.message ||
+            'Failed to submit request.'
+          );
+        }
+      });
   }
 }

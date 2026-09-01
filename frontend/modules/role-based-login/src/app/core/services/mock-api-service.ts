@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+//delay emission for given time 
 import { Observable, delay, of } from 'rxjs';
 
 @Injectable({
@@ -10,9 +11,7 @@ export class MockApiService {
   formData: FormData
 ): Observable<any> {
 
-  console.log(
-    'Mock API received FormData'
-  );
+  
 
   const registrationData =
     formData.get('registrationData');
@@ -97,10 +96,6 @@ export class MockApiService {
   );
 
 
-  console.log(
-    'Saved mock registrations:',
-    registrations
-  );
 
 
   /*
@@ -142,10 +137,7 @@ getRegistrations():
       ? JSON.parse(existingData)
       : [];
 
-  console.log(
-    'Mock GET registrations:',
-    registrations
-  );
+  
 
   return of(
     registrations
@@ -181,10 +173,7 @@ getRegistrationById(
     );
   }
 
-  console.log(
-    'Mock registration details:',
-    registration
-  );
+ 
 
   return of(
     registration

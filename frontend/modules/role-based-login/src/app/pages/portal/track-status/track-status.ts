@@ -17,6 +17,9 @@ import {
   TrackingStatusResponse
 } from '../../../core/services/tracking-status-response';
 
+import {
+  LoggerService
+} from '../../../layouts/logging/loggerService';
 
 @Component({
   selector: 'app-track-status',
@@ -35,6 +38,8 @@ export class TrackStatus
   private readonly registrationStatusService =
     inject(RegistrationStatusService);
 
+  private readonly logger =
+  inject(LoggerService);
 
   readonly statusData =
     signal<TrackingStatusResponse | null>(
@@ -49,18 +54,11 @@ export class TrackStatus
 
 
   ngOnInit(): void {
-  console.log(
-    '[TrackStatus] ngOnInit called'
-  );
-
   this.loadStatus();
 }
 
 
  private loadStatus(): void {
-  console.log(
-    '[TrackStatus] Calling my-status API'
-  );
 
   this.loading.set(true);
   this.errorMessage.set('');
@@ -69,21 +67,17 @@ export class TrackStatus
     .getMyStatus()
     .subscribe({
       next: response => {
-        console.log(
-          '[TrackStatus] Response:',
-          response
-        );
+        
 
         this.statusData.set(response);
         this.loading.set(false);
       },
 
       error: error => {
-        console.error(
-          '[TrackStatus] API error:',
-          error
-        );
-
+        
+        this.logger.error(
+    'Unable to load application status'
+  );
         this.loading.set(false);
 
         this.errorMessage.set(

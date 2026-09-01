@@ -39,7 +39,7 @@ export function passwordPolicyValidator(
      * At least one alphabetic character.
      */
     if (!/[a-zA-Z]/.test(password)) {
-        console.log('one alphabet touched');
+        
       errors['alphabetRequired'] = true;
     }
 
@@ -52,7 +52,7 @@ export function passwordPolicyValidator(
       !/[0-9]/.test(password) &&
       !/[^a-zA-Z0-9\s]/.test(password)
     ) {
-        console.log('one numeric or special character touched');
+       
       errors['numberOrSpecialRequired'] = true;
     }
 
@@ -101,7 +101,7 @@ export function passwordPolicyValidator(
         normalizedPassword ===
         reversedUserId
       ) {
-        console.log('reverse userid');
+        
         errors['reverseOfUserId'] = true;
       }
 
@@ -119,7 +119,7 @@ export function passwordPolicyValidator(
       ) {
 
         errors['circularShiftOfUserId'] = true;
-        console.log('circular shift of user id');
+       
       }
     }
 

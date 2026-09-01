@@ -97,7 +97,9 @@ import { RegistrationService }
 import { RegistrationRequest }
   from '../../../core/models/registration-request';
 import { Router, ActivatedRoute } from '@angular/router';
-
+import {
+  LoggerService
+} from '../../../layouts/logging/loggerService';
 
 @Component({
   selector: 'app-sender-id-new',
@@ -161,6 +163,10 @@ export class SenderIdNew implements OnInit{
 
     if (!this.editSenderId) {
 
+       this.logger.warn(
+    'Sender ID edit mode opened without a valid identifier'
+  );
+
       this.toast.error(
         'Missing Sender ID.'
       );
@@ -206,6 +212,8 @@ export class SenderIdNew implements OnInit{
   private readonly registrationService =
     inject(RegistrationService);
 
+  private readonly logger =
+  inject(LoggerService);
   readonly existingDocuments =
   signal<any[]>([]);
 
@@ -719,10 +727,7 @@ readonly steps = [
 
       next: response => {
 
-        console.log(
-          'MY DRAFT RESPONSE:',
-          response
-        );
+       
 
         const company =
           response.company;
@@ -887,20 +892,16 @@ readonly steps = [
         }
 
 
-        console.log(
-          'FORM AFTER PREFILL:',
-          this.registrationForm.getRawValue()
-        );
+        
 
       },
 
 
       error: error => {
 
-        console.error(
-          'MY DRAFT API ERROR:',
-          error
-        );
+       this.logger.error(
+    'Unable to load existing company information'
+  );
 
         this.toast.error(
           'Unable to load existing company information.'
@@ -922,10 +923,7 @@ private loadSenderIdForEdit(
 
       next: (response: any) => {
 
-        console.log(
-          'EDIT SENDER ID RESPONSE:',
-          response
-        );
+        
 
 
         /*
@@ -944,10 +942,9 @@ private loadSenderIdForEdit(
 
       error: error => {
 
-        console.error(
-          'EDIT LOAD ERROR:',
-          error
-        );
+         this.logger.error(
+    'Unable to load Sender ID details for editing'
+  );
 
         this.toast.error(
           'Unable to load Sender ID details.'
@@ -1271,10 +1268,7 @@ private configureAdditionalSenderIdMode(): void {
   });
 
 
-  console.log(
-    'Test data filled:',
-    this.registrationForm.getRawValue()
-  );
+  
 }
 
 
@@ -1347,9 +1341,7 @@ this.isSubmitting.set(true);
 this.successMessage.set('');
 this.errorMessage.set('');
 
-formData.forEach((value, key) => {
-  console.log(key, value);
-});
+
 
 
 const request$ = this.isEditMode
@@ -1366,10 +1358,7 @@ request$.subscribe({
 
   next: response => {
 
-    console.log(
-      'Backend response:',
-      response
-    );
+    
 
     this.isSubmitting.set(false);
 
@@ -1377,12 +1366,17 @@ request$.subscribe({
 
     if (this.isEditMode) {
 
+      this.logger.info(
+      'Sender ID registration resubmitted successfully'
+    );
       this.toast.success(
         'Sender ID resubmitted successfully.'
       );
 
     } else {
-
+      this.logger.info(
+      'Sender ID registration submitted successfully'
+    );
       this.toast.success(
         'Registration submitted successfully.'
       );
@@ -1395,23 +1389,35 @@ request$.subscribe({
 
   error: error => {
 
-    console.error(
-      'Registration API error:',
-      error
-    );
+  if (error.status >= 500) {
 
-    this.isSubmitting.set(false);
-
-    this.errorMessage.set(
+    this.logger.error(
       this.isEditMode
-        ? 'Sender ID could not be resubmitted. Please try again.'
-        : 'Registration could not be submitted. Please try again.'
+        ? 'Sender ID registration resubmission failed due to server error'
+        : 'Sender ID registration submission failed due to server error'
     );
 
-    this.toast.error(
-      this.errorMessage()
+  } else {
+
+    this.logger.warn(
+      this.isEditMode
+        ? 'Sender ID registration resubmission request rejected'
+        : 'Sender ID registration submission request rejected'
     );
   }
+
+  this.isSubmitting.set(false);
+
+  this.errorMessage.set(
+    this.isEditMode
+      ? 'Sender ID could not be resubmitted. Please try again.'
+      : 'Registration could not be submitted. Please try again.'
+  );
+
+  this.toast.error(
+    this.errorMessage()
+  );
+}
 
 });
 

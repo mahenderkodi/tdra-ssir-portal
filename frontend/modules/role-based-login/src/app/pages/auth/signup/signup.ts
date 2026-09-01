@@ -24,6 +24,8 @@ import {
 } from '../../../core/validators/password-policy.validator';
 
 
+import { LoggerService } from '../../../layouts/logging/loggerService';
+
 @Component({
   selector: 'app-signup',
   standalone: true,
@@ -45,6 +47,8 @@ export class Signup {
   private readonly router =
     inject(Router);
 
+  private readonly logger = inject(LoggerService);
+
 
   readonly errorMessage =
     signal('');
@@ -54,43 +58,55 @@ export class Signup {
 
 
   readonly signupForm =
-  this.fb.nonNullable.group({
+    this.fb.nonNullable.group({
 
-    email: [
-      '',
-      [
-        Validators.required,
-        Validators.email
+      email: [
+        '',
+        [
+          Validators.required,
+          Validators.email
+        ]
+      ],
+
+      username: [
+        '',
+        Validators.required
+      ],
+
+      password: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(6),
+          Validators.maxLength(15),
+
+          passwordPolicyValidator(
+            () => this.getUsername()
+          )
+        ]
       ]
-    ],
+    });
 
-    username: [
-      '',
-      Validators.required
-    ],
+  constructor() {
 
-    password: [
-      '',
-      [
-        Validators.required,
-        Validators.minLength(6),
-        Validators.maxLength(15),
+    this.signupForm.controls.username
+      .valueChanges
+      .subscribe(() => {
 
-        passwordPolicyValidator(
-          () => this.getUsername()
-        )
-      ]
-    ]
-  });
+        this.signupForm.controls.password
+          .updateValueAndValidity({
+            emitEvent: false
+          });
+      });
+  }
 
+  private getUsername(): string {
 
-private getUsername(): string {
-
-  return this.signupForm
-    ?.controls
-    .username
-    .value ?? '';
-}
+    return this.signupForm
+      ?.controls
+      .username
+      .value ?? '';
+  }
 
 
   onSubmit(): void {
@@ -118,6 +134,9 @@ private getUsername(): string {
 
         next: response => {
 
+          this.logger.info(
+            'Account registration initialized successfully'
+          );
           this.isSubmitting.set(false);
 
 
@@ -143,19 +162,29 @@ private getUsername(): string {
 
         error: error => {
 
-          console.error(
-            'Signup error:',
-            error
-          );
+          if (error.status >= 500) {
 
+            this.logger.error(
+              'Account registration failed due to server error'
+            );
+
+            this.errorMessage.set(
+              'Unable to create account. Please try again later.'
+            );
+
+          } else {
+
+            this.logger.warn(
+              'Account registration request rejected'
+            );
+
+            this.errorMessage.set(
+              error.error?.message ??
+              'Unable to create account.'
+            );
+          }
 
           this.isSubmitting.set(false);
-
-
-          this.errorMessage.set(
-            error.error?.message ??
-            'Unable to create account.'
-          );
         }
 
       });

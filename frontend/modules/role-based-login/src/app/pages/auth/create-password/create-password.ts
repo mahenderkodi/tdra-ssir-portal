@@ -20,6 +20,7 @@ import {
   AuthService
 } from '../../../core/auth/auth-service';
 import { passwordPolicyValidator } from '../../../core/validators/password-policy.validator';
+import { LoggerService } from '../../../layouts/logging/loggerService';
 
 @Component({
   selector: 'app-create-password',
@@ -32,10 +33,6 @@ import { passwordPolicyValidator } from '../../../core/validators/password-polic
 })
 export class CreatePassword {
 
-  ngOnInit(): void {
-    console.log(this.authService
-                  .currentUser());
-  }
   private readonly router =
     inject(Router);
 
@@ -45,10 +42,13 @@ export class CreatePassword {
   private readonly authService =
     inject(AuthService);
 
+  private readonly logger = inject(LoggerService);
+
   readonly successMessage = signal('');
   readonly errorMessage = signal('');
   readonly isSubmitting = signal(false);
   readonly passwordCreated = signal(false);
+
 
   readonly passwordForm =
     this.formBuilder.nonNullable.group(
@@ -103,24 +103,22 @@ export class CreatePassword {
       return;
     }
 
-    console.log("submit called");
+
 
     const formValue =
       this.passwordForm.getRawValue();
 
     this.isSubmitting.set(true);
-    console.log("is submitting touched");
+
     this.authService
       .setupPassword({
         password: formValue.password
       })
       .subscribe({
         next: (response) => {
-          console.log(
-            'Setup-password response:',
-            response
-          );
 
+          this.logger.info('Permanent password set successfully'
+          );
           this.isSubmitting.set(false);
           this.passwordCreated.set(true);
 
@@ -130,14 +128,13 @@ export class CreatePassword {
         },
 
         error: (error) => {
-          console.error(
-            'Setup-password error:',
-            error
-          );
-
           this.isSubmitting.set(false);
 
           if (error.status === 401) {
+            this.logger.warn(
+              'Temporary login session expired during password setup'
+            );
+
             this.errorMessage.set(
               'Your temporary login session has expired. Please sign in again.'
             );
@@ -146,6 +143,10 @@ export class CreatePassword {
           }
 
           if (error.status === 403) {
+            this.logger.warn(
+              'Password setup denied by authorization'
+            );
+
             this.errorMessage.set(
               'You are not authorized to set a permanent password.'
             );
@@ -153,6 +154,9 @@ export class CreatePassword {
             return;
           }
 
+          this.logger.error(
+            'Password setup failed'
+          );
           this.errorMessage.set(
             error.error?.message ??
             'Password update failed.'

@@ -24,7 +24,7 @@ export class SenderId {
   private readonly http =
     inject(HttpClient);
 
-  private readonly apiUrl =
+  private readonly LIST_OF_SENDERIDS =
     'http://localhost:8080/api/v1/sender-ids';
 
 
@@ -32,7 +32,7 @@ export class SenderId {
     Observable<DashboardStatsResponse> {
 
     return this.http.get<DashboardStatsResponse>(
-      `${this.apiUrl}/stats`
+      `${this.LIST_OF_SENDERIDS}/stats`
     );
   }
 }

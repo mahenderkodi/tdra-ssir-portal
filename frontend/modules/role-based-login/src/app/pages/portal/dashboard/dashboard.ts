@@ -6,13 +6,16 @@ import {
 } from '@angular/core';
 
 import { SenderId } from '../../../core/services/sender-id';
-import {SenderIdResponse} from '../../../core/auth/models/sender-id-response-model';
+import { SenderIdResponse } from '../../../core/auth/models/sender-id-response-model';
 
 import { DashboardStatsResponse } from '../../../core/services/dashboard-stats-response';
 import { RegistrationService }
   from '../../../core/services/registration-service';
 
 import { RouterLink } from '@angular/router';
+import {
+  LoggerService
+} from '../../../layouts/logging/loggerService';
 
 @Component({
   selector: 'app-portal-dashboard',
@@ -32,6 +35,8 @@ export class PortalDashboard
   private readonly senderIdService =
     inject(SenderId);
 
+  private readonly logger =
+    inject(LoggerService);
 
   /*
    * Stores the statistics returned by:
@@ -51,7 +56,7 @@ export class PortalDashboard
     signal(true);
 
   readonly registrations =
-  signal<SenderIdResponse[]>([]);
+    signal<SenderIdResponse[]>([]);
 
   /*
    * Stores a user-friendly API error.
@@ -60,57 +65,52 @@ export class PortalDashboard
     signal('');
 
 
-    private readonly registrationService =
-  inject(RegistrationService);
+  private readonly registrationService =
+    inject(RegistrationService);
 
 
- 
-
-ngOnInit(): void {
- 
-  this.loadRegistrations();
-}
 
 
-private loadRegistrations(): void {
+  ngOnInit(): void {
 
-  this.loading.set(true);
-  this.errorMessage.set('');
+    this.loadRegistrations();
+  }
 
-  this.registrationService
-    .getRegistrations()
-    .subscribe({
 
-      next: response => {
+  private loadRegistrations(): void {
 
-        console.log(
-          'REGISTRATIONS RESPONSE:',
-          response
-        );
+    this.loading.set(true);
+    this.errorMessage.set('');
 
-        this.registrations.set(
-          response as any[]
-        );
+    this.registrationService
+      .getRegistrations()
+      .subscribe({
 
-        this.loading.set(false);
-      },
+        next: response => {
 
-      error: error => {
 
-        console.error(
-          'REGISTRATIONS ERROR:',
-          error
-        );
+          this.registrations.set(
+            response as any[]
+          );
 
-        this.loading.set(false);
+          this.loading.set(false);
+        },
 
-        this.errorMessage.set(
-          'Unable to load Sender ID registrations.'
-        );
-      }
+        error: () => {
 
-    });
-}
+          this.logger.error(
+            'Unable to load Sender ID registrations'
+          );
+
+          this.loading.set(false);
+
+          this.errorMessage.set(
+            'Unable to load Sender ID registrations.'
+          );
+        }
+
+      });
+  }
 
   /*
    * Fetches the approved company's
@@ -129,9 +129,8 @@ private loadRegistrations(): void {
         },
 
         error: error => {
-          console.error(
-            'Failed to load dashboard statistics:',
-            error
+          this.logger.error(
+            'Unable to load portal dashboard statistics'
           );
 
           this.loading.set(false);
@@ -154,6 +153,6 @@ private loadRegistrations(): void {
 
   retry(): void {
 
-  this.loadRegistrations();
-}
+    this.loadRegistrations();
+  }
 }

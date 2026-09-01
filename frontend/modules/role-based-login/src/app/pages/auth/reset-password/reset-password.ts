@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/auth/auth-service';
+import { LoggerService } from '../../../layouts/logging/loggerService';
 
 @Component({
   selector: 'app-reset-password',
@@ -16,6 +17,7 @@ export class ResetPassword implements OnInit {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private logger = inject(LoggerService);
 
   resetForm!: FormGroup;
   token: string = '';
@@ -28,7 +30,12 @@ export class ResetPassword implements OnInit {
     this.token = this.route.snapshot.queryParamMap.get('token') || '';
 
     if (!this.token) {
-      this.errorMessage.set('The password-reset link is invalid or expired.');
+      this.logger.warn(
+        'Password reset link is missing a token'
+      );
+      this.errorMessage.set(
+        'The password-reset link is invalid or expired.'
+      );
     }
 
     this.resetForm = this.fb.group({
@@ -59,11 +66,17 @@ export class ResetPassword implements OnInit {
 
     this.authService.resetPassword(payload).subscribe({
       next: (response) => {
+        this.logger.info(
+          'Password reset completed successfully'
+        );
         this.isSubmitting.set(false);
         this.successMessage.set(response.message);
         setTimeout(() => this.router.navigate(['/auth/login']), 3000);
       },
       error: (err) => {
+        this.logger.warn(
+          'Password reset request rejected'
+        );
         this.isSubmitting.set(false);
         this.errorMessage.set(err.error?.message || 'Password update failed.');
       }

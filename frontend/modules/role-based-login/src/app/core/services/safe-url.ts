@@ -1,9 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 
+//Using DOM Sanitizer - Angular protects certain HTML bindings 
+// from unsafe values.
+// SafeResourceUrl - A resource URL that your application has 
+// explicitly marked as trusted.
 import {
   DomSanitizer,
   SafeResourceUrl
 } from '@angular/platform-browser';
+import { LoggerService } from '../../layouts/logging/loggerService';
 
 
 @Injectable({
@@ -11,16 +16,19 @@ import {
 })
 export class SafeResourceUrlService {
 
+  private readonly logger = inject(LoggerService);
   private readonly sanitizer =
     inject(DomSanitizer);
 
-
+  // URL accepted - safeUrl
+  // URL rejected - null
   getTrustedDocumentUrl(
     url: string
   ): SafeResourceUrl | null {
 
     try {
-
+      //URL()  - built in browser url api
+      //throws error when a given url is not valid
       const parsedUrl =
         new URL(url);
 
@@ -28,9 +36,13 @@ export class SafeResourceUrlService {
       /*
        * Local development
        */
-      const isLocalhost =
+      const isAllowedLocalhost =
         parsedUrl.hostname === 'localhost' &&
-        parsedUrl.port === '9100';
+        parsedUrl.port === '9100' &&
+        (
+          parsedUrl.protocol === 'http:' ||
+          parsedUrl.protocol === 'https:'
+        );
 
 
       /*
@@ -57,7 +69,7 @@ export class SafeResourceUrlService {
        *
        * Production document URLs must use HTTPS.
        */
-      if (isLocalhost) {
+      if (isAllowedLocalhost) {
 
         return this.sanitizer
           .bypassSecurityTrustResourceUrl(
@@ -81,6 +93,9 @@ export class SafeResourceUrlService {
       /*
        * Unknown / untrusted URL
        */
+      this.logger.warn(
+        'Blocked untrusted document URL'
+      );
       return null;
 
     } catch {
@@ -88,6 +103,9 @@ export class SafeResourceUrlService {
       /*
        * Invalid URL
        */
+      this.logger.warn(
+        'Invalid document URL rejected'
+      );
       return null;
     }
   }

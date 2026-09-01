@@ -2,9 +2,12 @@ import { Component, OnInit, signal, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AdminRegistrationService } from '../../../core/services/admin-registration';
-import { HotToastService } from '@ngxpert/hot-toast'; 
+import { HotToastService } from '@ngxpert/hot-toast';
 import { timer, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import {
+  LoggerService
+} from '../../../layouts/logging/loggerService';
 
 @Component({
   selector: 'app-admin-registrations',
@@ -14,9 +17,14 @@ import { switchMap } from 'rxjs/operators';
   styleUrl: './registrations.css'
 })
 export class AdminRegistrationsComponent implements OnInit, OnDestroy {
-  private adminService = inject(AdminRegistrationService);
-  private toast = inject(HotToastService);
+  private readonly adminService = inject(AdminRegistrationService);
+  private readonly toast = inject(HotToastService);
+  // poll subscription may contain subscription or undefined
+  // poll subscription is a RxJS subscription that repeatedly asks server
+  // for new data at a fixed time interval.
   private pollSubscription?: Subscription;
+  private readonly logger =
+    inject(LoggerService);
 
   registrations = signal<any[]>([]);
   isLoading = signal(true);
@@ -29,8 +37,8 @@ export class AdminRegistrationsComponent implements OnInit, OnDestroy {
   rejectedCount = signal(0);
 
   ngOnInit(): void {
-    // Poll the backend every 15 seconds to keep the admin queue updated in real-time [3]
-    this.pollSubscription = timer(0, 15000).pipe(
+    // Poll the backend every 15 seconds to keep the admin queue updated in real-time 
+    this.pollSubscription = timer(0, 30000).pipe(
       switchMap(() => this.adminService.getAllRegistrations())
     ).subscribe({
       next: (data) => {
@@ -39,6 +47,9 @@ export class AdminRegistrationsComponent implements OnInit, OnDestroy {
         this.isLoading.set(false);
       },
       error: () => {
+        this.logger.error(
+          'Unable to synchronize admin registrations queue'
+        );
         this.isLoading.set(false);
         this.toast.error('Failed to synchronize registrations queue.');
       }
@@ -59,17 +70,38 @@ export class AdminRegistrationsComponent implements OnInit, OnDestroy {
 
     this.adminService.updateRegistrationStatus(id, 'APPROVED', 'Quick approved via Admin Queue Dashboard').subscribe({
       next: (response) => {
+        this.logger.info(
+          'Admin registration approved successfully'
+        );
         this.actionInProgressId.set(null);
         this.toast.success(`Application ${response.trackingId} successfully approved!`);
-        
+
         // Refresh local memory state instantly without full page reload
         const updatedList = this.registrations().map(r => r.id === id ? response : r);
         this.registrations.set(updatedList);
         this.calculateMetrics(updatedList);
       },
       error: (err) => {
+
+        if (err.status >= 500) {
+
+          this.logger.error(
+            'Admin registration approval failed due to server error'
+          );
+
+        } else {
+
+          this.logger.warn(
+            'Admin registration approval request rejected'
+          );
+        }
+
         this.actionInProgressId.set(null);
-        this.toast.error(err.error?.message || 'Failed to approve application.');
+
+        this.toast.error(
+          err.error?.message ||
+          'Failed to approve application.'
+        );
       }
     });
   }
