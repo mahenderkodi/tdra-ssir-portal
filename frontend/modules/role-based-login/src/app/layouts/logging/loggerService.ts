@@ -3,6 +3,8 @@ import {
     isDevMode
 } from '@angular/core';
 
+import {environment} from '../../../environments/environment';
+
 /*Enum effectivey gives the following default values
 DEBUG = 0
 INFO = 1
@@ -38,10 +40,7 @@ export enum LogLevel {
 export class LoggerService {
     
     //What's the minimum severity I'm willing to log?
-    private minLevel =
-        isDevMode()
-            ? LogLevel.DEBUG
-            : LogLevel.ERROR;
+   private minLevel = environment.logLevel;
 
 
     debug(message: string) {

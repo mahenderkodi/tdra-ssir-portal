@@ -9,6 +9,7 @@ import { AuthenticatedUser } from './models/authenticated-user-model';
 import { TokenStorageService } from './token-storage';
 import { MessageResponse } from './models/message-response-model';
 import { LoggerService } from '../../layouts/logging/loggerService';
+import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
@@ -19,7 +20,7 @@ export class AuthService {
   private readonly tokenStorage = inject(TokenStorageService);
   private readonly logger = inject(LoggerService);
   private readonly AUTH_API =
-    'http://localhost:8080/api/v1/auth';
+    `${environment.apiBaseUrl}/auth`;
 
   // Holds the currently logged-in user's details in Angular memory.
   readonly currentUser =

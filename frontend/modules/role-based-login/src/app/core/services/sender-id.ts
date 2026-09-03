@@ -14,6 +14,7 @@ import {
 import {
   DashboardStatsResponse
 } from './dashboard-stats-response';
+import { environment } from '../../../environments/environment';
 
 
 @Injectable({
@@ -25,7 +26,7 @@ export class SenderId {
     inject(HttpClient);
 
   private readonly LIST_OF_SENDERIDS =
-    'http://localhost:8080/api/v1/sender-ids';
+    `${environment.apiBaseUrl}/sender-ids`;
 
 
   getDashboardStats():

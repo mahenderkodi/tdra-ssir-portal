@@ -15,6 +15,7 @@ import { RegistrationSubmissionResponseModel } from '../models/registration-resp
 import { MockApiService }
   from './mock-api-service';
 
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -30,16 +31,16 @@ export class RegistrationService {
 
   
   private readonly REGISTRATION_API =
-    'http://localhost:8080/api/v1/registrations';
+    `${environment.apiBaseUrl}/registrations`;
 
   // API for Sender IDs belonging to the logged-in company - submission.
   private readonly ONBOARDING_API =
-  'http://localhost:8080/api/v1/onboarding-single';
+  `${environment.apiBaseUrl}/onboarding-single`;
 
 // API to fetch all the sender ids
 
   private readonly SENDER_IDS_API =
-  'http://localhost:8080/api/v1/sender-ids';
+  `${environment.apiBaseUrl}/sender-ids`;
 
  
   createRegistration(

@@ -12,6 +12,7 @@ import {
 } from 'rxjs';
 
 import {TrackingStatusResponse} from './tracking-status-response';
+import { environment } from '../../../environments/environment';
 
 
 @Injectable({
@@ -23,7 +24,7 @@ export class RegistrationStatusService {
     inject(HttpClient);
 
   private readonly apiUrl =
-    'http://localhost:8080/api/v1/registrations';
+    `${environment.apiBaseUrl}/registrations`;
 
 
   getMyStatus():

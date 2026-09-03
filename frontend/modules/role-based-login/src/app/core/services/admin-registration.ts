@@ -4,7 +4,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient,HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
- 
+ import { environment } from '../../../environments/environment';
 @Injectable({
 
   providedIn: 'root'
@@ -15,9 +15,9 @@ export class AdminRegistrationService {
 
   private readonly http = inject(HttpClient);
 
-  private readonly REGISTRATION_API = 'http://localhost:8080/api/v1/registrations';
+  private readonly REGISTRATION_API = `${environment.apiBaseUrl}/registrations`;
 
-  private readonly LIST_OF_REGISTRATIONS = 'http://localhost:8080/api/v1/onboarding-single';
+  private readonly LIST_OF_REGISTRATIONS = `${environment.apiBaseUrl}/onboarding-single`;
  
   // 1. Fetch pending registrations list (Admin Queue View) [3]
 
