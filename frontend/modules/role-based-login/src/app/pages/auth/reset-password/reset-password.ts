@@ -4,10 +4,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/auth/auth-service';
 import { LoggerService } from '../../../layouts/logging/loggerService';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-reset-password',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,TranslatePipe],
 
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.css',
@@ -33,9 +34,9 @@ export class ResetPassword implements OnInit {
       this.logger.warn(
         'Password reset link is missing a token'
       );
-      this.errorMessage.set(
-        'The password-reset link is invalid or expired.'
-      );
+     this.errorMessage.set(
+  'errors.RESET001'
+);
     }
 
     this.resetForm = this.fb.group({
@@ -65,20 +66,31 @@ export class ResetPassword implements OnInit {
     };
 
     this.authService.resetPassword(payload).subscribe({
-      next: (response) => {
-        this.logger.info(
-          'Password reset completed successfully'
-        );
-        this.isSubmitting.set(false);
-        this.successMessage.set(response.message);
-        setTimeout(() => this.router.navigate(['/auth/login']), 3000);
-      },
+      next: () => {
+
+  this.logger.info(
+    'Password reset completed successfully'
+  );
+
+  this.isSubmitting.set(false);
+
+  this.successMessage.set(
+    'auth.resetPassword.success'
+  );
+
+  setTimeout(
+    () => this.router.navigate(['/auth/login']),
+    3000
+  );
+},
       error: (err) => {
         this.logger.warn(
           'Password reset request rejected'
         );
         this.isSubmitting.set(false);
-        this.errorMessage.set(err.error?.message || 'Password update failed.');
+        this.errorMessage.set(
+  'errors.RESET002'
+);
       }
     });
   }

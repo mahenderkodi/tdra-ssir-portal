@@ -1,7 +1,4 @@
 {
-  "common": {
-    "appName": "TDRA Sender ID Registry"
-  },
   "auth": {
     "login": {
       "title": "Sign In",
@@ -15,11 +12,112 @@
       "signUp": "Sign Up",
       "or": "OR",
       "singleSignOn": "Single Sign-On"
-    }
+    },
+
+    "signup": {
+      "title": "Create Account",
+      "portalName": "TDRA SMS Sender ID Registry Portal",
+
+      "email": "Email",
+      "username": "Username",
+      "password": "Password",
+
+      "creatingAccount": "Creating Account...",
+      "signUp": "Sign Up",
+
+      "alreadyHaveAccount": "Already have an account?",
+      "signIn": "Sign In"
+    },
+  
+  "forgotPassword": {
+      "title": "Forgot Password",
+      "description": "Enter your registered email address",
+      "registeredEmail": "Registered Email",
+      "sendResetLink": "Send Reset Link",
+      "sendingResetLink": "Sending Reset Link...",
+      "backToSignIn": "Back to Sign In",
+      "success": "If the email is registered, a password reset link has been sent."
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Set Your New Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "passwordHint": "Password must be at least 8 characters long.",
+      "resetButton": "Reset Password",
+      "resetting": "Resetting Password...",
+      "success": "Your password has been reset successfully."
+    },
+    "createPassword": {
+  "title": "Set Your Password",
+  "description": "Create a permanent password for your account",
+  "newPassword": "New Password",
+  "confirmPassword": "Confirm Password",
+  "settingPassword": "Setting Password...",
+  "setPermanentPassword": "Set Permanent Password",
+  "passwordSetMessage": "Your permanent password has been set. Please sign in again using your new password.",
+  "continueToSignIn": "Continue to Sign In",
+  "success": "Your permanent password has been set successfully."
+}
+
   },
+
+  "portal": {
+  "dashboard": {
+    "title": "Corporate Dashboard",
+    "description": "View your company’s Sender ID activity and account summary.",
+    "loading": "Loading dashboard",
+    "retry": "Retry",
+
+    "registrationsTitle": "Sender ID Registrations",
+    "registrationsDescription": "View and manage your Sender ID registration requests.",
+    "createSenderId": "Create Sender ID",
+
+    "table": {
+      "senderId": "Sender ID",
+      "trackingId": "Tracking ID",
+      "status": "Status",
+      "submittedOn": "Submitted On",
+      "action": "Action"
+    },
+
+    "view": "View",
+    "noRegistrations": "No Sender ID registrations found."
+  }
+},
+
+    "validation": {
+    "emailRequired": "Email is required.",
+    "invalidEmail": "Please enter a valid email address.",
+
+    "usernameRequired": "Username is required.",
+
+    "passwordRequired": "Password is required.",
+    "passwordMinLength": "Password must be at least 6 characters.",
+    "passwordMaxLength": "Password cannot exceed 15 characters.",
+    "passwordAlphabetRequired": "Password must contain at least one alphabetic character.",
+    "passwordNumberOrSpecialRequired": "Password must contain at least one numeric or special character.",
+    "passwordSameAsUserId": "Password cannot be the same as your User ID.",
+    "passwordReverseOfUserId": "Password cannot be the reverse of your User ID.",
+    "passwordCircularShiftOfUserId": "Password cannot be a circular shift of your User ID.",
+     "passwordMismatch": "Passwords do not match.",
+     "confirmPasswordRequired": "Please confirm your password."
+  },
+  
 
   "errors": {
     "AUTH001": "Invalid username/email or password.",
-    "AUTH002": "Login succeeded, but the account status was not provided."
+    "AUTH002": "Login succeeded, but the account status was not provided.",
+
+    "REG001": "Unable to create account.",
+    "REG002": "Unable to create account. Please try again later.",
+    "FORGOT001": "Failed to submit password reset request.",
+    "RESET001": "The password-reset link is invalid or expired.",
+    "RESET002": "Password update failed.",
+    "CREATEPWD001": "Your temporary login session has expired. Please sign in again.",
+"CREATEPWD002": "You are not authorized to set a permanent password.",
+"CREATEPWD003": "Password update failed.",
+"DASH001": "Unable to load Sender ID registrations.",
+"DASH002": "Unable to load dashboard information."
   }
 }

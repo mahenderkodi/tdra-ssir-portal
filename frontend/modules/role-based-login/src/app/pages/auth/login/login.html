@@ -13,51 +13,51 @@
     <!-- Modern @if control flow handles security error outputs [2] -->
     @if (errorMessage()) {
       <div class="alert alert-danger small" role="alert">
-        {{ errorMessage() }}
+        {{ errorMessage() | translate }}
       </div>
     }
 
     <!-- Single, Consolidated Credentials Login Form [2] -->
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="mb-3">
-        <label class="form-label required">Username or Email  </label>
+        <label class="form-label required">{{ 'auth.login.usernameOrEmail' | translate }}</label>
         <input type="text" class="form-control" formControlName="usernameOrEmail" placeholder="admin_masdar">
       </div>
       <div class="mb-3">
-        <label class="form-label required">Password  </label>
+        <label class="form-label required"> {{ 'auth.login.password' | translate }}</label>
         <input type="password" class="form-control" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
       </div>
  
       <!-- Forgot Password Link [3] -->
       <div class="text-end mb-3">
-        <a routerLink="/auth/forgot-password" >Forgot password?</a>
+        <a routerLink="/auth/forgot-password" >{{ 'auth.login.forgotPassword' | translate }}</a>
       </div>
 
       <div class="d-grid mb-3">
         <button type="submit" class="btn btn-primary" [disabled]="isSubmitting()">
           @if (isSubmitting()) {
             <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-            Signing In...
+            {{ 'auth.login.signingIn' | translate }}
           } @else {
-            Sign In
+            {{ 'auth.login.signIn' | translate }}
           }
         </button>
       </div>
     </form>
 
     <div class="text-center small mb-3">
-  Don't have an account?
+ {{ 'auth.login.noAccount' | translate }}
 
   <a
     routerLink="/auth/signup"
     
   >
-    Sign Up
+    {{ 'auth.login.signUp' | translate }}
   </a>
 </div>
 
     <div class="text-center text-muted my-3 small position-relative">
-      <span class="bg-white px-3 position-relative z-1 text-uppercase">OR</span>
+      <span class="bg-white px-3 position-relative z-1 text-uppercase"> {{ 'auth.login.or' | translate }}</span>
       <hr class="position-absolute w-100 top-50 start-0 m-0 z-0">
     </div>
 
@@ -66,7 +66,7 @@
       <button type="button" class="btn btn-outline-dark d-flex align-items-center justify-content-center gap-1" (click)="loginWithUaePass()">
         <span class="fw-bold text-danger">UAE</span>
         <span >PASS</span>
-        <span class="small ms-2 fw-semibold">Single Sign-On</span>
+        <span class="small ms-2 fw-semibold">{{ 'auth.login.singleSignOn' | translate }}</span>
       </button>
     </div>
 

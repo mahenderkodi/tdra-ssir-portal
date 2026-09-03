@@ -21,13 +21,14 @@ import {
 } from '../../../core/auth/auth-service';
 import { passwordPolicyValidator } from '../../../core/validators/password-policy.validator';
 import { LoggerService } from '../../../layouts/logging/loggerService';
-
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-create-password',
   standalone: true,
   imports: [
-    ReactiveFormsModule
-  ],
+  ReactiveFormsModule,
+  TranslatePipe
+],
   templateUrl: './create-password.html',
   styleUrl: './create-password.css'
 })
@@ -115,17 +116,19 @@ export class CreatePassword {
         password: formValue.password
       })
       .subscribe({
-        next: (response) => {
+        next: () => {
 
-          this.logger.info('Permanent password set successfully'
-          );
-          this.isSubmitting.set(false);
-          this.passwordCreated.set(true);
+  this.logger.info(
+    'Permanent password set successfully'
+  );
 
-          this.successMessage.set(
-            response.message
-          );
-        },
+  this.isSubmitting.set(false);
+  this.passwordCreated.set(true);
+
+  this.successMessage.set(
+    'auth.createPassword.success'
+  );
+},
 
         error: (error) => {
           this.isSubmitting.set(false);
@@ -136,8 +139,8 @@ export class CreatePassword {
             );
 
             this.errorMessage.set(
-              'Your temporary login session has expired. Please sign in again.'
-            );
+  'errors.CREATEPWD001'
+);
 
             return;
           }
@@ -148,8 +151,8 @@ export class CreatePassword {
             );
 
             this.errorMessage.set(
-              'You are not authorized to set a permanent password.'
-            );
+  'errors.CREATEPWD002'
+);
 
             return;
           }
@@ -158,9 +161,8 @@ export class CreatePassword {
             'Password setup failed'
           );
           this.errorMessage.set(
-            error.error?.message ??
-            'Password update failed.'
-          );
+    'errors.CREATEPWD003'
+  );
         }
       });
   }

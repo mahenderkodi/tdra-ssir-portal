@@ -5,6 +5,10 @@ import {
 } from '@angular/core';
 
 import {
+  TranslatePipe
+} from '@ngx-translate/core';
+
+import {
   FormBuilder,
   ReactiveFormsModule,
   Validators
@@ -25,9 +29,10 @@ import {
 @Component({
   selector: 'app-forgot-password',
   imports: [
-    ReactiveFormsModule,
-    RouterModule
-  ],
+  ReactiveFormsModule,
+  RouterModule,
+  TranslatePipe
+],
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.css',
 })
@@ -83,34 +88,33 @@ export class ForgotPassword {
       .forgotPassword(email)
       .subscribe({
 
-        next: (response) => {
+  next: () => {
 
-          this.logger.info(
-            'Password reset link requested'
-          );
+    this.logger.info(
+      'Password reset link requested'
+    );
 
-          this.isSubmitting.set(false);
+    this.isSubmitting.set(false);
 
-          this.successMessage.set(
-            response.message
-          );
+    this.successMessage.set(
+      'auth.forgotPassword.success'
+    );
 
-          this.forgotForm.reset();
-        },
+    this.forgotForm.reset();
+  },
 
-        error: (err) => {
+  error: () => {
 
-          this.logger.warn(
-            'Password reset link request failed'
-          );
+    this.logger.warn(
+      'Password reset link request failed'
+    );
 
-          this.isSubmitting.set(false);
+    this.isSubmitting.set(false);
 
-          this.errorMessage.set(
-            err.error?.message ||
-            'Failed to submit request.'
-          );
-        }
-      });
+    this.errorMessage.set(
+      'errors.FORGOT001'
+    );
+  }
+});
   }
 }

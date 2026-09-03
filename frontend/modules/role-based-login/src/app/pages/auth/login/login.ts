@@ -98,7 +98,7 @@ export class Login {
           );
 
           this.errorMessage.set(
-            'Login succeeded, but the account status was not provided.'
+            'errors.AUTH002'
           );
 
           this.authService.logout();
@@ -112,7 +112,7 @@ export class Login {
           this.isSubmitting.set(false);
 
           this.errorMessage.set(
-            'Invalid username/email or password.'
+            'errors.AUTH001'
           );
         }
       });

@@ -10,6 +10,8 @@ import {
   Validators
 } from '@angular/forms';
 
+import { TranslatePipe } from '@ngx-translate/core';
+
 import {
   Router,
   RouterLink
@@ -30,9 +32,10 @@ import { LoggerService } from '../../../layouts/logging/loggerService';
   selector: 'app-signup',
   standalone: true,
   imports: [
-    ReactiveFormsModule,
-    RouterLink
-  ],
+  ReactiveFormsModule,
+  RouterLink,
+  TranslatePipe
+],
   templateUrl: './signup.html',
   styleUrl: './signup.css'
 })
@@ -162,30 +165,29 @@ export class Signup {
 
         error: error => {
 
-          if (error.status >= 500) {
+  if (error.status >= 500) {
 
-            this.logger.error(
-              'Account registration failed due to server error'
-            );
+    this.logger.error(
+      'Account registration failed due to server error'
+    );
 
-            this.errorMessage.set(
-              'Unable to create account. Please try again later.'
-            );
+    this.errorMessage.set(
+      'errors.REG002'
+    );
 
-          } else {
+  } else {
 
-            this.logger.warn(
-              'Account registration request rejected'
-            );
+    this.logger.warn(
+      'Account registration request rejected'
+    );
 
-            this.errorMessage.set(
-              error.error?.message ??
-              'Unable to create account.'
-            );
-          }
+    this.errorMessage.set(
+      'errors.REG001'
+    );
+  }
 
-          this.isSubmitting.set(false);
-        }
+  this.isSubmitting.set(false);
+}
 
       });
   }

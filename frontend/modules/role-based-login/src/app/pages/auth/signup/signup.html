@@ -2,11 +2,11 @@
 
   <div class="login-header text-center">
     <h3 class="mb-0">
-      Create Account
+       {{ 'auth.signup.title' | translate }}
     </h3>
 
     <p class="small mb-0 mt-1">
-      TDRA SMS Sender ID Registry Portal
+      {{ 'auth.signup.portalName' | translate }}
     </p>
   </div>
 
@@ -18,7 +18,7 @@
         class="alert alert-danger small"
         role="alert"
       >
-        {{ errorMessage() }}
+         {{ errorMessage() | translate }}
       </div>
     }
 
@@ -38,7 +38,7 @@
       >
 
         <label class="form-label required">
-          Email
+          {{ 'auth.signup.email' | translate }}
         </label>
 
         <input
@@ -58,7 +58,7 @@
           signupForm.controls.email.hasError('required')
         ) {
           <div class="form-control-feedback">
-            Email is required.
+           {{ 'validation.emailRequired' | translate }}
           </div>
         }
 
@@ -67,7 +67,7 @@
           signupForm.controls.email.hasError('email')
         ) {
           <div class="form-control-feedback">
-            Please enter a valid email address.
+            {{ 'validation.invalidEmail' | translate }}
           </div>
         }
 
@@ -84,7 +84,7 @@
       >
 
         <label class="form-label required">
-          Username
+           {{ 'auth.signup.username' | translate }}
         </label>
 
         <input
@@ -104,7 +104,7 @@
           signupForm.controls.username.hasError('required')
         ) {
           <div class="form-control-feedback">
-            Username is required.
+            {{ 'validation.usernameRequired' | translate }}
           </div>
         }
 
@@ -121,7 +121,7 @@
       >
 
         <label class="form-label required">
-          Password
+          {{ 'auth.signup.password' | translate }}
         </label>
 
         <input
@@ -144,7 +144,7 @@
             signupForm.controls.password.hasError('required')
           ) {
             <div class="form-control-feedback">
-              Password is required.
+               {{ 'validation.passwordRequired' | translate }}
             </div>
           }
 
@@ -152,7 +152,7 @@
             signupForm.controls.password.hasError('minlength')
           ) {
             <div class="form-control-feedback">
-              Password must be at least 6 characters.
+              {{ 'validation.passwordMinLength' | translate }}
             </div>
           }
 
@@ -160,7 +160,7 @@
             signupForm.controls.password.hasError('maxlength')
           ) {
             <div class="form-control-feedback">
-              Password cannot exceed 15 characters.
+              {{ 'validation.passwordMaxLength' | translate }}
             </div>
           }
 
@@ -168,7 +168,7 @@
             signupForm.controls.password.hasError('alphabetRequired')
           ) {
             <div class="form-control-feedback">
-              Password must contain at least one alphabetic character.
+             {{ 'validation.passwordAlphabetRequired' | translate }}
             </div>
           }
 
@@ -176,8 +176,7 @@
             signupForm.controls.password.hasError('numberOrSpecialRequired')
           ) {
             <div class="form-control-feedback">
-              Password must contain at least one numeric
-              or special character.
+               {{ 'validation.passwordNumberOrSpecialRequired' | translate }}
             </div>
           }
 
@@ -185,7 +184,7 @@
             signupForm.controls.password.hasError('sameAsUserId')
           ) {
             <div class="form-control-feedback">
-              Password cannot be the same as your User ID.
+              {{ 'validation.passwordSameAsUserId' | translate }}
             </div>
           }
 
@@ -193,7 +192,7 @@
             signupForm.controls.password.hasError('reverseOfUserId')
           ) {
             <div class="form-control-feedback">
-              Password cannot be the reverse of your User ID.
+              {{ 'validation.passwordReverseOfUserId' | translate }}
             </div>
           }
 
@@ -201,7 +200,7 @@
             signupForm.controls.password.hasError('circularShiftOfUserId')
           ) {
             <div class="form-control-feedback">
-              Password cannot be a circular shift of your User ID.
+              {{ 'validation.passwordCircularShiftOfUserId' | translate }}
             </div>
           }
 
@@ -229,11 +228,11 @@
               aria-hidden="true"
             ></span>
 
-            Creating Account...
+             {{ 'auth.signup.creatingAccount' | translate }}
 
           } @else {
 
-            Sign Up
+             {{ 'auth.signup.signUp' | translate }}
 
           }
 
@@ -246,10 +245,10 @@
 
     <div class="text-center small">
 
-      Already have an account?
+      {{ 'auth.signup.alreadyHaveAccount' | translate }}
 
       <a routerLink="/auth/login">
-        Sign In
+       {{ 'auth.signup.signIn' | translate }}
       </a>
 
     </div>
