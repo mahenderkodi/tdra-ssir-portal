@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 
 import {environment} from '../../../environments/environment';
+import {LogLevel} from './loglevel';
 
 /*Enum effectivey gives the following default values
 DEBUG = 0
@@ -19,17 +20,7 @@ In Production mode -- the minLevel is set to ERROR, so only error messages will 
 isDevMode - isDevMode() is a function provided by Angular that checks whether the application is running in development mode or production mode. It returns true if the application is in development mode and false if it is in production mode. This can be useful for enabling or disabling certain features or behaviors based on the environment.
 */
 
-export enum LogLevel {
 
-    DEBUG,
-
-    INFO,
-
-    WARN,
-
-    ERROR
-
-}
 
 //@Injectable - This is a service Angular can manage and inject.
 // providedIn: 'root' - Make this service available application-wide.

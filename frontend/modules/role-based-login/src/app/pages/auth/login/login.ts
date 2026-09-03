@@ -4,12 +4,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth-service';
 import { LoggerService } from '../../../layouts/logging/loggerService';
+import { TranslatePipe } from '@ngx-translate/core';
 
 //ReactiveFormsModule allows the template to use [formGroup], formControlName
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink], // Registers form directives
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslatePipe], // Registers form directives
   templateUrl: './login.html',
   styleUrl: './login.css' // Mapped to login.css
 })

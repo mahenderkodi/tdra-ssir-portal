@@ -13,6 +13,15 @@ import { authInterceptor } from './core/auth/auth-interceptor';
 import { errorInterceptor } from './core/auth/error-interceptor';
 
 import { provideHotToastConfig } from '@ngxpert/hot-toast';//This is a third-party library that provides a simple way to show toast notifications in Angular applications.
+import {
+  provideTranslateService
+} from '@ngx-translate/core';
+
+import {
+  provideTranslateHttpLoader
+} from '@ngx-translate/http-loader';
+
+
 
 export const appConfig: ApplicationConfig = {
   //providers - This is an array of providers. Tells Angular's Dependency Injection system - something/capability that should be available to the application.
@@ -31,6 +40,17 @@ export const appConfig: ApplicationConfig = {
     ),
 
     // Global toast notification configuration
-    provideHotToastConfig()
+    provideHotToastConfig(),
+    provideTranslateService({
+
+      loader: provideTranslateHttpLoader({
+        prefix: '/i18n/',
+        suffix: '.json'
+      }),
+
+      fallbackLang: 'en-US',
+
+      lang: 'en-US'
+    })
   ]
 };

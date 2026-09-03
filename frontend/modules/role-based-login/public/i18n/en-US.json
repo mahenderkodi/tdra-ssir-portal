@@ -1,0 +1,25 @@
+{
+  "common": {
+    "appName": "TDRA Sender ID Registry"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign In",
+      "portalName": "TDRA SMS Sender ID Registry Portal",
+      "usernameOrEmail": "Username or Email",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "signingIn": "Signing In...",
+      "signIn": "Sign In",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign Up",
+      "or": "OR",
+      "singleSignOn": "Single Sign-On"
+    }
+  },
+
+  "errors": {
+    "AUTH001": "Invalid username/email or password.",
+    "AUTH002": "Login succeeded, but the account status was not provided."
+  }
+}
