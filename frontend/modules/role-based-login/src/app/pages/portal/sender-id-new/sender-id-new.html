@@ -4,43 +4,39 @@
 
     <header class="mb-3 mb-md-4">
 
-      <h5 class="corp-font ">TDRA Sender Registry</h5>
+      <h5 class="corp-font ">{{ 'portal.senderIdNew.registryName' | translate }}</h5>
 
- <h1 class=" fw-bold mb-2">
+ <h1 class="fw-bold mb-2">
 
   @if (isEditMode) {
 
-    Edit & Resubmit Sender ID
+    {{ 'portal.senderIdNew.editTitle' | translate }}
 
   } @else if (isAdditionalSenderId) {
 
-    Create New Sender ID
+    {{ 'portal.senderIdNew.additionalTitle' | translate }}
 
   } @else {
 
-    Company Registration
+    {{ 'portal.senderIdNew.registrationTitle' | translate }}
 
   }
 
 </h1>
 
-  <p class="corp-font-light mb-0">
+ <p class="corp-font-light mb-0">
 
   @if (isEditMode) {
 
-    Review the TDRA feedback, update the
-    requested information and resubmit
-    your Sender ID application.
+    {{ 'portal.senderIdNew.editDescription' | translate }}
 
   } @else if (isAdditionalSenderId) {
 
-    Review your existing company information
-    and enter the new Sender ID.
+    {{ 'portal.senderIdNew.additionalDescription' | translate }}
 
   } @else {
 
-    Complete all four sections before
-    submitting your registration request.
+    {{ 'portal.senderIdNew.registrationDescription' | translate }}
 
   }
 
@@ -95,7 +91,10 @@
 
     <div
   class="mb-4"
-  aria-label="Registration progress"
+  [attr.aria-label]="
+  'portal.senderIdNew.registrationProgress'
+    | translate
+"
 >
 
   <div
@@ -110,11 +109,17 @@
 >
 
     <span class="small">
-      Step {{ currentStep() }} of {{ steps.length }}
+      {{
+  'portal.senderIdNew.stepOf'
+    | translate: {
+        current: currentStep(),
+        total: steps.length
+      }
+}}
     </span>
 
     <span class="small">
-      {{ steps[currentStep() - 1].title }}
+      {{ steps[currentStep() - 1].title | translate}}
     </span>
 
   </div>
@@ -244,7 +249,7 @@
             class="btn btn-outline-secondary"
             (click)="previousStep()"
           >
-            Previous
+            {{ 'portal.senderIdNew.previous' | translate }}
           </button>
 
         </div>
@@ -278,7 +283,7 @@
             class="btn btn-primary"
             (click)="nextStep()"
           >
-            Next
+           {{ 'portal.senderIdNew.next' | translate }}
           </button>
 
         }
@@ -294,23 +299,38 @@
 
             @if (isSubmitting()) {
 
-              <span
-                class="spinner-border spinner-border-sm me-2"
-              ></span>
+  <span
+    class="spinner-border spinner-border-sm me-2"
+  ></span>
 
-              Submitting...
+  {{ 'portal.senderIdNew.submitting' | translate }}
 
-            } @else {
+} @else {
 
-              @if (isEditMode) {
-                Resubmit Application
-              } @else if (isAdditionalSenderId) {
-                Create Sender ID
-              } @else {
-                Submit Registration
-              }
+  @if (isEditMode) {
 
-            }
+    {{
+      'portal.senderIdNew.resubmitApplication'
+        | translate
+    }}
+
+  } @else if (isAdditionalSenderId) {
+
+    {{
+      'portal.senderIdNew.createSenderId'
+        | translate
+    }}
+
+  } @else {
+
+    {{
+      'portal.senderIdNew.submitRegistration'
+        | translate
+    }}
+
+  }
+
+}
 
           </button>
 

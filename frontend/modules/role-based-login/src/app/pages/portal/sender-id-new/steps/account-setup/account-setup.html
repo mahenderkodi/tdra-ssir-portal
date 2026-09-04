@@ -4,11 +4,11 @@
   <div class="mb-4">
 
     <h2 class="corp-font">
-      Account Setup
+      {{ 'portal.senderIdNew.accountSetup.title' | translate }}
     </h2>
 
     <p class="corp-font-light mb-0">
-      Configure the account and communication preferences.
+      {{ 'portal.senderIdNew.accountSetup.description' | translate }}
     </p>
 
   </div>
@@ -19,8 +19,7 @@
     class="alert alert-info small mb-4"
     role="alert"
   >
-    Password creation will be enabled only after the registration
-    is reviewed and approved by TDRA.
+    {{ 'portal.senderIdNew.accountSetup.passwordInfo' | translate }}
   </div>
 
 
@@ -38,7 +37,7 @@
         for="Username"
         class="form-control-label required"
       >
-        Username
+        {{ 'portal.senderIdNew.accountSetup.username' | translate }}
       </label>
 
       <input
@@ -46,13 +45,16 @@
         type="text"
         class="form-control"
         formControlName="Username"
-        placeholder="Enter username"
+        [placeholder]="
+          'portal.senderIdNew.accountSetup.usernamePlaceholder'
+            | translate
+        "
         autocomplete="username"
         [class.form-control-danger]="isInvalid('Username')"
       />
 
       <div class="form-text">
-        Use 4–30 letters, numbers, dots, underscores or hyphens.
+        {{ 'portal.senderIdNew.accountSetup.usernameHint' | translate }}
       </div>
 
 
@@ -61,7 +63,7 @@
         group.get('Username')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          Username is required.
+          {{ 'validation.usernameRequired' | translate }}
         </div>
       }
 
@@ -71,7 +73,7 @@
         group.get('Username')?.hasError('minlength')
       ) {
         <div class="form-control-feedback">
-          Username must contain at least 4 characters.
+          {{ 'validation.usernameMinLength' | translate }}
         </div>
       }
 
@@ -81,7 +83,7 @@
         group.get('Username')?.hasError('maxlength')
       ) {
         <div class="form-control-feedback">
-          Username cannot exceed 30 characters.
+          {{ 'validation.usernameMaxLength' | translate }}
         </div>
       }
 
@@ -91,8 +93,7 @@
         group.get('Username')?.hasError('pattern')
       ) {
         <div class="form-control-feedback">
-          Username can contain only letters, numbers, dots,
-          underscores and hyphens.
+          {{ 'validation.usernamePattern' | translate }}
         </div>
       }
 
@@ -109,7 +110,7 @@
         for="PreferredLanguage"
         class="form-control-label required"
       >
-        Preferred Language
+        {{ 'portal.senderIdNew.accountSetup.preferredLanguage' | translate }}
       </label>
 
       <select
@@ -123,12 +124,12 @@
           value=""
           disabled
         >
-          Select preferred language
+          {{ 'portal.senderIdNew.accountSetup.selectPreferredLanguage' | translate }}
         </option>
 
-        @for (language of languages; track language) {
-          <option [value]="language">
-            {{ language }}
+        @for (language of languages; track language.value) {
+          <option [value]="language.value">
+            {{ language.labelKey | translate }}
           </option>
         }
 
@@ -140,7 +141,7 @@
         group.get('PreferredLanguage')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          Preferred language is required.
+          {{ 'validation.preferredLanguageRequired' | translate }}
         </div>
       }
 
@@ -157,7 +158,7 @@
         for="TimeZone"
         class="form-control-label required"
       >
-        Time Zone
+        {{ 'portal.senderIdNew.accountSetup.timeZone' | translate }}
       </label>
 
       <select
@@ -171,7 +172,7 @@
           value=""
           disabled
         >
-          Select time zone
+          {{ 'portal.senderIdNew.accountSetup.selectTimeZone' | translate }}
         </option>
 
         @for (
@@ -179,7 +180,7 @@
           track timeZone.value
         ) {
           <option [value]="timeZone.value">
-            {{ timeZone.label }}
+            {{ timeZone.labelKey | translate }}
           </option>
         }
 
@@ -191,7 +192,7 @@
         group.get('TimeZone')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          Time zone is required.
+          {{ 'validation.timeZoneRequired' | translate }}
         </div>
       }
 
@@ -208,7 +209,7 @@
         for="MfaPreference"
         class="form-control-label required"
       >
-        MFA Preference
+        {{ 'portal.senderIdNew.accountSetup.mfaPreference' | translate }}
       </label>
 
       <select
@@ -222,15 +223,15 @@
           value=""
           disabled
         >
-          Select MFA preference
+          {{ 'portal.senderIdNew.accountSetup.selectMfaPreference' | translate }}
         </option>
 
         @for (
           preference of mfaPreferences;
-          track preference
+          track preference.value
         ) {
-          <option [value]="preference">
-            {{ preference }}
+          <option [value]="preference.value">
+            {{ preference.labelKey | translate }}
           </option>
         }
 
@@ -238,7 +239,7 @@
 
 
       <div class="form-text">
-        MFA will be configured after TDRA approval.
+        {{ 'portal.senderIdNew.accountSetup.mfaInfo' | translate }}
       </div>
 
 
@@ -247,7 +248,7 @@
         group.get('MfaPreference')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          MFA preference is required.
+          {{ 'validation.mfaPreferenceRequired' | translate }}
         </div>
       }
 
@@ -264,7 +265,7 @@
         for="NotificationPreference"
         class="form-control-label required"
       >
-        Notification Preference
+        {{ 'portal.senderIdNew.accountSetup.notificationPreference' | translate }}
       </label>
 
       <select
@@ -280,15 +281,15 @@
           value=""
           disabled
         >
-          Select notification preference
+          {{ 'portal.senderIdNew.accountSetup.selectNotificationPreference' | translate }}
         </option>
 
         @for (
           preference of notificationPreferences;
-          track preference
+          track preference.value
         ) {
-          <option [value]="preference">
-            {{ preference }}
+          <option [value]="preference.value">
+            {{ preference.labelKey | translate }}
           </option>
         }
 
@@ -300,7 +301,7 @@
         group.get('NotificationPreference')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          Notification preference is required.
+          {{ 'validation.notificationPreferenceRequired' | translate }}
         </div>
       }
 

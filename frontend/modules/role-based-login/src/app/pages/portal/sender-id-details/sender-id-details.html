@@ -9,7 +9,7 @@
     ></div>
 
     <p class="mt-3 text-secondary">
-      Loading Sender ID details...
+      {{ 'portal.senderIdDetails.loading' | translate }}
     </p>
 
   </div>
@@ -70,7 +70,7 @@
             routerLink="/portal/dashboard"
             class="text-decoration-none"
           >
-            ← Back to Dashboard
+            ← {{ 'portal.senderIdDetails.backToDashboard' | translate }}
           </a>
 
 
@@ -86,7 +86,7 @@
 
           <div class="text-secondary small">
 
-            Tracking ID:
+         {{ 'portal.senderIdDetails.trackingId' | translate }}:
 
             <span class="fw-semibold">
               {{ sender.trackingId }}
@@ -97,7 +97,7 @@
         </div>
 
         <p class="mb-0">
-  Current Status: <span
+  {{ 'portal.senderIdDetails.currentStatus' | translate }}: <span
           class="status-badge"
           [ngClass]="{
 
@@ -174,22 +174,22 @@
 
         @if (sender.status === 'ACTIVE') {
 
-          TDRA Approval Comment
+          {{ 'portal.senderIdDetails.tdraApprovalComment' | translate }}
 
         }
         @else if (sender.status === 'REJECTED') {
 
-          TDRA Rejection Comment
+          {{ 'portal.senderIdDetails.tdraRejectionComment' | translate }}
 
         }
         @else if (sender.status === 'INFO_REQUESTED') {
 
-          TDRA Information Request
+          {{ 'portal.senderIdDetails.tdraInformationRequest' | translate }}
 
         }
         @else {
 
-          TDRA Review Comment
+          {{ 'portal.senderIdDetails.tdraReviewComment' | translate }}
 
         }
 
@@ -198,10 +198,18 @@
 
       <div class="feedback-text mb-3">
 
-        {{
-          tdraRemark() ||
-          'TDRA has requested additional information.'
-        }}
+       @if (tdraRemark()) {
+
+  {{ tdraRemark() }}
+
+} @else {
+
+  {{
+    'portal.senderIdDetails.additionalInfoRequested'
+      | translate
+  }}
+
+}
 
       </div>
 
@@ -219,7 +227,7 @@
           }"
           class="btn btn-primary btn-sm"
         >
-          Edit & Resubmit
+         {{ 'portal.senderIdDetails.editAndResubmit' | translate }}
         </a>
 
       }
@@ -245,7 +253,7 @@
           <div class="details-card mb-3 mb-md-4">
 
             <div class="details-card-header">
-              Company Information
+             {{ 'portal.senderIdDetails.companyInformation' | translate }}
             </div>
 
 
@@ -257,7 +265,7 @@
                 <div class="detail-item">
 
                   <span class="detail-label">
-                    Company Name
+                   {{ 'portal.senderIdDetails.companyName' | translate }}
                   </span>
 
                   <span class="detail-value">
@@ -272,7 +280,7 @@
                 <div class="detail-item">
 
                   <span class="detail-label">
-                    Legal Entity Name
+                    {{ 'portal.senderIdDetails.legalEntityName' | translate }}
                   </span>
 
                   <span class="detail-value">
@@ -287,7 +295,7 @@
                 <div class="detail-item">
 
                   <span class="detail-label">
-                    Sender ID
+                   {{ 'portal.senderIdDetails.senderId' | translate }}
                   </span>
 
                   <span class="detail-value sender-name">
@@ -302,7 +310,7 @@
                 <div class="detail-item">
 
                   <span class="detail-label">
-                    Trade License Number
+                   {{ 'portal.senderIdDetails.tradeLicenseNumber' | translate }}
                   </span>
 
                   <span class="detail-value">
@@ -317,7 +325,7 @@
                 <div class="detail-item">
 
                   <span class="detail-label">
-                    Registration Number
+                    {{ 'portal.senderIdDetails.registrationNumber' | translate }}
                   </span>
 
                   <span class="detail-value">
@@ -333,7 +341,7 @@
                 <div class="detail-item">
 
                   <span class="detail-label">
-                    Company Email
+                   {{ 'portal.senderIdDetails.companyEmail' | translate }}
                   </span>
 
                   <span class="detail-value">
@@ -356,7 +364,7 @@
           <div class="details-card mb-3 mb-md-4">
 
             <div class="details-card-header">
-              Registered Office
+              {{ 'portal.senderIdDetails.registeredOffice' | translate }}
             </div>
 
 
@@ -372,7 +380,7 @@
                 >
 
                   <span class="detail-label">
-                    Address
+                   {{ 'portal.senderIdDetails.address' | translate }}
                   </span>
 
                   <span class="detail-value">
@@ -391,7 +399,7 @@
                 <div class="detail-item">
 
                   <span class="detail-label">
-                    City
+                   {{ 'portal.senderIdDetails.city' | translate }}
                   </span>
 
                   <span class="detail-value">
@@ -408,7 +416,7 @@
                 <div class="detail-item">
 
                   <span class="detail-label">
-                    Emirate
+                   {{ 'portal.senderIdDetails.emirate' | translate }}
                   </span>
 
                   <span class="detail-value">
@@ -425,7 +433,7 @@
                 <div class="detail-item">
 
                   <span class="detail-label">
-                    Country
+                  {{ 'portal.senderIdDetails.country' | translate }}
                   </span>
 
                   <span class="detail-value">
@@ -449,7 +457,7 @@
           <div class="details-card mb-3 mb-md-4">
 
             <div class="details-card-header">
-              Authorized Representative
+              {{ 'portal.senderIdDetails.authorizedRepresentative' | translate }}
             </div>
 
 
@@ -465,7 +473,7 @@
                   <div class="detail-item">
 
                     <span class="detail-label">
-                      Name
+                   {{ 'portal.senderIdDetails.name' | translate }}
                     </span>
 
                     <span class="detail-value">
@@ -490,7 +498,7 @@
                   <div class="detail-item">
 
                     <span class="detail-label">
-                      Designation
+                     {{ 'portal.senderIdDetails.designation' | translate }}s
                     </span>
 
                     <span class="detail-value">
@@ -514,7 +522,7 @@
                   >
 
                     <span class="detail-label">
-                      Official Email
+                     {{ 'portal.senderIdDetails.officialEmail' | translate }}s
                     </span>
 
                     <span class="detail-value">
@@ -533,7 +541,7 @@
                   <div class="detail-item">
 
                     <span class="detail-label">
-                      Mobile
+                     {{ 'portal.senderIdDetails.mobile' | translate }}
                     </span>
 
                     <span class="detail-value">
@@ -570,7 +578,7 @@
             >
 
               <span>
-                Submitted Documents
+                {{ 'portal.senderIdDetails.submittedDocuments' | translate }}
               </span>
 
               <span class="document-count">
@@ -622,10 +630,15 @@
       <div class="flex-grow-1 overflow-hidden">
 
         <div class="fw-semibold text-truncate">
-          {{
-            doc.fileName ||
-            'Document'
-          }}
+          @if (doc.fileName) {
+
+  {{ doc.fileName }}
+
+} @else {
+
+  {{ 'portal.senderIdDetails.document' | translate }}
+
+}
         </div>
 
         <div class="small text-secondary">
@@ -661,13 +674,13 @@
         ) {
 
           <span class="badge" style="background-color: #d71b36;">
-             opened
+             {{ 'portal.senderIdDetails.opened' | translate }}
           </span>
 
         } @else {
 
           <span class="small fw-semibold" style="color: #d71b36;">
-            View
+           {{ 'portal.senderIdDetails.view' | translate }}
           </span>
 
         }
@@ -715,7 +728,7 @@
               <div class="overflow-hidden">
 
                 <div class="viewer-label">
-                  DOCUMENT PREVIEW
+                 {{ 'portal.senderIdDetails.documentPreview' | translate }}
                 </div>
 
                 <div
@@ -725,10 +738,15 @@
                   "
                 >
 
-                  {{
-                    activeDocument()?.fileName ||
-                    'Select a document'
-                  }}
+                  @if (activeDocument()?.fileName) {
+
+  {{ activeDocument()?.fileName }}
+
+} @else {
+
+  {{ 'portal.senderIdDetails.selectDocument' | translate }}
+
+}
 
                 </div>
 
@@ -747,7 +765,7 @@
       rel="noopener"
       class="login"
     >
-      Open in New Tab
+      {{ 'portal.senderIdDetails.openInNewTab' | translate }}
     </a>
 
   </div>
@@ -820,12 +838,11 @@
                   </div>
 
                   <h6>
-                    Preview unavailable
+                   {{ 'portal.senderIdDetails.previewUnavailable' | translate }}
                   </h6>
 
                   <p>
-                    Open this file in a new tab
-                    to view it.
+                   {{ 'portal.senderIdDetails.openFileInstruction' | translate }}
                   </p>
 
                 </div>
@@ -850,12 +867,11 @@
                   </div>
 
                   <h6>
-                    Select a document
+                    {{ 'portal.senderIdDetails.selectDocument' | translate }}
                   </h6>
 
                   <p>
-                    Select one of your submitted
-                    documents to preview it.
+                    {{ 'portal.senderIdDetails.selectDocumentInstruction' | translate }}
                   </p>
 
                 </div>

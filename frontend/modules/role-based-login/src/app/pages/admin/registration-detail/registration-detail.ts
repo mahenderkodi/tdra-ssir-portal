@@ -4,10 +4,12 @@ import {
   signal,
   inject,
   Input,
-
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
+import {
+  CommonModule
+} from '@angular/common';
+
 import {
   ActivatedRoute,
   Router
@@ -17,21 +19,37 @@ import {
   SafeResourceUrl
 } from '@angular/platform-browser';
 
-import { SafeResourceUrlService } from '../../../core/services/safe-url';
+import {
+  TranslatePipe,
+  TranslateService
+} from '@ngx-translate/core';
+
+import {
+  SafeResourceUrlService
+} from '../../../core/services/safe-url';
 
 import {
   AdminRegistrationService
 } from '../../../core/services/admin-registration';
 
-import { HotToastService } from '@ngxpert/hot-toast';
+import {
+  HotToastService
+} from '@ngxpert/hot-toast';
+
 import {
   LoggerService
 } from '../../../layouts/logging/loggerService';
 
 @Component({
   selector: 'app-admin-registration-detail',
+
   standalone: true,
-  imports: [CommonModule],
+
+  imports: [
+    CommonModule,
+    TranslatePipe
+  ],
+
   templateUrl: './registration-detail.html',
   styleUrl: './registration-detail.css'
 })
@@ -56,7 +74,11 @@ export class AdminRegistrationDetailComponent
   private readonly logger =
     inject(LoggerService);
 
-  @Input() id!: string;
+  private readonly translate =
+    inject(TranslateService);
+
+  @Input()
+  id!: string;
 
 
   registration =
@@ -84,8 +106,6 @@ export class AdminRegistrationDetailComponent
     signal<string | null>(null);
 
 
-
-
   ngOnInit(): void {
 
     const resolvedId =
@@ -99,7 +119,7 @@ export class AdminRegistrationDetailComponent
       );
 
       this.errorMessage.set(
-        'Missing registration identifier.'
+        'errors.ADMINDETAIL001'
       );
 
       this.isLoading.set(false);
@@ -113,14 +133,12 @@ export class AdminRegistrationDetailComponent
   }
 
 
-  previewDocument(doc: any): void {
+  previewDocument(
+    doc: any
+  ): void {
 
     this.activeDocument.set(doc);
 
-    /*
-     * iframe requires a trusted resource URL.
-     * We mainly use this for PDFs.
-     */
     if (doc?.presignedUrl) {
 
       this.activePreviewUrl.set(
@@ -137,11 +155,12 @@ export class AdminRegistrationDetailComponent
   }
 
 
+  isImage(
+    doc: any
+  ): boolean {
 
-
-  isImage(doc: any): boolean {
-
-    const fileName = doc?.fileName;
+    const fileName =
+      doc?.fileName;
 
     if (!fileName) {
       return false;
@@ -152,9 +171,12 @@ export class AdminRegistrationDetailComponent
   }
 
 
-  isPdf(doc: any): boolean {
+  isPdf(
+    doc: any
+  ): boolean {
 
-    const fileName = doc?.fileName;
+    const fileName =
+      doc?.fileName;
 
     if (!fileName) {
       return false;
@@ -163,7 +185,10 @@ export class AdminRegistrationDetailComponent
     return /\.pdf$/i.test(fileName);
   }
 
-  executeAction(status: string): void {
+
+  executeAction(
+    status: string
+  ): void {
 
     const resolvedId =
       this.id ||
@@ -176,15 +201,10 @@ export class AdminRegistrationDetailComponent
       return;
     }
 
-
     let comments =
       this.actionComment().trim();
 
 
-    /*
-     * Reject and Request Info
-     * require explanation.
-     */
     if (
       (
         status === 'REJECTED' ||
@@ -194,14 +214,20 @@ export class AdminRegistrationDetailComponent
     ) {
 
       if (status === 'REJECTED') {
+
         this.toast.error(
-          'Please enter the reason for rejection.'
+          this.translate.instant(
+            'validation.rejectionReasonRequired'
+          )
         );
       }
 
       if (status === 'INFO_REQUESTED') {
+
         this.toast.error(
-          'Please enter what additional information is required.'
+          this.translate.instant(
+            'validation.additionalInformationRequired'
+          )
         );
       }
 
@@ -210,7 +236,8 @@ export class AdminRegistrationDetailComponent
 
 
     /*
-     * Approval comment is optional.
+     * This comment is submitted to the backend,
+     * so keep its business value unchanged.
      */
     if (
       status === 'APPROVED' &&
@@ -244,26 +271,40 @@ export class AdminRegistrationDetailComponent
             this.logger.info(
               'Admin registration approved successfully'
             );
+
             this.toast.success(
-              'Registration approved successfully.'
+              this.translate.instant(
+                'admin.registrationDetail.approvedSuccess'
+              )
             );
 
-          } else if (status === 'REJECTED') {
+          } else if (
+            status === 'REJECTED'
+          ) {
+
             this.logger.info(
               'Admin registration rejected successfully'
             );
+
             this.toast.success(
-              'Registration rejected successfully.'
+              this.translate.instant(
+                'admin.registrationDetail.rejectedSuccess'
+              )
             );
 
-          } else if (status === 'INFO_REQUESTED') {
+          } else if (
+            status === 'INFO_REQUESTED'
+          ) {
+
             this.logger.info(
               'Admin registration information request sent successfully'
             );
-            this.toast.success(
-              'Information request sent successfully.'
-            );
 
+            this.toast.success(
+              this.translate.instant(
+                'admin.registrationDetail.infoRequestSuccess'
+              )
+            );
           }
 
           void this.router.navigate(
@@ -287,12 +328,10 @@ export class AdminRegistrationDetailComponent
           }
 
           this.isProcessing.set(false);
-
           this.activeAction.set(null);
 
           this.errorMessage.set(
-            err.error?.message ||
-            'Failed to process request.'
+            'errors.ADMINDETAIL002'
           );
         }
 
@@ -341,7 +380,7 @@ export class AdminRegistrationDetailComponent
           this.isLoading.set(false);
 
           this.errorMessage.set(
-            'Failed to load application details.'
+            'errors.ADMINDETAIL003'
           );
         }
 

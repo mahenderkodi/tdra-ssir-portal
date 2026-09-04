@@ -1,9 +1,31 @@
 <div class="container-fluid">
-  <div class="card border-0 shadow-sm p-4 text-center">
-    <h2 class="fw-bold mb-3">Internal Staff User Directory</h2>
+
+  <div
+    class="
+      card
+      border-0
+      shadow-sm
+      p-4
+      text-center
+    "
+  >
+
+    <h2 class="fw-bold mb-3">
+      {{ 'admin.users.title' | translate }}
+    </h2>
+
     <p class="text-muted mb-0">
-      Role assignment and staff directory management services are loaded under
-      the ROLE_TDRA_SUPER_ADMIN authorization context.
+
+      {{ 'admin.users.descriptionPrefix' | translate }}
+
+      <strong>
+        ROLE_TDRA_SUPER_ADMIN
+      </strong>
+
+      {{ 'admin.users.descriptionSuffix' | translate }}
+
     </p>
+
   </div>
+
 </div>

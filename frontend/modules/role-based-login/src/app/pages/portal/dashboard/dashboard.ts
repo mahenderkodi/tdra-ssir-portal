@@ -16,12 +16,16 @@ import { RouterLink } from '@angular/router';
 import {
   LoggerService
 } from '../../../layouts/logging/loggerService';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-portal-dashboard',
   standalone: true,
 
-  imports: [RouterLink],
+  imports: [
+  RouterLink,
+  TranslatePipe
+],
 
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
@@ -105,7 +109,7 @@ export class PortalDashboard
           this.loading.set(false);
 
           this.errorMessage.set(
-            'Unable to load Sender ID registrations.'
+            'errors.DASH001'
           );
         }
 
@@ -128,7 +132,7 @@ export class PortalDashboard
           this.loading.set(false);
         },
 
-        error: error => {
+        error: () => {
           this.logger.error(
             'Unable to load portal dashboard statistics'
           );
@@ -136,8 +140,7 @@ export class PortalDashboard
           this.loading.set(false);
 
           this.errorMessage.set(
-            error.error?.message ??
-            'Unable to load dashboard information.'
+            'errors.DASH002'
           );
         }
       });

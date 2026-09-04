@@ -15,33 +15,29 @@
     role="status"
   ></div>
 
-  <p class="mt-3  text-secondary">
-    Loading registration details...
+  <p class="mt-3 text-secondary">
+    {{ 'admin.registrationDetail.loading' | translate }}
   </p>
 </div>
 
 
 <section
   *ngIf="!isLoading() && registration()"
-  class="container-fluid py-3
-    py-md-4 audit-page"
+  class="container-fluid py-3 py-md-4 audit-page"
 >
 
-  <!-- ==================================================
-       PAGE HEADER
-       ================================================== -->
-
+  <!-- PAGE HEADER -->
   <div
     class="
       d-flex
-    flex-column
-    flex-md-row
-    justify-content-md-between
-    align-items-start
-    align-items-md-center
-    gap-3
-    mb-3
-    mb-md-4
+      flex-column
+      flex-md-row
+      justify-content-md-between
+      align-items-start
+      align-items-md-center
+      gap-3
+      mb-3
+      mb-md-4
     "
   >
 
@@ -52,12 +48,12 @@
         class="btn btn-link p-0 mb-2"
         (click)="goBack()"
       >
-        ← Back to Onboarding Queue
+        ← {{ 'admin.registrationDetail.backToQueue' | translate }}
       </button>
 
 
       <h2 class="audit-page-title mt-2 mb-1">
-        Registration Review
+        {{ 'admin.registrationDetail.title' | translate }}
       </h2>
 
 
@@ -105,27 +101,21 @@
     *ngIf="errorMessage()"
     class="alert alert-danger mb-4"
   >
-    {{ errorMessage() }}
+    {{ errorMessage() | translate }}
   </div>
 
 
   <div class="row g-4">
 
-    <!-- ==================================================
-         LEFT SIDE
-         ================================================== -->
-
+    <!-- LEFT SIDE -->
     <div class="col-xl-5 col-lg-6">
 
 
-      <!-- ==================================================
-           COMPANY INFORMATION
-           ================================================== -->
-
+      <!-- COMPANY INFORMATION -->
       <div class="audit-card mb-3 mb-md-4">
 
         <div class="audit-card-header">
-          Company Information
+          {{ 'admin.registrationDetail.companyInformation' | translate }}
         </div>
 
 
@@ -137,7 +127,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Company Name
+                {{ 'admin.registrationDetail.companyName' | translate }}
               </span>
 
               <span class="detail-value">
@@ -150,7 +140,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Legal Entity Name
+                {{ 'admin.registrationDetail.legalEntityName' | translate }}
               </span>
 
               <span class="detail-value">
@@ -163,7 +153,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Trade License Number
+                {{ 'admin.registrationDetail.tradeLicenseNumber' | translate }}
               </span>
 
               <span class="detail-value">
@@ -176,7 +166,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Registration Number
+                {{ 'admin.registrationDetail.registrationNumber' | translate }}
               </span>
 
               <span class="detail-value">
@@ -189,7 +179,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                VAT / Tax Number
+                {{ 'admin.registrationDetail.vatTaxNumber' | translate }}
               </span>
 
               <span class="detail-value">
@@ -202,7 +192,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Company Type
+                {{ 'admin.registrationDetail.companyType' | translate }}
               </span>
 
               <span class="detail-value">
@@ -215,7 +205,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Industry
+                {{ 'admin.registrationDetail.industry' | translate }}
               </span>
 
               <span class="detail-value">
@@ -228,7 +218,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Date of Incorporation
+                {{ 'admin.registrationDetail.dateOfIncorporation' | translate }}
               </span>
 
               <span class="detail-value">
@@ -244,7 +234,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Company Email
+                {{ 'admin.registrationDetail.companyEmail' | translate }}
               </span>
 
               <span class="detail-value">
@@ -257,7 +247,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Company Phone
+                {{ 'admin.registrationDetail.companyPhone' | translate }}
               </span>
 
               <span class="detail-value">
@@ -270,7 +260,7 @@
             <div class="detail-item detail-full">
 
               <span class="detail-label">
-                Website
+                {{ 'admin.registrationDetail.website' | translate }}
               </span>
 
               <a
@@ -299,14 +289,11 @@
       </div>
 
 
-      <!-- ==================================================
-           SENDER ID INFORMATION
-           ================================================== -->
-
+      <!-- SENDER ID INFORMATION -->
       <div class="audit-card mb-4">
 
         <div class="audit-card-header">
-          Sender ID Information
+          {{ 'admin.registrationDetail.senderIdInformation' | translate }}
         </div>
 
 
@@ -318,7 +305,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Proposed Sender ID
+                {{ 'admin.registrationDetail.proposedSenderId' | translate }}
               </span>
 
               <span class="detail-value fw-bold">
@@ -331,7 +318,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Sender ID Status
+                {{ 'admin.registrationDetail.senderIdStatus' | translate }}
               </span>
 
               <span class="detail-value">
@@ -344,7 +331,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Submitted On
+                {{ 'admin.registrationDetail.submittedOn' | translate }}
               </span>
 
               <span class="detail-value">
@@ -363,14 +350,11 @@
       </div>
 
 
-      <!-- ==================================================
-           REGISTERED OFFICE
-           ================================================== -->
-
+      <!-- REGISTERED OFFICE -->
       <div class="audit-card mb-4">
 
         <div class="audit-card-header">
-          Registered Office
+          {{ 'admin.registrationDetail.registeredOffice' | translate }}
         </div>
 
 
@@ -382,7 +366,7 @@
             <div class="detail-item detail-full">
 
               <span class="detail-label">
-                Address
+                {{ 'admin.registrationDetail.address' | translate }}
               </span>
 
               <span class="detail-value">
@@ -395,7 +379,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                City
+                {{ 'admin.registrationDetail.city' | translate }}
               </span>
 
               <span class="detail-value">
@@ -408,7 +392,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Emirate / State
+                {{ 'admin.registrationDetail.emirateState' | translate }}
               </span>
 
               <span class="detail-value">
@@ -421,7 +405,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Country
+                {{ 'admin.registrationDetail.country' | translate }}
               </span>
 
               <span class="detail-value">
@@ -434,7 +418,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Postal Code
+                {{ 'admin.registrationDetail.postalCode' | translate }}
               </span>
 
               <span class="detail-value">
@@ -450,14 +434,11 @@
       </div>
 
 
-      <!-- ==================================================
-           AUTHORIZED REPRESENTATIVE
-           ================================================== -->
-
+      <!-- AUTHORIZED REPRESENTATIVE -->
       <div class="audit-card mb-4">
 
         <div class="audit-card-header">
-          Authorized Representative
+          {{ 'admin.registrationDetail.authorizedRepresentative' | translate }}
         </div>
 
 
@@ -469,7 +450,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Name
+                {{ 'admin.registrationDetail.name' | translate }}
               </span>
 
               <span class="detail-value">
@@ -488,7 +469,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Designation
+                {{ 'admin.registrationDetail.designation' | translate }}
               </span>
 
               <span class="detail-value">
@@ -501,7 +482,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Department
+                {{ 'admin.registrationDetail.department' | translate }}
               </span>
 
               <span class="detail-value">
@@ -514,7 +495,7 @@
             <div class="detail-item detail-full">
 
               <span class="detail-label">
-                Official Email
+                {{ 'admin.registrationDetail.officialEmail' | translate }}
               </span>
 
               <span class="detail-value">
@@ -527,7 +508,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Mobile
+                {{ 'admin.registrationDetail.mobile' | translate }}
               </span>
 
               <span class="detail-value">
@@ -540,7 +521,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Office Number
+                {{ 'admin.registrationDetail.officeNumber' | translate }}
               </span>
 
               <span class="detail-value">
@@ -553,7 +534,7 @@
             <div class="detail-item detail-full">
 
               <span class="detail-label">
-                Address
+                {{ 'admin.registrationDetail.address' | translate }}
               </span>
 
               <span class="detail-value">
@@ -566,7 +547,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                UAE Pass ID
+                {{ 'admin.registrationDetail.uaePassId' | translate }}
               </span>
 
               <span class="detail-value">
@@ -579,7 +560,7 @@
             <div class="detail-item">
 
               <span class="detail-label">
-                Emirates ID / Passport
+                {{ 'admin.registrationDetail.emiratesIdPassport' | translate }}
               </span>
 
               <span class="detail-value">
@@ -598,334 +579,321 @@
       </div>
 
 
-      <!-- ==================================================
-     SUBMITTED DOCUMENTS
-     ================================================== -->
+      <!-- SUBMITTED DOCUMENTS -->
+      <div class="audit-card">
 
-<div class="audit-card">
+        <div
+          class="
+            audit-card-header
+            d-flex
+            justify-content-between
+            align-items-center
+          "
+        >
 
-  <!-- Header -->
-  <div
-    class="
-      audit-card-header
-      d-flex
-      justify-content-between
-      align-items-center
-    "
-  >
+          <span>
+            {{ 'admin.registrationDetail.submittedDocuments' | translate }}
+          </span>
 
-    <span>
-      Submitted Documents
-    </span>
-
-    <span class="document-count">
-      {{ registration().documents?.length || 0 }}
-    </span>
-
-  </div>
-
-
-  <!-- Document List -->
-  <div class="document-list">
-
-    @for (
-      doc of registration().documents;
-      track doc.presignedUrl
-    ) {
-
-      <button
-        type="button"
-        class="
-          w-100
-          d-flex
-          align-items-center
-          gap-3
-          text-start
-          border
-          rounded
-          p-3
-          mb-2
-        "
-        [ngClass]="{
-
-          'border-primary border-2 bg-light shadow-sm':
-            activeDocument()?.presignedUrl === doc.presignedUrl,
-
-          'bg-white':
-            activeDocument()?.presignedUrl !== doc.presignedUrl
-
-        }"
-        (click)="previewDocument(doc)"
-      >
-
-        <!-- Document Icon -->
-        <div class="fs-4 flex-shrink-0">
-          📄
-        </div>
-
-
-        <!-- Document Details -->
-        <div class="flex-grow-1 overflow-hidden">
-
-          <div class="fw-semibold text-truncate">
-
-            {{
-              doc.fileName ||
-              'Document'
-            }}
-
-          </div>
-
-
-          <div class="small text-secondary">
-
-            {{
-              doc.contentType ||
-              doc.documentType ||
-              'FILE'
-            }}
-
-
-            @if (doc.fileSizeBytes) {
-
-              <span>
-
-                •
-                {{
-                  (doc.fileSizeBytes / 1024)
-                    | number:'1.0-0'
-                }}
-                KB
-
-              </span>
-
-            }
-
-          </div>
+          <span class="document-count">
+            {{ registration().documents?.length || 0 }}
+          </span>
 
         </div>
 
 
-        <!-- Selected / View -->
-        <div class="flex-shrink-0">
+        <div class="document-list">
 
-          @if (
-            activeDocument()?.presignedUrl ===
-            doc.presignedUrl
+          @for (
+            doc of registration().documents;
+            track doc.presignedUrl
           ) {
 
-            <span
-              class="badge"
-              style="background-color: #d71b36;"
-            >
-              Opened
-            </span>
+            <button
+              type="button"
+              class="
+                w-100
+                d-flex
+                align-items-center
+                gap-3
+                text-start
+                border
+                rounded
+                p-3
+                mb-2
+              "
+              [ngClass]="{
 
-          } @else {
+                'border-primary border-2 bg-light shadow-sm':
+                  activeDocument()?.presignedUrl === doc.presignedUrl,
 
-            <span
-              class="small fw-semibold"
-              style="color: #d71b36;"
+                'bg-white':
+                  activeDocument()?.presignedUrl !== doc.presignedUrl
+
+              }"
+              (click)="previewDocument(doc)"
             >
-              View
-            </span>
+
+              <div class="fs-4 flex-shrink-0">
+                📄
+              </div>
+
+
+              <div class="flex-grow-1 overflow-hidden">
+
+                <div class="fw-semibold text-truncate">
+
+                  @if (doc.fileName) {
+                    {{ doc.fileName }}
+                  } @else {
+                    {{ 'admin.registrationDetail.document' | translate }}
+                  }
+
+                </div>
+
+
+                <div class="small text-secondary">
+
+                  @if (doc.contentType) {
+                    {{ doc.contentType }}
+                  } @else if (doc.documentType) {
+                    {{ doc.documentType }}
+                  } @else {
+                    {{ 'admin.registrationDetail.file' | translate }}
+                  }
+
+
+                  @if (doc.fileSizeBytes) {
+
+                    <span>
+
+                      •
+                      {{
+                        (doc.fileSizeBytes / 1024)
+                          | number:'1.0-0'
+                      }}
+                      KB
+
+                    </span>
+
+                  }
+
+                </div>
+
+              </div>
+
+
+              <div class="flex-shrink-0">
+
+                @if (
+                  activeDocument()?.presignedUrl ===
+                  doc.presignedUrl
+                ) {
+
+                  <span
+                    class="badge"
+                    style="background-color: #d71b36;"
+                  >
+                    {{ 'admin.registrationDetail.opened' | translate }}
+                  </span>
+
+                } @else {
+
+                  <span
+                    class="small fw-semibold"
+                    style="color: #d71b36;"
+                  >
+                    {{ 'admin.registrationDetail.view' | translate }}
+                  </span>
+
+                }
+
+              </div>
+
+            </button>
+
+          }
+
+
+          @if (
+            !registration().documents ||
+            registration().documents.length === 0
+          ) {
+
+            <div class="text-center text-secondary p-4">
+              {{ 'admin.registrationDetail.noDocuments' | translate }}
+            </div>
 
           }
 
         </div>
 
-      </button>
-
-    }
-
-
-    <!-- Empty State -->
-    @if (
-      !registration().documents ||
-      registration().documents.length === 0
-    ) {
-
-      <div class="text-center text-secondary p-4">
-        No documents were submitted.
       </div>
-
-    }
-
-  </div>
-
-</div>
 
     </div>
 
 
-    <!-- ==================================================
-         RIGHT SIDE
-         ================================================== -->
-
+    <!-- RIGHT SIDE -->
     <div class="col-xl-7 col-lg-6">
 
 
-     <!-- ==================================================
-     DOCUMENT VIEWER
-     ================================================== -->
-
-<div
-  class="
-    audit-card
-    document-viewer-card
-    mb-4
-  "
->
-
-  <div
-    class="
-      audit-card-header
-      document-viewer-header
-      d-flex
-      justify-content-between
-      align-items-center
-      gap-3
-    "
-  >
-
-    <div class="overflow-hidden">
-
-      <div class="viewer-eyebrow">
-        DOCUMENT PREVIEW
-      </div>
-
-      <div class="viewer-title text-truncate">
-
-        {{
-          activeDocument()?.fileName ||
-          'Select a document'
-        }}
-
-      </div>
-
-    </div>
-
-
-    <a
-      *ngIf="activeDocument()?.presignedUrl"
-      [href]="activeDocument().presignedUrl"
-      target="_blank"
-      rel="noopener"
-      class="
-        login
-      "
-    >
-      Open in New Tab
-    </a>
-
-  </div>
-
-
-  <div class="document-preview">
-
-
-    <!-- IMAGE -->
-    <div
-      *ngIf="
-        activeDocument() &&
-        isImage(activeDocument())
-      "
-      class="image-preview-container"
-    >
-
-      <img
-        [src]="activeDocument().presignedUrl"
-        [alt]="activeDocument().fileName"
-        class="document-image"
+      <!-- DOCUMENT VIEWER -->
+      <div
+        class="
+          audit-card
+          document-viewer-card
+          mb-4
+        "
       >
 
-    </div>
+        <div
+          class="
+            audit-card-header
+            document-viewer-header
+            d-flex
+            justify-content-between
+            align-items-center
+            gap-3
+          "
+        >
+
+          <div class="overflow-hidden">
+
+            <div class="viewer-eyebrow">
+              {{ 'admin.registrationDetail.documentPreview' | translate }}
+            </div>
+
+            <div class="viewer-title text-truncate">
+
+              @if (activeDocument()?.fileName) {
+                {{ activeDocument()?.fileName }}
+              } @else {
+                {{ 'admin.registrationDetail.selectDocument' | translate }}
+              }
+
+            </div>
+
+          </div>
 
 
-    <!-- PDF -->
-    <iframe
-      *ngIf="
-        activeDocument() &&
-        isPdf(activeDocument()) &&
-        activePreviewUrl()
-      "
-      [src]="activePreviewUrl()"
-      class="pdf-preview"
-      title="Document preview"
-    ></iframe>
+          <a
+            *ngIf="activeDocument()?.presignedUrl"
+            [href]="activeDocument().presignedUrl"
+            target="_blank"
+            rel="noopener"
+            class="login"
+          >
+            {{ 'admin.registrationDetail.openInNewTab' | translate }}
+          </a>
+
+        </div>
 
 
-    <!-- OTHER FILE TYPE -->
-    <div
-      *ngIf="
-        activeDocument() &&
-        !isImage(activeDocument()) &&
-        !isPdf(activeDocument())
-      "
-      class="preview-placeholder"
-    >
+        <div class="document-preview">
 
-      <div class="preview-placeholder-icon">
-        📄
+
+          <!-- IMAGE -->
+          <div
+            *ngIf="
+              activeDocument() &&
+              isImage(activeDocument())
+            "
+            class="image-preview-container"
+          >
+
+            <img
+              [src]="activeDocument().presignedUrl"
+              [alt]="activeDocument().fileName"
+              class="document-image"
+            >
+
+          </div>
+
+
+          <!-- PDF -->
+          <iframe
+            *ngIf="
+              activeDocument() &&
+              isPdf(activeDocument()) &&
+              activePreviewUrl()
+            "
+            [src]="activePreviewUrl()"
+            class="pdf-preview"
+            [attr.title]="
+              'admin.registrationDetail.documentPreview'
+                | translate
+            "
+          ></iframe>
+
+
+          <!-- OTHER FILE TYPE -->
+          <div
+            *ngIf="
+              activeDocument() &&
+              !isImage(activeDocument()) &&
+              !isPdf(activeDocument())
+            "
+            class="preview-placeholder"
+          >
+
+            <div class="preview-placeholder-icon">
+              📄
+            </div>
+
+            <h6>
+              {{ 'admin.registrationDetail.previewUnavailable' | translate }}
+            </h6>
+
+            <p>
+              {{ 'admin.registrationDetail.openDocumentInstruction' | translate }}
+            </p>
+
+
+            <a
+              [href]="activeDocument().presignedUrl"
+              target="_blank"
+              rel="noopener"
+              class="btn btn-primary"
+            >
+              {{ 'admin.registrationDetail.openDocument' | translate }}
+            </a>
+
+          </div>
+
+
+          <!-- NO DOCUMENT -->
+          <div
+            *ngIf="!activeDocument()"
+            class="preview-placeholder"
+          >
+
+            <div class="preview-placeholder-icon">
+              📁
+            </div>
+
+            <h6>
+              {{ 'admin.registrationDetail.noDocumentSelected' | translate }}
+            </h6>
+
+            <p>
+              {{ 'admin.registrationDetail.selectDocumentInstruction' | translate }}
+            </p>
+
+          </div>
+
+        </div>
+
       </div>
 
-      <h6>
-        Preview unavailable
-      </h6>
 
-      <p>
-        Open this document in a new tab to view it.
-      </p>
-
-
-      <a
-        [href]="activeDocument().presignedUrl"
-        target="_blank"
-        rel="noopener"
-        class="btn btn-primary"
-      >
-        Open Document
-      </a>
-
-    </div>
-
-
-    <!-- NO DOCUMENT -->
-    <div
-      *ngIf="!activeDocument()"
-      class="preview-placeholder"
-    >
-
-      <div class="preview-placeholder-icon">
-        📁
-      </div>
-
-      <h6>
-        No document selected
-      </h6>
-
-      <p>
-        Select a submitted document to preview it.
-      </p>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-      <!-- ==================================================
-           EXISTING TDRA REMARK
-           ================================================== -->
-
+      <!-- EXISTING TDRA REMARK -->
       <div
         *ngIf="registration().remarks"
         class="audit-card mb-4"
       >
 
         <div class="audit-card-header">
-          Existing TDRA Remark
+          {{ 'admin.registrationDetail.existingTdraRemark' | translate }}
         </div>
 
 
@@ -940,139 +908,138 @@
       </div>
 
 
-      <!-- ==================================================
-           TDRA REVIEW
-           ================================================== -->
-
+      <!-- TDRA REVIEW -->
       <div class="audit-card">
 
         <div class="audit-card-header">
-          TDRA Review Decision
+          {{ 'admin.registrationDetail.reviewDecision' | translate }}
         </div>
 
 
         <div class="audit-card-body">
 
-  <div class="mb-3">
+          <div class="mb-3">
 
-    <label
-      for="reviewComments"
-      class="form-label fw-semibold"
-    >
-      Review Comments
-    </label>
-
-
-    <textarea
-      id="reviewComments"
-      class="form-control"
-      rows="4"
-      placeholder="Enter comments for the applicant..."
-      [value]="actionComment()"
-      (input)="
-        actionComment.set(
-          $any($event.target).value
-        )
-      "
-    ></textarea>
+            <label
+              for="reviewComments"
+              class="form-label fw-semibold"
+            >
+              {{ 'admin.registrationDetail.reviewComments' | translate }}
+            </label>
 
 
-    <div class="form-text text-muted mt-1">
-      Required when rejecting an application
-      or requesting additional information.
-    </div>
-
-  </div>
-
-
-  <!-- Review Actions -->
-  <div
-    class="
-      review-actions
-      d-flex
-      flex-column
-      flex-sm-row
-      flex-wrap
-      justify-content-sm-end
-      gap-2
-    "
-  >
-
-    <!-- Reject -->
-    <button
-      type="button"
-      class="btn btn-default-inv"
-      [disabled]="isProcessing()"
-      (click)="executeAction('REJECTED')"
-    >
-
-      <span
-        *ngIf="
-          activeAction() === 'REJECTED'
-        "
-        class="
-          spinner-border
-          spinner-border-sm
-          me-2
-        "
-      ></span>
-
-      Reject
-
-    </button>
+            <textarea
+              id="reviewComments"
+              class="form-control"
+              rows="4"
+              [placeholder]="
+                'admin.registrationDetail.reviewCommentsPlaceholder'
+                  | translate
+              "
+              [value]="actionComment()"
+              (input)="
+                actionComment.set(
+                  $any($event.target).value
+                )
+              "
+            ></textarea>
 
 
-    <!-- Request Information -->
-    <button
-      type="button"
-      class="btn btn-warning-inv"
-      [disabled]="isProcessing()"
-      (click)="executeAction('INFO_REQUESTED')"
-    >
+            <div class="form-text text-muted mt-1">
+              {{ 'admin.registrationDetail.reviewCommentsHint' | translate }}
+            </div>
 
-      <span
-        *ngIf="
-          activeAction() ===
-          'INFO_REQUESTED'
-        "
-        class="
-          spinner-border
-          spinner-border-sm
-          me-2
-        "
-      ></span>
-
-      Request Information
-
-    </button>
+          </div>
 
 
-    <!-- Approve -->
-    <button
-      type="button"
-      class="btn btn-primary"
-      [disabled]="isProcessing()"
-      (click)="executeAction('APPROVED')"
-    >
+          <!-- Review Actions -->
+          <div
+            class="
+              review-actions
+              d-flex
+              flex-column
+              flex-sm-row
+              flex-wrap
+              justify-content-sm-end
+              gap-2
+            "
+          >
 
-      <span
-        *ngIf="
-          activeAction() === 'APPROVED'
-        "
-        class="
-          spinner-border
-          spinner-border-sm
-          me-2
-        "
-      ></span>
+            <!-- Reject -->
+            <button
+              type="button"
+              class="btn btn-default-inv"
+              [disabled]="isProcessing()"
+              (click)="executeAction('REJECTED')"
+            >
 
-      Approve
+              <span
+                *ngIf="
+                  activeAction() === 'REJECTED'
+                "
+                class="
+                  spinner-border
+                  spinner-border-sm
+                  me-2
+                "
+              ></span>
 
-    </button>
+              {{ 'admin.registrationDetail.reject' | translate }}
 
-  </div>
+            </button>
 
-</div>
+
+            <!-- Request Information -->
+            <button
+              type="button"
+              class="btn btn-warning-inv"
+              [disabled]="isProcessing()"
+              (click)="executeAction('INFO_REQUESTED')"
+            >
+
+              <span
+                *ngIf="
+                  activeAction() ===
+                  'INFO_REQUESTED'
+                "
+                class="
+                  spinner-border
+                  spinner-border-sm
+                  me-2
+                "
+              ></span>
+
+              {{ 'admin.registrationDetail.requestInformation' | translate }}
+
+            </button>
+
+
+            <!-- Approve -->
+            <button
+              type="button"
+              class="btn btn-primary"
+              [disabled]="isProcessing()"
+              (click)="executeAction('APPROVED')"
+            >
+
+              <span
+                *ngIf="
+                  activeAction() === 'APPROVED'
+                "
+                class="
+                  spinner-border
+                  spinner-border-sm
+                  me-2
+                "
+              ></span>
+
+              {{ 'admin.registrationDetail.approve' | translate }}
+
+            </button>
+
+          </div>
+
+        </div>
 
       </div>
 

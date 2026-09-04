@@ -3,12 +3,19 @@
   <!-- Section heading -->
   <div class="mb-4 mb-md-4">
     <h2 class="corp-font">
-      Company Registration
-    </h2>
+  {{
+    'portal.senderIdNew.companyRegistration.title'
+      | translate
+  }}
+</h2>
 
-    <p class="corp-font-light">
-      Enter the organization’s legal and registration information.
-    </p>
+<p class="corp-font-light">
+  {{
+    'portal.senderIdNew.companyRegistration.description'
+      | translate
+  }}
+</p>
+
   </div>
 
   <!-- Responsive form grid -->
@@ -27,7 +34,10 @@
     for="companyName"
     class="form-control-label required"
   >
-    Company Name
+    {{
+    'portal.senderIdNew.companyRegistration.companyName'
+      | translate
+  }}
   </label>
 
   <input
@@ -35,7 +45,10 @@
     type="text"
     class="form-control"
     formControlName="companyName"
-    placeholder="Enter company name"
+    [placeholder]="
+  'portal.senderIdNew.companyRegistration.companyNamePlaceholder'
+    | translate
+"
     [class.form-control-danger]="
       group.get('companyName')?.touched &&
       group.get('companyName')?.invalid
@@ -43,13 +56,13 @@
   />
 
   @if (
-    group.get('companyName')?.touched &&
-    group.get('companyName')?.hasError('required')
-  ) {
-    <div class="form-control-feedback">
-      Company name is required.
-    </div>
-  }
+  group.get('companyName')?.touched &&
+  group.get('companyName')?.hasError('required')
+) {
+  <div class="form-control-feedback">
+    {{ 'validation.companyNameRequired' | translate }}
+  </div>
+}
 
 </div>
 
@@ -65,7 +78,10 @@
     for="legalEntityName"
     class="form-control-label required"
   >
-    Legal Entity Name
+   {{
+  'portal.senderIdNew.companyRegistration.legalEntityName'
+    | translate
+}}
   </label>
 
   <input
@@ -73,7 +89,10 @@
     type="text"
     class="form-control"
     formControlName="legalEntityName"
-    placeholder="Enter legal entity name"
+    [placeholder]="
+  'portal.senderIdNew.companyRegistration.legalEntityNamePlaceholder'
+    | translate
+"
     [class.form-control-danger]="
       group.get('legalEntityName')?.touched &&
       group.get('legalEntityName')?.invalid
@@ -85,7 +104,7 @@
     group.get('legalEntityName')?.hasError('required')
   ) {
     <div class="form-control-feedback">
-      Legal entity name is required.
+      {{ 'validation.legalEntityNameRequired' | translate }}
     </div>
   }
 </div>
@@ -103,7 +122,10 @@
     for="tradeLicenseNumber"
     class="form-control-label required"
   >
-    Trade License Number
+   {{
+  'portal.senderIdNew.companyRegistration.tradeLicenseNumber'
+    | translate
+}}
   </label>
 
   <input
@@ -111,7 +133,10 @@
     type="text"
     class="form-control"
     formControlName="tradeLicenseNumber"
-    placeholder="Enter trade license number"
+    [placeholder]="
+  'portal.senderIdNew.companyRegistration.tradeLicensePlaceholder'
+    | translate
+"
     [class.form-control-danger]="
       group.get('tradeLicenseNumber')?.touched &&
       group.get('tradeLicenseNumber')?.invalid
@@ -123,7 +148,7 @@
     group.get('tradeLicenseNumber')?.hasError('required')
   ) {
     <div class="form-control-feedback">
-      Trade license number is required.
+      {{ 'validation.tradeLicenseRequired' | translate }}
     </div>
   }
 
@@ -141,7 +166,7 @@
     for="registrationNumber"
     class="form-control-label required"
   >
-    Registration Number
+    {{ 'portal.senderIdNew.companyRegistration.registrationNumber' | translate }}
   </label>
 
   <input
@@ -149,7 +174,10 @@
     type="text"
     class="form-control"
     formControlName="registrationNumber"
-    placeholder="Enter registration number"
+     [placeholder]="
+  'portal.senderIdNew.companyRegistration.registrationNumberPlaceholder'
+    | translate
+"
     [class.form-control-danger]="
       group.get('registrationNumber')?.touched &&
       group.get('registrationNumber')?.invalid
@@ -161,7 +189,7 @@
     group.get('registrationNumber')?.hasError('required')
   ) {
     <div class="form-control-feedback">
-      Registration number is required.
+     {{ 'validation.registrationNumberRequired' | translate }}
     </div>
   }
 </div>
@@ -179,7 +207,7 @@
     for="taxId"
     class="form-control-label required"
   >
-    Tax ID / VAT Number
+    {{ 'portal.senderIdNew.companyRegistration.taxId' | translate }}
   </label>
 
   <input
@@ -187,7 +215,10 @@
     type="text"
     class="form-control"
     formControlName="taxId"
-    placeholder="Enter Tax ID or VAT number"
+    [placeholder]="
+  'portal.senderIdNew.companyRegistration.taxIdPlaceholder'
+    | translate
+"
     [class.form-control-danger]="
       group.get('taxId')?.touched &&
       group.get('taxId')?.invalid
@@ -199,7 +230,7 @@
     group.get('taxId')?.hasError('required')
   ) {
     <div class="form-control-feedback">
-      Tax ID or VAT number is required.
+      {{ 'validation.taxIdRequired' | translate }}
     </div>
   }
 </div>
@@ -217,7 +248,7 @@
     for="companyType"
     class="form-control-label required"
   >
-    Company Type
+    {{ 'portal.senderIdNew.companyRegistration.companyType' | translate }}
   </label>
 
   <select
@@ -231,7 +262,7 @@
   >
 
     <option value="" disabled>
-      Select company type
+      {{'portal.senderIdNew.companyRegistration.selectCompanyType' | translate }}
     </option>
 
     @for (type of companyTypes; track type) {
@@ -248,7 +279,7 @@
     group.get('companyType')?.hasError('required')
   ) {
     <div class="form-control-feedback">
-      Company type is required.
+      {{ 'validation.companyTypeRequired' | translate }}
     </div>
   }
 
@@ -268,7 +299,7 @@
     for="industry"
     class=" form-control-label required"
   >
-    Industry
+    {{ 'portal.senderIdNew.companyRegistration.industry' | translate }}
   </label>
 
   <select
@@ -285,7 +316,7 @@
       value=""
       disabled
     >
-      Select industry
+      {{ 'portal.senderIdNew.companyRegistration.selectIndustry' | translate }}
     </option>
 
     @for (industry of industries; track industry) {
@@ -303,7 +334,7 @@
   ) {
 
     <div class="form-control-feedback">
-      Industry is required.
+      {{ 'validation.industryRequired' | translate }}
     </div>
 
   }
@@ -323,7 +354,7 @@
     for="dateOfIncorporation"
     class="form-control-label required"
   >
-    Date of Incorporation
+    {{ 'portal.senderIdNew.companyRegistration.dateOfIncorporation' | translate }}
   </label>
 
   <input
@@ -342,7 +373,7 @@
     group.get('dateOfIncorporation')?.hasError('required')
   ) {
     <div class="form-control-feedback">
-      Date of incorporation is required.
+      {{ 'validation.dateOfIncorporationRequired' | translate }}
     </div>
   }
 
@@ -355,7 +386,7 @@
     for="country"
     class="form-control-label required"
   >
-    Country
+    {{ 'portal.senderIdNew.companyRegistration.country' | translate }}
   </label>
 
   <input
@@ -380,7 +411,7 @@
     for="registeredAddress"
     class="form-control-label required"
   >
-    Registered Address
+    {{ 'portal.senderIdNew.companyRegistration.registeredAddress' | translate }}
   </label>
 
   <textarea
@@ -391,7 +422,10 @@
       group.get('registeredAddress')?.invalid
     "
     formControlName="registeredAddress"
-    placeholder="Enter complete registered address"
+     [placeholder]="
+  'portal.senderIdNew.companyRegistration.registeredAddressPlaceholder'
+    | translate
+"
     rows="3"
   ></textarea>
 
@@ -400,7 +434,7 @@
     group.get('registeredAddress')?.hasError('required')
   ) {
     <div class="form-control-feedback">
-      Registered address is required.
+      {{ 'validation.registeredAddressRequired' | translate }}
     </div>
   }
 </div>
@@ -418,7 +452,7 @@
     for="emirateState"
     class="form-control-label required"
   >
-    Emirate / State
+   {{ 'portal.senderIdNew.companyRegistration.emirateState' | translate }}
   </label>
 
   <select
@@ -432,7 +466,7 @@
   >
 
     <option value="" disabled>
-      Select emirate
+      {{ 'portal.senderIdNew.companyRegistration.selectEmirate' | translate }}
     </option>
 
     @for (emirate of emirates; track emirate) {
@@ -449,7 +483,7 @@
     group.get('emirateState')?.hasError('required')
   ) {
     <div class="form-control-feedback">
-      Emirate is required.
+      {{'validation.emirateRequired' | translate }}
     </div>
   }
 
@@ -468,7 +502,7 @@
     for="city"
     class="form-control-label required"
   >
-    City
+    {{ 'portal.senderIdNew.companyRegistration.city' | translate }}
   </label>
 
 
@@ -477,7 +511,10 @@
     type="text"
     class="form-control"
     formControlName="city"
-    placeholder="Enter city"
+     [placeholder]="
+  'portal.senderIdNew.companyRegistration.cityPlaceholder'
+    | translate
+"
     [class.form-control-danger]="
       group.get('city')?.touched &&
       group.get('city')?.invalid
@@ -490,7 +527,7 @@
     group.get('city')?.hasError('required')
   ) {
     <div class="form-control-feedback">
-      City is required.
+      {{ 'validation.cityRequired' | translate }}
     </div>
   }
 
@@ -509,7 +546,7 @@
     for="postalCode"
     class="form-control-label required"
   >
-    Postal Code
+    {{ 'portal.senderIdNew.companyRegistration.postalCode' | translate }}
   </label>
 
   <input
@@ -517,7 +554,10 @@
     type="text"
     class="form-control"
     formControlName="postalCode"
-    placeholder="Enter postal code"
+     [placeholder]="
+  'portal.senderIdNew.companyRegistration.postalCodePlaceholder'
+    | translate
+"
     [class.form-control-danger]="
       group.get('postalCode')?.touched &&
       group.get('postalCode')?.invalid
@@ -529,7 +569,7 @@
     group.get('postalCode')?.hasError('required')
   ) {
     <div class="form-control-feedback">
-      Postal code is required.
+      {{ 'validation.postalCodeRequired' | translate }}
     </div>
   }
 </div>
@@ -542,7 +582,7 @@
     for="website"
     class="form-control-label fw-bold"
   >
-    Website
+    {{ 'portal.senderIdNew.companyRegistration.website' | translate }}
   </label>
 
   <input
@@ -554,7 +594,7 @@
   />
 
   <small class="form-text text-muted">
-    Optional
+    {{ 'portal.senderIdNew.companyRegistration.optional' | translate }}
   </small>
 
 </div>
@@ -572,7 +612,7 @@
     for="companyEmail"
     class="form-control-label required"
   >
-    Company Email
+    {{ 'portal.senderIdNew.companyRegistration.companyEmail' | translate }}
   </label>
 
   <input
@@ -592,7 +632,7 @@
     group.get('companyEmail')?.hasError('required')
   ) {
     <div class="form-control-feedback">
-      Company email is required.
+      {{ 'validation.companyEmailRequired' | translate }}
     </div>
   }
 
@@ -601,7 +641,7 @@
     group.get('companyEmail')?.hasError('email')
   ) {
     <div class="form-control-feedback">
-      Enter a valid email address.
+      {{ 'validation.companyEmailInvalid' | translate }}
     </div>
   }
 </div>
@@ -619,7 +659,7 @@
     for="companyPhone"
     class="form-control-label required"
   >
-    Company Phone
+    {{ 'portal.senderIdNew.companyRegistration.companyPhone' | translate }}
   </label>
 
   <input
@@ -639,7 +679,7 @@
     group.get('companyPhone')?.hasError('required')
   ) {
     <div class="form-control-feedback">
-      Company phone is required.
+      {{ 'validation.companyPhoneRequired' | translate }}
     </div>
   }
 
@@ -648,7 +688,7 @@
     group.get('companyPhone')?.hasError('pattern')
   ) {
     <div class="form-control-feedback">
-      Enter a valid phone number.
+      {{ 'validation.companyPhoneInvalid' | translate }}
     </div>
   }
 </div>
@@ -666,7 +706,7 @@
     for="proposedSenderId"
     class="form-control-label required"
   >
-    Proposed Sender ID
+    {{ 'portal.senderIdNew.companyRegistration.proposedSenderId' | translate }}
   </label>
 
   <input
@@ -674,7 +714,10 @@
     type="text"
     class="form-control"
     formControlName="proposedSenderId"
-    placeholder="Enter proposed sender ID"
+     [placeholder]="
+  'portal.senderIdNew.companyRegistration.proposedSenderIdPlaceholder'
+    | translate
+"
     [class.form-control-danger]="
       group.get('proposedSenderId')?.touched &&
       group.get('proposedSenderId')?.invalid
@@ -686,7 +729,7 @@
     group.get('proposedSenderId')?.invalid
   ) {
     <div class="form-control-feedback">
-      Proposed sender ID is required.
+      {{ 'validation.proposedSenderIdRequired' | translate }}
     </div>
   }
 </div>

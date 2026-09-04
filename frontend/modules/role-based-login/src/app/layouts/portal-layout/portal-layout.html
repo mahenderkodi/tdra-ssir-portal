@@ -19,11 +19,11 @@
               <div class="d-flex align-items-center gap-2">
 
                 <div class="portal-brand-title">
-                  Sender Registry
+                  {{ 'portal.layout.senderRegistry' | translate }}
                 </div>
 
                 <div class="portal-brand-subtitle">
-                  Company Portal
+                  {{ 'portal.layout.companyPortal' | translate }}
                 </div>
 
               </div>
@@ -37,44 +37,47 @@
 
         <!-- RIGHT -->
         <div
-  class="
-    col-4
-    col-lg-8
-    h-100
-    d-flex
-    align-items-center
-    justify-content-end
-  "
->
+          class="
+            col-4
+            col-lg-8
+            h-100
+            d-flex
+            align-items-center
+            justify-content-end
+          "
+        >
 
-  <div
-    class="
-      d-none
-      d-lg-flex
-      align-items-center
-      justify-content-end
-    "
-  >
+          <div
+            class="
+              d-none
+              d-lg-flex
+              align-items-center
+              justify-content-end
+            "
+          >
 
-    <a
-      href="#"
-      class="login"
-      (click)="logout(); $event.preventDefault()"
-    >
-      Sign Out
-    </a>
+            <a
+              href="#"
+              class="login"
+              (click)="logout(); $event.preventDefault()"
+            >
+              {{ 'portal.layout.signOut' | translate }}
+            </a>
 
-  </div>
+          </div>
 
-  <a
-    href="#"
-    class="burger d-lg-none"
-    [class.active]="mobileMenuOpen"
-    (click)="toggleMobileMenu(); $event.preventDefault()"
-    aria-label="Open navigation menu"
-  ></a>
+          <a
+            href="#"
+            class="burger d-lg-none"
+            [class.active]="mobileMenuOpen"
+            (click)="toggleMobileMenu(); $event.preventDefault()"
+            [attr.aria-label]="
+              'portal.layout.openNavigationMenu'
+                | translate
+            "
+          ></a>
 
-</div>
+        </div>
 
       </div>
 
@@ -84,48 +87,48 @@
     <!-- MOBILE MENU -->
     @if (mobileMenuOpen) {
 
-  <div
-    class="mobile-menu d-block d-lg-none h-auto py-3"
-    style="min-height: 0;"
-  >
-
-    <nav
-      role="navigation"
-      aria-labelledby="portal-mobile-navigation"
-      class="w-100"
-    >
-
-      <h2
-        class="visually-hidden"
-        id="portal-mobile-navigation"
-      >
-        Mobile Navigation
-      </h2>
-
       <div
-        class="
-          d-flex
-          w-100
-          justify-content-center
-          align-items-center
-        "
+        class="mobile-menu d-block d-lg-none h-auto py-3"
+        style="min-height: 0;"
       >
 
-        <a
-          href="#"
-          class="login"
-          (click)="logout(); $event.preventDefault()"
+        <nav
+          role="navigation"
+          aria-labelledby="portal-mobile-navigation"
+          class="w-100"
         >
-          Sign Out
-        </a>
+
+          <h2
+            class="visually-hidden"
+            id="portal-mobile-navigation"
+          >
+            {{ 'portal.layout.mobileNavigation' | translate }}
+          </h2>
+
+          <div
+            class="
+              d-flex
+              w-100
+              justify-content-center
+              align-items-center
+            "
+          >
+
+            <a
+              href="#"
+              class="login"
+              (click)="logout(); $event.preventDefault()"
+            >
+              {{ 'portal.layout.signOut' | translate }}
+            </a>
+
+          </div>
+
+        </nav>
 
       </div>
 
-    </nav>
-
-  </div>
-
-}
+    }
 
   </header>
 

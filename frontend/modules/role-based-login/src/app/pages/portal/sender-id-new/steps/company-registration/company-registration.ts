@@ -38,6 +38,9 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 
+import {
+  TranslatePipe
+} from '@ngx-translate/core';
 
 @Component({
   /*
@@ -75,7 +78,8 @@ import {
   |
   */
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TranslatePipe
   ],
 
   /*

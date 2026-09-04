@@ -29,15 +29,19 @@ import {
   LoggerService
 } from '../../../layouts/logging/loggerService';
 
+import { TranslatePipe } from '@ngx-translate/core';
+
+
 @Component({
   selector: 'app-sender-id-details',
 
   standalone: true,
 
-  imports: [
-    CommonModule,
-    RouterLink
-  ],
+ imports: [
+  CommonModule,
+  RouterLink,
+  TranslatePipe
+],
 
   templateUrl:
     './sender-id-details.html',
@@ -115,7 +119,7 @@ export class SenderIdDetails
       this.loading.set(false);
 
       this.errorMessage.set(
-        'Invalid Sender ID.'
+         'errors.SENDER001'
       );
 
       return;
@@ -152,7 +156,7 @@ export class SenderIdDetails
 
         },
 
-        error: error => {
+        error: () => {
 
           this.logger.error(
             'Unable to load Sender ID details'
@@ -161,7 +165,7 @@ export class SenderIdDetails
           this.loading.set(false);
 
           this.errorMessage.set(
-            'Unable to load Sender ID details.'
+            'errors.SENDER002'
           );
         }
 
@@ -199,7 +203,7 @@ export class SenderIdDetails
           this.loading.set(false);
         },
 
-        error: error => {
+        error: () => {
 
           this.logger.error(
             'Unable to load Sender ID registration details'
@@ -212,7 +216,7 @@ export class SenderIdDetails
           this.loading.set(false);
 
           this.errorMessage.set(
-            'Sender ID loaded, but company registration details could not be retrieved.'
+             'errors.SENDER003'
           );
         }
 

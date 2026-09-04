@@ -4,11 +4,14 @@
   <div class="mb-4">
 
     <h2 class="corp-font">
-      Authorized Representative
+      {{ 'portal.senderIdNew.authorizedRepresentative.title' | translate }}
     </h2>
 
     <p class="corp-font-light mb-0">
-      Enter the details of the person authorized to represent the company.
+      {{
+        'portal.senderIdNew.authorizedRepresentative.description'
+          | translate
+      }}
     </p>
 
   </div>
@@ -19,7 +22,10 @@
     class="alert alert-info small mb-4"
     role="alert"
   >
-    All fields in this section are mandatory.
+    {{
+      'portal.senderIdNew.authorizedRepresentative.mandatoryInfo'
+        | translate
+    }}
   </div>
 
 
@@ -40,7 +46,10 @@
         for="FirstName"
         class="form-control-label required"
       >
-        First Name
+        {{
+          'portal.senderIdNew.authorizedRepresentative.firstName'
+            | translate
+        }}
       </label>
 
       <input
@@ -48,7 +57,10 @@
         type="text"
         class="form-control"
         formControlName="firstName"
-        placeholder="Enter first name"
+        [placeholder]="
+          'portal.senderIdNew.authorizedRepresentative.firstNamePlaceholder'
+            | translate
+        "
         [class.form-control-danger]="
           group.get('firstName')?.touched &&
           group.get('firstName')?.invalid
@@ -60,7 +72,7 @@
         group.get('firstName')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          First name is required.
+          {{ 'validation.firstNameRequired' | translate }}
         </div>
       }
 
@@ -80,7 +92,10 @@
         for="lastName"
         class="form-control-label required"
       >
-        Last Name
+        {{
+          'portal.senderIdNew.authorizedRepresentative.lastName'
+            | translate
+        }}
       </label>
 
       <input
@@ -88,7 +103,10 @@
         type="text"
         class="form-control"
         formControlName="lastName"
-        placeholder="Enter last name"
+        [placeholder]="
+          'portal.senderIdNew.authorizedRepresentative.lastNamePlaceholder'
+            | translate
+        "
         [class.form-control-danger]="
           group.get('lastName')?.touched &&
           group.get('lastName')?.invalid
@@ -100,7 +118,7 @@
         group.get('lastName')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          Last name is required.
+          {{ 'validation.lastNameRequired' | translate }}
         </div>
       }
 
@@ -120,7 +138,10 @@
         for="designation"
         class="form-control-label required"
       >
-        Designation
+        {{
+          'portal.senderIdNew.authorizedRepresentative.designation'
+            | translate
+        }}
       </label>
 
       <input
@@ -128,7 +149,10 @@
         type="text"
         class="form-control"
         formControlName="designation"
-        placeholder="Enter designation"
+        [placeholder]="
+          'portal.senderIdNew.authorizedRepresentative.designationPlaceholder'
+            | translate
+        "
         [class.form-control-danger]="
           group.get('designation')?.touched &&
           group.get('designation')?.invalid
@@ -140,7 +164,7 @@
         group.get('designation')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          Designation is required.
+          {{ 'validation.designationRequired' | translate }}
         </div>
       }
 
@@ -160,7 +184,10 @@
         for="department"
         class="form-control-label required"
       >
-        Department
+        {{
+          'portal.senderIdNew.authorizedRepresentative.department'
+            | translate
+        }}
       </label>
 
       <input
@@ -168,7 +195,10 @@
         type="text"
         class="form-control"
         formControlName="department"
-        placeholder="Enter department"
+        [placeholder]="
+          'portal.senderIdNew.authorizedRepresentative.departmentPlaceholder'
+            | translate
+        "
         [class.form-control-danger]="
           group.get('department')?.touched &&
           group.get('department')?.invalid
@@ -180,7 +210,7 @@
         group.get('department')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          Department is required.
+          {{ 'validation.departmentRequired' | translate }}
         </div>
       }
 
@@ -200,7 +230,10 @@
         for="officialEmail"
         class="form-control-label required"
       >
-        Official Email
+        {{
+          'portal.senderIdNew.authorizedRepresentative.officialEmail'
+            | translate
+        }}
       </label>
 
       <input
@@ -221,7 +254,7 @@
         group.get('officialEmail')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          Official email is required.
+          {{ 'validation.officialEmailRequired' | translate }}
         </div>
       }
 
@@ -230,7 +263,7 @@
         group.get('officialEmail')?.hasError('email')
       ) {
         <div class="form-control-feedback">
-          Enter a valid official email address.
+          {{ 'validation.officialEmailInvalid' | translate }}
         </div>
       }
 
@@ -250,7 +283,10 @@
         for="mobileNumber"
         class="form-control-label required"
       >
-        Mobile Number
+        {{
+          'portal.senderIdNew.authorizedRepresentative.mobileNumber'
+            | translate
+        }}
       </label>
 
       <input
@@ -271,7 +307,7 @@
         group.get('mobileNumber')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          Mobile number is required.
+          {{ 'validation.mobileNumberRequired' | translate }}
         </div>
       }
 
@@ -280,7 +316,7 @@
         group.get('mobileNumber')?.hasError('pattern')
       ) {
         <div class="form-control-feedback">
-          Enter a valid mobile number.
+          {{ 'validation.mobileNumberInvalid' | translate }}
         </div>
       }
 
@@ -300,7 +336,10 @@
         for="officeNumber"
         class="form-control-label required"
       >
-        Office Number
+        {{
+          'portal.senderIdNew.authorizedRepresentative.officeNumber'
+            | translate
+        }}
       </label>
 
       <input
@@ -320,7 +359,7 @@
         group.get('officeNumber')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          Office number is required.
+          {{ 'validation.officeNumberRequired' | translate }}
         </div>
       }
 
@@ -329,7 +368,7 @@
         group.get('officeNumber')?.hasError('pattern')
       ) {
         <div class="form-control-feedback">
-          Enter a valid office number.
+          {{ 'validation.officeNumberInvalid' | translate }}
         </div>
       }
 
@@ -349,7 +388,10 @@
         for="uaePassId"
         class="form-control-label required"
       >
-        UAE PASS ID
+        {{
+          'portal.senderIdNew.authorizedRepresentative.uaePassId'
+            | translate
+        }}
       </label>
 
       <input
@@ -357,7 +399,10 @@
         type="text"
         class="form-control"
         formControlName="uaePassId"
-        placeholder="Enter UAE PASS ID"
+        [placeholder]="
+          'portal.senderIdNew.authorizedRepresentative.uaePassIdPlaceholder'
+            | translate
+        "
         [class.form-control-danger]="
           group.get('uaePassId')?.touched &&
           group.get('uaePassId')?.invalid
@@ -369,7 +414,7 @@
         group.get('uaePassId')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          UAE PASS ID is required.
+          {{ 'validation.uaePassIdRequired' | translate }}
         </div>
       }
 
@@ -389,7 +434,10 @@
         for="passportOrEmiratesId"
         class="form-control-label required"
       >
-        Passport / Emirates ID
+        {{
+          'portal.senderIdNew.authorizedRepresentative.passportOrEmiratesId'
+            | translate
+        }}
       </label>
 
       <input
@@ -397,7 +445,10 @@
         type="text"
         class="form-control"
         formControlName="passportOrEmiratesId"
-        placeholder="Enter passport or Emirates ID"
+        [placeholder]="
+          'portal.senderIdNew.authorizedRepresentative.passportOrEmiratesIdPlaceholder'
+            | translate
+        "
         [class.form-control-danger]="
           group.get('passportOrEmiratesId')?.touched &&
           group.get('passportOrEmiratesId')?.invalid
@@ -409,7 +460,7 @@
         group.get('passportOrEmiratesId')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          Passport or Emirates ID is required.
+          {{ 'validation.passportOrEmiratesIdRequired' | translate }}
         </div>
       }
 
@@ -429,14 +480,20 @@
         for="address"
         class="form-control-label required"
       >
-        Address
+        {{
+          'portal.senderIdNew.authorizedRepresentative.address'
+            | translate
+        }}
       </label>
 
       <textarea
         id="address"
         class="form-control"
         formControlName="address"
-        placeholder="Enter the complete representative address"
+        [placeholder]="
+          'portal.senderIdNew.authorizedRepresentative.addressPlaceholder'
+            | translate
+        "
         rows="3"
         [class.form-control-danger]="
           group.get('address')?.touched &&
@@ -449,7 +506,7 @@
         group.get('address')?.hasError('required')
       ) {
         <div class="form-control-feedback">
-          Address is required.
+          {{ 'validation.representativeAddressRequired' | translate }}
         </div>
       }
 

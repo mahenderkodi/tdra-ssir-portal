@@ -5,12 +5,11 @@
     <!-- Page heading -->
     <div class="mb-3 mb-md-4">
       <h1 class="h3 fw-bold mb-1">
-        Corporate Dashboard
+         {{ 'portal.dashboard.title' | translate }}
       </h1>
 
       <p class="text-secondary mb-0">
-        View your company’s Sender ID activity
-        and account summary.
+        {{ 'portal.dashboard.description' | translate }}
       </p>
     </div>
 
@@ -30,7 +29,7 @@
           role="status"
         >
           <span class="visually-hidden">
-            Loading dashboard
+            {{ 'portal.dashboard.loading' | translate }}
           </span>
         </div>
       </div>
@@ -53,7 +52,7 @@
         role="alert"
       >
         <span>
-          {{ errorMessage() }}
+          {{ errorMessage() | translate }}
         </span>
 
         <button
@@ -67,7 +66,7 @@
   "
   (click)="retry()"
 >
-  Retry
+ {{ 'portal.dashboard.retry' | translate }}
 </button>
       </div>
     }
@@ -90,12 +89,11 @@
 
     <div>
       <h2 class="h5 fw-bold mb-1">
-        Sender ID Registrations
+       {{ 'portal.dashboard.registrationsTitle' | translate }}
       </h2>
 
       <p class="text-secondary mb-0">
-        View and manage your Sender ID
-        registration requests.
+        {{ 'portal.dashboard.registrationsDescription' | translate }}
       </p>
     </div>
 <button
@@ -111,7 +109,7 @@
     mode: 'additional'
   }"
 >
-  Create Sender ID
+ {{ 'portal.dashboard.createSenderId' | translate }}
 </button>
 
   </div>
@@ -142,23 +140,23 @@
 
             <tr>
               <th>
-                Sender ID
+                 {{ 'portal.dashboard.table.senderId' | translate }}
               </th>
 
               <th>
-                Tracking ID
+                {{ 'portal.dashboard.table.trackingId' | translate }}
               </th>
 
               <th>
-                Status
+                 {{ 'portal.dashboard.table.status' | translate }}
               </th>
 
               <th>
-                Submitted On
+                {{ 'portal.dashboard.table.submittedOn' | translate }}
               </th>
 
               <th>
-                Action
+                {{ 'portal.dashboard.table.action' | translate }}
               </th>
             </tr>
 
@@ -222,7 +220,7 @@
     registration.id
   ]"
 >
-  View
+ {{ 'portal.dashboard.view' | translate }}
 </button>
 
 </td>
@@ -251,7 +249,7 @@
       "
     >
 
-      No Sender ID registrations found.
+      {{ 'portal.dashboard.noRegistrations' | translate }}
 
     </div>
 

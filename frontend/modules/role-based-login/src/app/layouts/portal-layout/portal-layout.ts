@@ -1,9 +1,20 @@
-import { Component, inject } from '@angular/core';
-import { PortalDashboard } from "../../pages/portal/dashboard/dashboard";
-import { RouterModule } from '@angular/router';
- import {
+import {
+  Component,
+  inject
+} from '@angular/core';
+
+import {
+  RouterModule,
   Router
 } from '@angular/router';
+
+import {
+  TranslatePipe
+} from '@ngx-translate/core';
+
+import {
+  PortalDashboard
+} from '../../pages/portal/dashboard/dashboard';
 
 import {
   AuthService
@@ -11,29 +22,36 @@ import {
 
 @Component({
   selector: 'app-portal-layout',
-  imports: [PortalDashboard,RouterModule],
+
+  imports: [
+    PortalDashboard,
+    RouterModule,
+    TranslatePipe
+  ],
+
   templateUrl: './portal-layout.html',
   styleUrl: './portal-layout.css',
 })
 export class PortalLayout {
+
   private readonly authService =
     inject(AuthService);
 
   private readonly router =
     inject(Router);
 
+  mobileMenuOpen = false;
 
-    mobileMenuOpen = false;
 
+  toggleMobileMenu(): void {
 
-toggleMobileMenu(): void {
+    this.mobileMenuOpen =
+      !this.mobileMenuOpen;
+  }
 
-  this.mobileMenuOpen =
-    !this.mobileMenuOpen;
-
-}
 
   logout(): void {
+
     this.authService.logout();
 
     void this.router.navigate([

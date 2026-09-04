@@ -8,26 +8,24 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 
+import {
+  TranslatePipe
+} from '@ngx-translate/core';
+
 @Component({
   selector: 'app-account-setup',
   standalone: true,
+
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TranslatePipe
   ],
+
   templateUrl: './account-setup.html',
   styleUrl: './account-setup.css'
 })
 export class AccountSetup {
 
-  /*
-  |--------------------------------------------------------------------------
-  | Account FormGroup received from the parent
-  |--------------------------------------------------------------------------
-  |
-  | The parent registration component creates the account FormGroup
-  | and passes it to this component.
-  |
-  */
   @Input({ required: true })
   group!: FormGroup;
 
@@ -36,10 +34,25 @@ export class AccountSetup {
   |--------------------------------------------------------------------------
   | Preferred-language options
   |--------------------------------------------------------------------------
+  |
+  | value:
+  | Sent to the backend.
+  |
+  | labelKey:
+  | Localized only for display.
+  |
   */
   readonly languages = [
-    'English',
-    'Arabic'
+    {
+      value: 'English',
+      labelKey:
+        'portal.senderIdNew.accountSetup.options.language.english'
+    },
+    {
+      value: 'Arabic',
+      labelKey:
+        'portal.senderIdNew.accountSetup.options.language.arabic'
+    }
   ];
 
 
@@ -47,26 +60,22 @@ export class AccountSetup {
   |--------------------------------------------------------------------------
   | Time-zone options
   |--------------------------------------------------------------------------
-  |
-  | value:
-  | The value submitted to the backend.
-  |
-  | label:
-  | The user-friendly text displayed in the dropdown.
-  |
   */
   readonly timeZones = [
     {
       value: 'Asia/Dubai',
-      label: 'UAE — Asia/Dubai (UTC+04:00)'
+      labelKey:
+        'portal.senderIdNew.accountSetup.options.timeZone.uae'
     },
     {
       value: 'Asia/Kolkata',
-      label: 'India — Asia/Kolkata (UTC+05:30)'
+      labelKey:
+        'portal.senderIdNew.accountSetup.options.timeZone.india'
     },
     {
       value: 'Europe/London',
-      label: 'United Kingdom — Europe/London'
+      labelKey:
+        'portal.senderIdNew.accountSetup.options.timeZone.uk'
     }
   ];
 
@@ -77,9 +86,21 @@ export class AccountSetup {
   |--------------------------------------------------------------------------
   */
   readonly mfaPreferences = [
-    'Authenticator App',
-    'SMS',
-    'Email'
+    {
+      value: 'Authenticator App',
+      labelKey:
+        'portal.senderIdNew.accountSetup.options.mfa.authenticatorApp'
+    },
+    {
+      value: 'SMS',
+      labelKey:
+        'portal.senderIdNew.accountSetup.options.mfa.sms'
+    },
+    {
+      value: 'Email',
+      labelKey:
+        'portal.senderIdNew.accountSetup.options.mfa.email'
+    }
   ];
 
 
@@ -89,24 +110,24 @@ export class AccountSetup {
   |--------------------------------------------------------------------------
   */
   readonly notificationPreferences = [
-    'Email',
-    'SMS',
-    'Email and SMS'
+    {
+      value: 'Email',
+      labelKey:
+        'portal.senderIdNew.accountSetup.options.notification.email'
+    },
+    {
+      value: 'SMS',
+      labelKey:
+        'portal.senderIdNew.accountSetup.options.notification.sms'
+    },
+    {
+      value: 'Email and SMS',
+      labelKey:
+        'portal.senderIdNew.accountSetup.options.notification.emailAndSms'
+    }
   ];
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | Validation helper
-  |--------------------------------------------------------------------------
-  |
-  | Returns true when a control is both touched and invalid.
-  |
-  | This can be used in account-setup.html:
-  |
-  | [class.is-invalid]="isInvalid('Username')"
-  |
-  */
   isInvalid(
     controlName: string
   ): boolean {

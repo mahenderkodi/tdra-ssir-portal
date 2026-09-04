@@ -20,13 +20,59 @@
     <!-- Single, Consolidated Credentials Login Form [2] -->
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="mb-3">
-        <label class="form-label required">{{ 'auth.login.usernameOrEmail' | translate }}</label>
-        <input type="text" class="form-control" formControlName="usernameOrEmail" placeholder="admin_masdar">
-      </div>
-      <div class="mb-3">
-        <label class="form-label required"> {{ 'auth.login.password' | translate }}</label>
-        <input type="password" class="form-control" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
-      </div>
+  <label class="form-label required">
+    {{ 'auth.login.usernameOrEmail' | translate }}
+  </label>
+
+  <input
+    type="text"
+    class="form-control"
+    formControlName="usernameOrEmail"
+    placeholder="admin_masdar"
+  >
+
+  @if (
+    loginForm.get('usernameOrEmail')?.touched &&
+    loginForm.get('usernameOrEmail')?.hasError('required')
+  ) {
+    <div class="text-danger small mt-1">
+      {{ 'validation.usernameOrEmailRequired' | translate }}
+    </div>
+  }
+</div>
+
+
+<div class="mb-3">
+  <label class="form-label required">
+    {{ 'auth.login.password' | translate }}
+  </label>
+
+  <input
+    type="password"
+    class="form-control"
+    formControlName="password"
+    placeholder="••••••••"
+    autocomplete="current-password"
+  />
+
+  @if (
+    loginForm.get('password')?.touched &&
+    loginForm.get('password')?.hasError('required')
+  ) {
+    <div class="text-danger small mt-1">
+      {{ 'validation.passwordRequired' | translate }}
+    </div>
+  }
+
+  @if (
+    loginForm.get('password')?.touched &&
+    loginForm.get('password')?.hasError('minlength')
+  ) {
+    <div class="text-danger small mt-1">
+      {{ 'validation.passwordMinLength' | translate }}
+    </div>
+  }
+</div>
  
       <!-- Forgot Password Link [3] -->
       <div class="text-end mb-3">

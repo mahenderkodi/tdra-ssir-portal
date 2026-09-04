@@ -22,6 +22,10 @@ import {
   OnInit,
 } from '@angular/core';
 
+import {
+  TranslatePipe,
+  TranslateService
+} from '@ngx-translate/core';
 
 import {
   HotToastService
@@ -124,12 +128,13 @@ import {
   |
   */
   imports: [
-    CompanyRegistration,
-    LegalDocuments,
-    AuthorizedRepresentative,
-    AccountSetup,
-    ReactiveFormsModule
-  ],
+  CompanyRegistration,
+  LegalDocuments,
+  AuthorizedRepresentative,
+  AccountSetup,
+  ReactiveFormsModule,
+  TranslatePipe
+],
 
   templateUrl: './sender-id-new.html',
 styleUrl: './sender-id-new.css',
@@ -168,8 +173,10 @@ export class SenderIdNew implements OnInit{
   );
 
       this.toast.error(
-        'Missing Sender ID.'
-      );
+  this.translate.instant(
+    'errors.SIDNEW001'
+  )
+);
 
       void this.router.navigate(
         ['/portal/dashboard']
@@ -238,30 +245,32 @@ readonly editSenderId =
     this.route.snapshot.queryParamMap.get('id')
   );
 
+  private readonly translate =
+  inject(TranslateService);
+
 readonly steps = [
   {
     number: 1,
     title:
-      this.isAdditionalSenderId
-        ? 'Company & Sender ID'
-        : this.isEditMode
-          ? 'Company & Sender ID'
-          : 'Company Registration'
+      this.isAdditionalSenderId ||
+      this.isEditMode
+        ? 'portal.senderIdNew.steps.companyAndSenderId'
+        : 'portal.senderIdNew.steps.companyRegistration'
   },
 
   {
     number: 2,
-    title: 'Legal Documents'
+    title: 'portal.senderIdNew.steps.legalDocuments'
   },
 
   {
     number: 3,
-    title: 'Authorized Representative'
+    title: 'portal.senderIdNew.steps.authorizedRepresentative'
   },
 
   {
     number: 4,
-    title: 'Account Setup'
+    title: 'portal.senderIdNew.steps.accountSetup'
   }
 ];
 
@@ -904,8 +913,10 @@ readonly steps = [
   );
 
         this.toast.error(
-          'Unable to load existing company information.'
-        );
+  this.translate.instant(
+    'errors.SIDNEW002'
+  )
+);
 
       }
 
@@ -947,8 +958,10 @@ private loadSenderIdForEdit(
   );
 
         this.toast.error(
-          'Unable to load Sender ID details.'
-        );
+  this.translate.instant(
+    'errors.SIDNEW003'
+  )
+);
 
       }
 
@@ -1017,8 +1030,10 @@ private configureAdditionalSenderIdMode(): void {
     if (senderIdControl.invalid) {
 
       this.toast.error(
-        'Please enter a valid Sender ID.'
-      );
+  this.translate.instant(
+    'validation.senderIdRequired'
+  )
+);
 
       return;
     }
@@ -1027,9 +1042,11 @@ private configureAdditionalSenderIdMode(): void {
 
     if (companyGroup.invalid) {
 
-      this.toast.error(
-        'Please complete all required company details.'
-      );
+     this.toast.error(
+  this.translate.instant(
+    'validation.companyDetailsRequired'
+  )
+);
 
       return;
     }
@@ -1369,17 +1386,22 @@ request$.subscribe({
       this.logger.info(
       'Sender ID registration resubmitted successfully'
     );
+
       this.toast.success(
-        'Sender ID resubmitted successfully.'
-      );
+  this.translate.instant(
+    'portal.senderIdNew.resubmitSuccess'
+  )
+);
 
     } else {
       this.logger.info(
       'Sender ID registration submitted successfully'
     );
       this.toast.success(
-        'Registration submitted successfully.'
-      );
+  this.translate.instant(
+    'portal.senderIdNew.submitSuccess'
+  )
+);
     }
 
     void this.router.navigate(
@@ -1408,15 +1430,20 @@ request$.subscribe({
 
   this.isSubmitting.set(false);
 
-  this.errorMessage.set(
-    this.isEditMode
-      ? 'Sender ID could not be resubmitted. Please try again.'
-      : 'Registration could not be submitted. Please try again.'
-  );
+ const errorKey =
+  this.isEditMode
+    ? 'errors.SIDNEW004'
+    : 'errors.SIDNEW005';
 
-  this.toast.error(
-    this.errorMessage()
-  );
+this.errorMessage.set(
+  errorKey
+);
+
+this.toast.error(
+  this.translate.instant(
+    errorKey
+  )
+);
 }
 
 });

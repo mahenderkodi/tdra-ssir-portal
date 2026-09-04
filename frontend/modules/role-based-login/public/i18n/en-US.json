@@ -83,10 +83,414 @@
 
     "view": "View",
     "noRegistrations": "No Sender ID registrations found."
-  }
+  },
+  "trackStatus": {
+  "title": "Application Status",
+  "description": "Track your company onboarding application.",
+  "loading": "Loading",
+  "trackingId": "Tracking ID",
+  "companyName": "Company Name",
+  "submittedAt": "Submitted At",
+  "submitted": "Submitted",
+  "underReview": "Under Review",
+  "finalDecision": "Final Decision",
+  "currentStatusPrefix": "Your application is currently"
+},
+"senderIdDetails": {
+  "loading": "Loading Sender ID details...",
+  "backToDashboard": "Back to Dashboard",
+  "trackingId": "Tracking ID",
+  "currentStatus": "Current Status",
+
+  "tdraApprovalComment": "TDRA Approval Comment",
+  "tdraRejectionComment": "TDRA Rejection Comment",
+  "tdraInformationRequest": "TDRA Information Request",
+  "tdraReviewComment": "TDRA Review Comment",
+  "additionalInfoRequested": "TDRA has requested additional information.",
+  "editAndResubmit": "Edit & Resubmit",
+
+  "companyInformation": "Company Information",
+  "companyName": "Company Name",
+  "legalEntityName": "Legal Entity Name",
+  "senderId": "Sender ID",
+  "tradeLicenseNumber": "Trade License Number",
+  "registrationNumber": "Registration Number",
+  "companyEmail": "Company Email",
+
+  "registeredOffice": "Registered Office",
+  "address": "Address",
+  "city": "City",
+  "emirate": "Emirate",
+  "country": "Country",
+
+  "authorizedRepresentative": "Authorized Representative",
+  "name": "Name",
+  "designation": "Designation",
+  "officialEmail": "Official Email",
+  "mobile": "Mobile",
+
+  "submittedDocuments": "Submitted Documents",
+  "document": "Document",
+  "opened": "Opened",
+  "view": "View",
+
+  "documentPreview": "Document Preview",
+  "selectDocument": "Select a document",
+  "openInNewTab": "Open in New Tab",
+  "previewUnavailable": "Preview unavailable",
+  "openFileInstruction": "Open this file in a new tab to view it.",
+  "selectDocumentInstruction": "Select one of your submitted documents to preview it."
 },
 
+"senderIdNew": {
+  "registryName": "TDRA Sender Registry",
+
+  "editTitle": "Edit & Resubmit Sender ID",
+  "additionalTitle": "Create New Sender ID",
+  "registrationTitle": "Company Registration",
+
+  "editDescription": "Review the TDRA feedback, update the requested information and resubmit your Sender ID application.",
+  "additionalDescription": "Review your existing company information and enter the new Sender ID.",
+  "registrationDescription": "Complete all four sections before submitting your registration request.",
+
+  "registrationProgress": "Registration progress",
+  "stepOf": "Step {{current}} of {{total}}",
+
+  "steps": {
+    "companyAndSenderId": "Company & Sender ID",
+    "companyRegistration": "Company Registration",
+    "legalDocuments": "Legal Documents",
+    "authorizedRepresentative": "Authorized Representative",
+    "accountSetup": "Account Setup"
+  },
+
+  "previous": "Previous",
+  "next": "Next",
+  "submitting": "Submitting...",
+  "resubmitApplication": "Resubmit Application",
+  "createSenderId": "Create Sender ID",
+  "submitRegistration": "Submit Registration",
+  "fillTestData": "Fill Test Data",
+
+  "resubmitSuccess": "Sender ID resubmitted successfully.",
+  "submitSuccess": "Registration submitted successfully.",
+  "companyRegistration": {
+  "title": "Company Registration",
+  "description": "Enter the organization’s legal and registration information.",
+
+  "companyName": "Company Name",
+  "companyNamePlaceholder": "Enter company name",
+
+  "legalEntityName": "Legal Entity Name",
+  "legalEntityNamePlaceholder": "Enter legal entity name",
+
+  "tradeLicenseNumber": "Trade License Number",
+  "tradeLicensePlaceholder": "Enter trade license number",
+
+  "registrationNumber": "Registration Number",
+  "registrationNumberPlaceholder": "Enter registration number",
+
+  "taxId": "Tax ID / VAT Number",
+  "taxIdPlaceholder": "Enter Tax ID or VAT number",
+
+  "companyType": "Company Type",
+  "selectCompanyType": "Select company type",
+
+  "industry": "Industry",
+  "selectIndustry": "Select industry",
+
+  "dateOfIncorporation": "Date of Incorporation",
+
+  "country": "Country",
+
+  "registeredAddress": "Registered Address",
+  "registeredAddressPlaceholder": "Enter complete registered address",
+
+  "emirateState": "Emirate / State",
+  "selectEmirate": "Select emirate",
+
+  "city": "City",
+  "cityPlaceholder": "Enter city",
+
+  "postalCode": "Postal Code",
+  "postalCodePlaceholder": "Enter postal code",
+
+  "website": "Website",
+  "optional": "Optional",
+
+  "companyEmail": "Company Email",
+
+  "companyPhone": "Company Phone",
+
+  "proposedSenderId": "Proposed Sender ID",
+  "proposedSenderIdPlaceholder": "Enter proposed sender ID"
+},
+"legalDocuments": {
+  "title": "Legal Documents",
+  "description": "Upload and manage the required company documents.",
+  "supportedFormats": "Supported formats: PDF, PNG, JPG and JPEG.",
+
+  "existingDocumentsInfo": "Your existing company documents are already available. You do not need to upload them again.",
+  "reuploadInstruction": "Please re-upload a document only if it has changed or needs to be replaced.",
+  "mandatoryInfoPrefix": "Documents marked with",
+  "mandatoryInfoSuffix": "are mandatory.",
+
+  "existingDocuments": "Existing Documents",
+  "view": "View",
+
+  "tradeLicense": "Trade License",
+  "certificateOfIncorporation": "Certificate of Incorporation",
+  "taxRegistrationCertificate": "Tax Registration Certificate",
+  "authorizedSignatoryLetter": "Authorized Signatory Letter",
+  "signatoryIdentityDocument": "Emirates ID / Passport of Signatory",
+  "businessRegistrationCertificate": "Business Registration Certificate",
+
+  "companyLogo": "Company Logo",
+  "additionalSupportingDocuments": "Additional Supporting Documents",
+
+  "replaceIfRequired": "(Replace if required)",
+  "optional": "(Optional)",
+  "selected": "Selected",
+
+  "supportingDocumentsSelected": "{{count}} supporting document(s) selected."
+},
+"authorizedRepresentative": {
+  "title": "Authorized Representative",
+  "description": "Enter the details of the person authorized to represent the company.",
+  "mandatoryInfo": "All fields in this section are mandatory.",
+
+  "firstName": "First Name",
+  "firstNamePlaceholder": "Enter first name",
+
+  "lastName": "Last Name",
+  "lastNamePlaceholder": "Enter last name",
+
+  "designation": "Designation",
+  "designationPlaceholder": "Enter designation",
+
+  "department": "Department",
+  "departmentPlaceholder": "Enter department",
+
+  "officialEmail": "Official Email",
+
+  "mobileNumber": "Mobile Number",
+  "officeNumber": "Office Number",
+
+  "uaePassId": "UAE PASS ID",
+  "uaePassIdPlaceholder": "Enter UAE PASS ID",
+
+  "passportOrEmiratesId": "Passport / Emirates ID",
+  "passportOrEmiratesIdPlaceholder": "Enter passport or Emirates ID",
+
+  "address": "Address",
+  "addressPlaceholder": "Enter the complete representative address"
+},
+"accountSetup": {
+  "title": "Account Setup",
+  "description": "Configure the account and communication preferences.",
+  "passwordInfo": "Password creation will be enabled only after the registration is reviewed and approved by TDRA.",
+
+  "username": "Username",
+  "usernamePlaceholder": "Enter username",
+  "usernameHint": "Use 4–30 letters, numbers, dots, underscores or hyphens.",
+
+  "preferredLanguage": "Preferred Language",
+  "selectPreferredLanguage": "Select preferred language",
+
+  "timeZone": "Time Zone",
+  "selectTimeZone": "Select time zone",
+
+  "mfaPreference": "MFA Preference",
+  "selectMfaPreference": "Select MFA preference",
+  "mfaInfo": "MFA will be configured after TDRA approval.",
+
+  "notificationPreference": "Notification Preference",
+  "selectNotificationPreference": "Select notification preference",
+
+  "options": {
+    "language": {
+      "english": "English",
+      "arabic": "Arabic"
+    },
+    "timeZone": {
+      "uae": "UAE — Asia/Dubai (UTC+04:00)",
+      "india": "India — Asia/Kolkata (UTC+05:30)",
+      "uk": "United Kingdom — Europe/London"
+    },
+    "mfa": {
+      "authenticatorApp": "Authenticator App",
+      "sms": "SMS",
+      "email": "Email"
+    },
+    "notification": {
+      "email": "Email",
+      "sms": "SMS",
+      "emailAndSms": "Email and SMS"
+    }
+  }
+}
+},
+"layout": {
+  "senderRegistry": "Sender Registry",
+  "companyPortal": "Company Portal",
+  "signOut": "Sign Out",
+  "openNavigationMenu": "Open navigation menu",
+  "mobileNavigation": "Mobile Navigation"
+}
+
+
+},
+
+"admin": {
+  "dashboard": {
+    "registryName": "TDRA Sender Registry",
+    "title": "TDRA Admin Control Board",
+    "description": "Overview of SMS Sender ID Registry Onboarding Operations",
+    "loading": "Loading...",
+
+    "pendingReviews": "Pending Reviews",
+    "pendingDescription": "Applications awaiting audit",
+
+    "approvedEntities": "Approved Entities",
+    "approvedDescription": "Active corporate registries",
+
+    "rejectedClients": "Rejected Clients",
+    "rejectedDescription": "Applications found non-compliant",
+
+    "totalSubmissions": "Total Submissions",
+    "totalDescription": "Total requests processed"
+  
+  
+ 
+
+},
+   "registrationDetail": {
+  "loading": "Loading registration details...",
+  "backToQueue": "Back to Onboarding Queue",
+  "title": "Registration Review",
+
+  "companyInformation": "Company Information",
+  "companyName": "Company Name",
+  "legalEntityName": "Legal Entity Name",
+  "tradeLicenseNumber": "Trade License Number",
+  "registrationNumber": "Registration Number",
+  "vatTaxNumber": "VAT / Tax Number",
+  "companyType": "Company Type",
+  "industry": "Industry",
+  "dateOfIncorporation": "Date of Incorporation",
+  "companyEmail": "Company Email",
+  "companyPhone": "Company Phone",
+  "website": "Website",
+
+  "senderIdInformation": "Sender ID Information",
+  "proposedSenderId": "Proposed Sender ID",
+  "senderIdStatus": "Sender ID Status",
+  "submittedOn": "Submitted On",
+
+  "registeredOffice": "Registered Office",
+  "address": "Address",
+  "city": "City",
+  "emirateState": "Emirate / State",
+  "country": "Country",
+  "postalCode": "Postal Code",
+
+  "authorizedRepresentative": "Authorized Representative",
+  "name": "Name",
+  "designation": "Designation",
+  "department": "Department",
+  "officialEmail": "Official Email",
+  "mobile": "Mobile",
+  "officeNumber": "Office Number",
+  "uaePassId": "UAE Pass ID",
+  "emiratesIdPassport": "Emirates ID / Passport",
+
+  "submittedDocuments": "Submitted Documents",
+  "document": "Document",
+  "file": "FILE",
+  "opened": "Opened",
+  "view": "View",
+  "noDocuments": "No documents were submitted.",
+
+  "documentPreview": "Document Preview",
+  "selectDocument": "Select a document",
+  "openInNewTab": "Open in New Tab",
+  "previewUnavailable": "Preview unavailable",
+  "openDocumentInstruction": "Open this document in a new tab to view it.",
+  "openDocument": "Open Document",
+  "noDocumentSelected": "No document selected",
+  "selectDocumentInstruction": "Select a submitted document to preview it.",
+
+  "existingTdraRemark": "Existing TDRA Remark",
+
+  "reviewDecision": "TDRA Review Decision",
+  "reviewComments": "Review Comments",
+  "reviewCommentsPlaceholder": "Enter comments for the applicant...",
+  "reviewCommentsHint": "Required when rejecting an application or requesting additional information.",
+
+  "reject": "Reject",
+  "requestInformation": "Request Information",
+  "approve": "Approve",
+
+  "approvedSuccess": "Registration approved successfully.",
+  "rejectedSuccess": "Registration rejected successfully.",
+  "infoRequestSuccess": "Information request sent successfully."
+},
+"registrations": {
+  "pendingReviews": "Pending Reviews",
+  "pendingDescription": "Applications awaiting audit",
+
+  "approvedEntities": "Approved Entities",
+  "approvedDescription": "Active registries on platform",
+
+  "rejectedClients": "Rejected Clients",
+  "rejectedDescription": "Applications rejected",
+
+  "totalSubmissions": "Total Submissions",
+  "totalDescription": "Onboarding requests processed",
+
+  "title": "Onboarding Registrations Queue",
+  "description": "Review applicant profiles, inspect documents, and manage approvals.",
+  "loading": "Loading...",
+
+  "table": {
+    "companyDetails": "Company Details",
+    "proposedSenderId": "Proposed Sender ID",
+    "authorizedRepresentative": "Authorized Representative",
+    "documents": "Documents",
+    "status": "Status",
+    "actions": "Actions"
+  },
+
+  "notAvailable": "N/A",
+  "filesAttached": "{{count}} Files Attached",
+  "inspect": "Inspect",
+  "emptyState": "No onboarding applications found in the queue.",
+
+  "approvalSuccess": "Application {{trackingId}} successfully approved!"
+},
+"layout": {
+  "productName": "TDRA SSIR",
+  "admin": "Admin",
+  "mainNavigation": "Main navigation",
+  "dashboard": "Dashboard",
+  "onboardingQueue": "Onboarding Queue",
+  "manageStaff": "Manage Staff",
+  "logOut": "Log Out",
+  "toggleNavigationMenu": "Toggle navigation menu",
+  "mobileNavigation": "Mobile Navigation"
+},
+"users": {
+  "title": "Internal Staff User Directory",
+  "descriptionPrefix": "Role assignment and staff directory management services are loaded under the",
+  "descriptionSuffix": "authorization context."
+}
+
+},
+
+
+
     "validation": {
+    "usernameOrEmailRequired": "Username or email is required.",
     "emailRequired": "Email is required.",
     "invalidEmail": "Please enter a valid email address.",
 
@@ -101,7 +505,58 @@
     "passwordReverseOfUserId": "Password cannot be the reverse of your User ID.",
     "passwordCircularShiftOfUserId": "Password cannot be a circular shift of your User ID.",
      "passwordMismatch": "Passwords do not match.",
-     "confirmPasswordRequired": "Please confirm your password."
+     "confirmPasswordRequired": "Please confirm your password.",
+     "senderIdRequired": "Please enter a valid Sender ID.",
+"companyDetailsRequired": "Please complete all required company details.",
+"companyNameRequired": "Company name is required.",
+"legalEntityNameRequired": "Legal entity name is required.",
+"tradeLicenseRequired": "Trade license number is required.",
+"registrationNumberRequired": "Registration number is required.",
+"taxIdRequired": "Tax ID or VAT number is required.",
+"companyTypeRequired": "Company type is required.",
+"industryRequired": "Industry is required.",
+"dateOfIncorporationRequired": "Date of incorporation is required.",
+"registeredAddressRequired": "Registered address is required.",
+"emirateRequired": "Emirate is required.",
+"cityRequired": "City is required.",
+"postalCodeRequired": "Postal code is required.",
+"companyEmailRequired": "Company email is required.",
+"companyEmailInvalid": "Enter a valid email address.",
+"companyPhoneRequired": "Company phone is required.",
+"companyPhoneInvalid": "Enter a valid phone number.",
+"proposedSenderIdRequired": "Proposed sender ID is required.",
+"tradeLicenseDocumentRequired": "Trade License is required.",
+"certificateOfIncorporationRequired": "Certificate of Incorporation is required.",
+"taxRegistrationCertificateRequired": "Tax Registration Certificate is required.",
+"authorizedSignatoryLetterRequired": "Authorized Signatory Letter is required.",
+"signatoryIdentityDocumentRequired": "Emirates ID or Passport of Signatory is required.",
+"businessRegistrationCertificateRequired": "Business Registration Certificate is required.",
+"firstNameRequired": "First name is required.",
+"lastNameRequired": "Last name is required.",
+"designationRequired": "Designation is required.",
+"departmentRequired": "Department is required.",
+
+"officialEmailRequired": "Official email is required.",
+"officialEmailInvalid": "Enter a valid official email address.",
+
+"mobileNumberRequired": "Mobile number is required.",
+"mobileNumberInvalid": "Enter a valid mobile number.",
+
+"officeNumberRequired": "Office number is required.",
+"officeNumberInvalid": "Enter a valid office number.",
+
+"uaePassIdRequired": "UAE PASS ID is required.",
+"passportOrEmiratesIdRequired": "Passport or Emirates ID is required.",
+"representativeAddressRequired": "Address is required.",
+"rejectionReasonRequired": "Please enter the reason for rejection.",
+"additionalInformationRequired": "Please enter what additional information is required.",
+"usernameMinLength": "Username must contain at least 4 characters.",
+"usernameMaxLength": "Username cannot exceed 30 characters.",
+"usernamePattern": "Username can contain only letters, numbers, dots, underscores and hyphens.",
+"preferredLanguageRequired": "Preferred language is required.",
+"timeZoneRequired": "Time zone is required.",
+"mfaPreferenceRequired": "MFA preference is required.",
+"notificationPreferenceRequired": "Notification preference is required."
   },
   
 
@@ -118,6 +573,20 @@
 "CREATEPWD002": "You are not authorized to set a permanent password.",
 "CREATEPWD003": "Password update failed.",
 "DASH001": "Unable to load Sender ID registrations.",
-"DASH002": "Unable to load dashboard information."
+"DASH002": "Unable to load dashboard information.",
+"STATUS001": "Unable to load application status.",
+"SENDER001": "Invalid Sender ID.",
+"SENDER002": "Unable to load Sender ID details.",
+"SENDER003": "Sender ID loaded, but company registration details could not be retrieved.",
+"SIDNEW001": "Missing Sender ID.",
+"SIDNEW002": "Unable to load existing company information.",
+"SIDNEW003": "Unable to load Sender ID details.",
+"SIDNEW004": "Sender ID could not be resubmitted. Please try again.",
+"SIDNEW005": "Registration could not be submitted. Please try again.",
+"ADMINREG001": "Failed to synchronize registrations queue.",
+"ADMINREG002": "Failed to approve application.",
+"ADMINDETAIL001": "Missing registration identifier.",
+"ADMINDETAIL002": "Failed to process request.",
+"ADMINDETAIL003": "Failed to load application details."
   }
 }

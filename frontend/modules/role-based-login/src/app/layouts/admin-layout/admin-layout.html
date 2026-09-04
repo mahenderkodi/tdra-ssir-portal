@@ -30,11 +30,11 @@
               <div class="d-flex align-items-center gap-2">
 
                 <span class="fw-bold text-white">
-                  TDRA SSIR
+                  {{ 'admin.layout.productName' | translate }}
                 </span>
 
                 <span class="small text-secondary">
-                  Admin
+                  {{ 'admin.layout.admin' | translate }}
                 </span>
 
               </div>
@@ -68,7 +68,7 @@
               class="visually-hidden"
               id="block-icon-main-menu-menu"
             >
-              Main navigation
+              {{ 'admin.layout.mainNavigation' | translate }}
             </h2>
 
 
@@ -83,7 +83,7 @@
                     exact: true
                   }"
                 >
-                  Dashboard
+                  {{ 'admin.layout.dashboard' | translate }}
                 </a>
 
               </li>
@@ -95,7 +95,7 @@
                   routerLink="/admin/registrations"
                   routerLinkActive="is-active"
                 >
-                  Onboarding Queue
+                  {{ 'admin.layout.onboardingQueue' | translate }}
                 </a>
 
               </li>
@@ -107,7 +107,7 @@
                   routerLink="/admin/users"
                   routerLinkActive="is-active"
                 >
-                  Manage Staff
+                  {{ 'admin.layout.manageStaff' | translate }}
                 </a>
 
               </li>
@@ -135,7 +135,7 @@
                 $event.preventDefault()
               "
             >
-              Log Out
+              {{ 'admin.layout.logOut' | translate }}
             </a>
 
           </div>
@@ -149,7 +149,6 @@
 
     <!-- =====================================
          MOBILE BURGER
-         Keep outside container like guide
          ===================================== -->
     <a
       href="#"
@@ -159,7 +158,10 @@
         toggleSidebar();
         $event.preventDefault()
       "
-      aria-label="Toggle navigation menu"
+      [attr.aria-label]="
+        'admin.layout.toggleNavigationMenu'
+          | translate
+      "
     ></a>
 
 
@@ -186,7 +188,7 @@
             class="visually-hidden"
             id="block-mobilenavigation-menu"
           >
-            Mobile Navigation
+            {{ 'admin.layout.mobileNavigation' | translate }}
           </h2>
 
 
@@ -202,7 +204,7 @@
                 }"
                 (click)="closeSidebar()"
               >
-                Dashboard
+                {{ 'admin.layout.dashboard' | translate }}
               </a>
 
             </li>
@@ -215,7 +217,7 @@
                 routerLinkActive="is-active"
                 (click)="closeSidebar()"
               >
-                Onboarding Queue
+                {{ 'admin.layout.onboardingQueue' | translate }}
               </a>
 
             </li>
@@ -228,7 +230,7 @@
                 routerLinkActive="is-active"
                 (click)="closeSidebar()"
               >
-                Manage Staff
+                {{ 'admin.layout.manageStaff' | translate }}
               </a>
 
             </li>
@@ -256,7 +258,7 @@
               $event.preventDefault()
             "
           >
-            Log Out
+            {{ 'admin.layout.logOut' | translate }}
           </a>
 
         </div>

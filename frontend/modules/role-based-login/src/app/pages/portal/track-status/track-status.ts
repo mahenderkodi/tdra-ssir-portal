@@ -21,14 +21,17 @@ import {
   LoggerService
 } from '../../../layouts/logging/loggerService';
 
+
+import { TranslatePipe } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-track-status',
   standalone: true,
 
   imports: [
-    DatePipe
-  ],
-
+  DatePipe,
+  TranslatePipe
+],
   templateUrl: './track-status.html',
   styleUrl: './track-status.css'
 })
@@ -73,18 +76,18 @@ export class TrackStatus
         this.loading.set(false);
       },
 
-      error: error => {
-        
-        this.logger.error(
+      error: () => {
+
+  this.logger.error(
     'Unable to load application status'
   );
-        this.loading.set(false);
 
-        this.errorMessage.set(
-          error.error?.message ??
-          'Unable to load application status.'
-        );
-      }
+  this.loading.set(false);
+
+  this.errorMessage.set(
+    'errors.STATUS001'
+  );
+}
     });
 }
 
