@@ -15,7 +15,7 @@ public class AdminRegistrationResponseDto {
     private String trackingId;
     private String companyName;
     private String companyType;
-    private String proposedSenderId; // Dynamically resolved matching trackingId [3]
+    private String proposedSenderId; 
     private String representativeName;
     private String representativeEmail;
     private String currentStatus;
