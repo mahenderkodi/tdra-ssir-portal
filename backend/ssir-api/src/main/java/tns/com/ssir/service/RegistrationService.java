@@ -33,6 +33,12 @@ public interface RegistrationService {
 
     void resetPassword(ResetPasswordRequest request);
     
-    // NEW: Handle UAE PASS authentication and auto-signup [6, 7]
+    // NEW: Handle UAE PASS authentication and auto-signup, including auto-linking by email match [6, 7]
     AuthResponse authenticateWithUaePass(String code);
+
+    // NEW: Manually link an authenticated user's account to their UAE PASS identity
+    void linkUaePassAccount(String code, Long userId);
+
+    // NEW: Remove the UAE PASS identity association from an authenticated user's account
+    void unlinkUaePassAccount(Long userId);
 }

@@ -73,10 +73,16 @@ public class SecurityConfig {
 				// 1. Always allow preflight OPTIONS handshakes globally
 				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
+				// Manual UAE PASS linking/unlinking requires an existing authenticated session
+				.requestMatchers(HttpMethod.POST, "/api/v1/auth/uae-pass/link").authenticated()
+				.requestMatchers(HttpMethod.DELETE, "/api/v1/auth/uae-pass/unlink").authenticated()
+
 				// 2. Consolidated Public Whitelist [1, 3]
 				.requestMatchers("/api/v1/auth/**").permitAll() // Login, OAuth, refresh tokens, register-init
 				.requestMatchers(HttpMethod.POST, "/api/v1/registrations/track").permitAll() // Public track submission
 				.requestMatchers("/error").permitAll()
+				
+				.requestMatchers("/ws", "/ws/**").permitAll() 
 				
 				// --- ADDED SWAGGER UI WHITELISTS [1] ---
 				.requestMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll()
@@ -122,6 +128,8 @@ public class SecurityConfig {
 				// --- ADDED: Secure Sender ID endpoints ---
 				.requestMatchers("/api/v1/sender-ids", "/api/v1/sender-ids/**")
 				.hasAnyRole("COMPANY_ADMIN", "COMPANY_USER", "COMPANY_VIEWER", "TDRA_SUPER_ADMIN", "TDRA_APPROVER")
+				
+				
 
 				.anyRequest().authenticated());
 

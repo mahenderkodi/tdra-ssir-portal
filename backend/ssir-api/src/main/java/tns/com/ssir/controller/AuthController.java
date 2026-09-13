@@ -179,9 +179,27 @@ public class AuthController {
     
     // I. SECURE UAE PASS AUTHENTICATION HUB
     @PostMapping("/uae-pass/login")
-    @Operation(summary = "UAE PASS Authentication Hub", description = "Exchanges a staging UAE PASS code for a local secure JWT session.")
+    @Operation(summary = "UAE PASS Authentication Hub", description = "Exchanges a staging UAE PASS code for a local secure JWT session. Automatically links to an existing account sharing the same email, or creates a new one.")
     public ResponseEntity<AuthResponse> loginWithUaePass(@Valid @RequestBody UaePassLoginRequest loginRequest) {
         AuthResponse authResponse = registrationService.authenticateWithUaePass(loginRequest.getCode());
         return ResponseEntity.ok(authResponse);
+    }
+
+    // II. MANUAL UAE PASS ACCOUNT LINKING (for users already logged in via username/password)
+    @PostMapping("/uae-pass/link")
+    @Operation(summary = "Manually Link UAE PASS Account", description = "Associates the currently authenticated user's account with their UAE PASS identity using a freshly issued authorization code.")
+    public ResponseEntity<?> linkUaePassAccount(
+            @Valid @RequestBody UaePassLoginRequest linkRequest,
+            @AuthenticationPrincipal UserPrincipal principal) {
+
+        registrationService.linkUaePassAccount(linkRequest.getCode(), principal.getId());
+        return ResponseEntity.ok("{\"message\": \"Your account has been successfully linked to UAE PASS.\"}");
+    }
+
+    @DeleteMapping("/uae-pass/unlink")
+    @Operation(summary = "Unlink UAE PASS Account", description = "Removes the UAE PASS identity association from the currently authenticated user's account.")
+    public ResponseEntity<?> unlinkUaePassAccount(@AuthenticationPrincipal UserPrincipal principal) {
+        registrationService.unlinkUaePassAccount(principal.getId());
+        return ResponseEntity.ok("{\"message\": \"Your UAE PASS account has been unlinked.\"}");
     }
 }

@@ -555,13 +555,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         return camelCase.replaceAll("(?<!_)(?=[A-Z])", "_");
     }
     
-    @Override
-    @Transactional
-    public AuthResponse authenticateWithUaePass(String code) {
-        log.info("Initiating UAE PASS staging authentication handshake for code...");
-
+    // Shared handshake: exchanges an authorization code for a UAE PASS access token,
+    // then resolves the caller's profile with it. Reused by login (auto-link/auto-signup) and manual linking.
+    private UaePassUserInfo fetchUaePassUserInfo(String code) {
         RestTemplate restTemplate = new RestTemplate();
-        
+
         // Step A: Exchange the Authorization Code for a UAE PASS Access Token [10]
         // FIX: Update redirect_uri to point to port 4201 to resolve 'Callback url mismatch' [10]
         String tokenUrl = "https://stg-id.uaepass.ae/idshub/token"
@@ -609,17 +607,37 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Empty user profile returned by UAE PASS.");
         }
 
+        return userInfo;
+    }
+
+    @Override
+    @Transactional
+    public AuthResponse authenticateWithUaePass(String code) {
+        log.info("Initiating UAE PASS staging authentication handshake for code...");
+
+        UaePassUserInfo userInfo = fetchUaePassUserInfo(code);
+
         String uaeUuid = userInfo.getUuid();
         String email = userInfo.getEmail() != null ? userInfo.getEmail().trim() : "";
         String fullName = userInfo.getFullnameEN() != null ? userInfo.getFullnameEN().trim() : "UAE Pass User";
 
         // Step C: Check if a user with this UUID already exists in the database
         java.util.Optional<User> userOpt = userRepository.findByUaePassUuid(uaeUuid);
+        java.util.Optional<User> emailMatch = !email.isEmpty()
+                ? userRepository.findByEmail(email)
+                : java.util.Optional.empty();
         User user;
 
         if (userOpt.isPresent()) {
             user = userOpt.get();
             log.info("Existing UAE PASS user mapped: {}", user.getUsername());
+        } else if (emailMatch.isPresent() && emailMatch.get().getUaePassUuid() == null) {
+            // AUTO-LINKING: an existing local account shares this email and has no UAE PASS
+            // identity yet, so we associate this UAE PASS UUID with it instead of creating a duplicate account.
+            user = emailMatch.get();
+            user.setUaePassUuid(uaeUuid);
+            user = userRepository.save(user);
+            log.info("Auto-linked UAE PASS identity to existing account by email match: {}", user.getUsername());
         } else {
             log.info("New UAE PASS user detected. Executing on-the-fly registration...");
 
@@ -675,5 +693,39 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .companyId(user.getCompany() != null ? user.getCompany().getId() : null)
                 .firstTimeLogin(false)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void linkUaePassAccount(String code, Long userId) {
+        log.info("Initiating manual UAE PASS linking for authenticated user id: {}", userId);
+
+        UaePassUserInfo userInfo = fetchUaePassUserInfo(code);
+        String uaeUuid = userInfo.getUuid();
+
+        userRepository.findByUaePassUuid(uaeUuid).ifPresent(existingOwner -> {
+            if (!existingOwner.getId().equals(userId)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "This UAE PASS identity is already linked to another account.");
+            }
+        });
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User session expired."));
+
+        user.setUaePassUuid(uaeUuid);
+        userRepository.save(user);
+        log.info("Manually linked UAE PASS identity to account: {}", user.getUsername());
+    }
+
+    @Override
+    @Transactional
+    public void unlinkUaePassAccount(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User session expired."));
+
+        user.setUaePassUuid(null);
+        userRepository.save(user);
+        log.info("Unlinked UAE PASS identity from account: {}", user.getUsername());
     }
 }
